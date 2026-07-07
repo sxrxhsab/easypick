@@ -15,8 +15,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copier les fichiers
 COPY . /var/www/html/
 
-# Installer les dépendances PHP (Stripe, PHPMailer...)
+# Installer les dépendances PHP
 RUN composer install --no-dev --no-interaction
+
+# ✅ Créer le dossier uploads et donner les droits
+RUN mkdir -p /var/www/html/uploads && chmod -R 755 /var/www/html/uploads
 
 # Configurer Apache
 RUN chown -R www-data:www-data /var/www/html && \
