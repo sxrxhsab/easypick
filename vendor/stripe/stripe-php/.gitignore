@@ -1,4 +1,9 @@
 # Ignore build files
+vendor/
+uploads/
+.env
+config-stripe.php
+config-email.php
 build/*
 
 # Mac OS X dumps these all over the place.
