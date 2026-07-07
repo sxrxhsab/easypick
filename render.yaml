@@ -1,9 +1,9 @@
 services:
   - type: web
     name: easypick
-    env: php
-    buildCommand: composer install --no-dev
-    startCommand: php -S 0.0.0.0:10000 -t .
+    runtime: docker
+    repo: https://github.com/sxrxhsab/easypick
+    plan: free
     envVars:
       - key: DATABASE_URL
         fromDatabase:
