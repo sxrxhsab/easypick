@@ -9,13 +9,9 @@ $password = getenv('DB_PASSWORD') ?: '';
 
 try {
     $pdo = new PDO(
-        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=require",
         $username,
-        $password,
-        [
-            PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/certs/ca-certificates.crt',
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
-        ]
+        $password
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
