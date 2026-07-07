@@ -11,7 +11,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 $nb_produits = $pdo->query('SELECT COUNT(*) FROM produits')->fetchColumn();
 $nb_commandes = $pdo->query('SELECT COUNT(*) FROM commandes')->fetchColumn();
 $nb_utilisateurs = $pdo->query('SELECT COUNT(*) FROM utilisateurs')->fetchColumn();
-$chiffre_affaires = $pdo->query('SELECT SUM(total) FROM commandes WHERE statut = "payee"')->fetchColumn();
+
+// ✅ Correction : utiliser la colonne "statut" avec la valeur "payée" (ou "payee" selon ta base)
+// Si tu as des commandes avec statut "payée" (avec accent), utilise "payée". Sinon, remplace par "payee".
+$chiffre_affaires = $pdo->query('SELECT SUM(total) FROM commandes WHERE statut = "payée"')->fetchColumn();
 $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',', ' ') : '0,00';
 ?>
 <!DOCTYPE html>
@@ -109,19 +112,13 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
 
     <!-- ===== CONTENU ===== -->
     <section class="section">
-        <div class="admin-menu">
-    <a href="admin.php" class="active"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
-    <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
-    <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
-    <a href="#"><i class="fas fa-users"></i> Utilisateurs</a>
-</div>
         <div class="container">
 
-            <!-- Menu admin -->
+            <!-- Menu admin (une seule fois) -->
             <div class="admin-menu">
                 <a href="admin.php" class="active"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
                 <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
-                <a href="#"><i class="fas fa-shopping-bag"></i> Commandes</a>
+                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
                 <a href="#"><i class="fas fa-users"></i> Utilisateurs</a>
             </div>
 
