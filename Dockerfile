@@ -1,8 +1,11 @@
+# Utiliser l'image PHP 8.2 avec Apache
 FROM php:8.2-apache
 
-# Installer les extensions nécessaires pour PostgreSQL
+# Installer les extensions nécessaires pour PostgreSQL + ZIP
 RUN apt-get update && apt-get install -y \
     libpq-dev \
+    zip \
+    unzip \
     && docker-php-ext-install pdo_pgsql pgsql
 
 # Activer le module Rewrite d'Apache
@@ -21,4 +24,5 @@ RUN composer install --no-dev --no-interaction
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
+# Exposer le port 80
 EXPOSE 80
