@@ -1,11 +1,11 @@
 <?php
-// db.php pour MySQL sur Aiven
+// db.php - Connexion à la base de données
 
-$host = 'easypick-db-sabeursamy66-2547.a.aivencloud.com';
-$port = 26003;
-$dbname = 'defaultdb';
-$username = 'avnadmin';
-$password = 'AVNS_JLGOdhJG2I8e9xkhs99';
+$host = getenv('DB_HOST') ?: 'localhost';
+$port = getenv('DB_PORT') ?: 3306;
+$dbname = getenv('DB_NAME') ?: 'easypick';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASSWORD') ?: '';
 
 try {
     $pdo = new PDO(
