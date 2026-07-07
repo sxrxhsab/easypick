@@ -14,7 +14,7 @@ $nb_utilisateurs = $pdo->query('SELECT COUNT(*) FROM utilisateurs')->fetchColumn
 
 // ✅ Correction : utiliser la colonne "statut" avec la valeur "payée" (ou "payee" selon ta base)
 // Si tu as des commandes avec statut "payée" (avec accent), utilise "payée". Sinon, remplace par "payee".
-$chiffre_affaires = $pdo->query('SELECT SUM(total) FROM commandes WHERE statut = "payée"')->fetchColumn();
+$chiffre_affaires = $pdo->query("SELECT SUM(total) FROM commandes WHERE statut = 'payee'")->fetchColumn();
 $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',', ' ') : '0,00';
 ?>
 <!DOCTYPE html>
