@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 $nb_produits = $pdo->query('SELECT COUNT(*) FROM produits')->fetchColumn();
 $nb_commandes = $pdo->query('SELECT COUNT(*) FROM commandes')->fetchColumn();
 $nb_utilisateurs = $pdo->query('SELECT COUNT(*) FROM utilisateurs')->fetchColumn();
-$chiffre_affaires = $pdo->query('SELECT SUM(total) FROM commandes WHERE statut = "payee" OR statut = "expediee" OR statut = "livree"')->fetchColumn();
+$chiffre_affaires = $pdo->query('SELECT SUM(total) FROM commandes WHERE statut = "payee"')->fetchColumn();
 $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',', ' ') : '0,00';
 ?>
 <!DOCTYPE html>
