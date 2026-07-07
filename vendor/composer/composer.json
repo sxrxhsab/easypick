@@ -1,0 +1,8 @@
+{
+    "name": "easypick/easypick",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.8",
+        "stripe/stripe-php": "^13.0"
+    }
+}
