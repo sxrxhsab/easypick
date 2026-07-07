@@ -1,30 +1,25 @@
 <?php
-// db.php pour Render (PostgreSQL avec SSL)
+// db.php pour MySQL sur Aiven
 
-$database_url = getenv('DATABASE_URL');
+$host = 'easypick-db-sabeursamy66-2547.a.aivencloud.com';
+$port = 26003;
+$dbname = 'defaultdb';
+$username = 'avnadmin';
+$password = 'AVNS_JLGOdhJG2I8e9xkhs99';
 
-if ($database_url) {
-    // Utiliser l'URL complète avec les paramètres (sslmode=require déjà inclus)
-    try {
-        $pdo = new PDO($database_url);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        die('Erreur de connexion PostgreSQL : ' . $e->getMessage());
-    }
-} else {
-    // Fallback pour le développement local (sans SSL)
-    $host = 'localhost';
-    $port = 5432;
-    $dbname = 'easypick';
-    $username = 'postgres';
-    $password = '';
-    try {
-        $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $username, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        die('Erreur de connexion PostgreSQL locale : ' . $e->getMessage());
-    }
+try {
+    $pdo = new PDO(
+        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+        $username,
+        $password,
+        [
+            PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/certs/ca-certificates.crt',
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
+        ]
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die('Erreur de connexion MySQL : ' . $e->getMessage());
 }
 ?>
