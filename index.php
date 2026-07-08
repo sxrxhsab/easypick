@@ -21,9 +21,6 @@ $user_role = $_SESSION['user_role'] ?? '';
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
-    <!-- Langue JS -->
-    <script src="lang.js"></script>
-
     <style>
         /* ---- TOUS TES STYLES (que tu avais déjà) ---- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -320,21 +317,21 @@ $user_role = $_SESSION['user_role'] ?? '';
             <div class="top-item">
                 <i class="fas fa-truck"></i>
                 <div class="top-text">
-                    <strong data-i18n="livraison">Livraison</strong>
+                    <strong>Livraison</strong>
                     <span>Internationale</span>
                 </div>
             </div>
             <div class="top-item">
                 <i class="fas fa-shield-alt"></i>
                 <div class="top-text">
-                    <strong data-i18n="paiement">Paiement</strong>
+                    <strong>Paiement</strong>
                     <span>100% sécurisé</span>
                 </div>
             </div>
             <div class="top-item">
                 <i class="fas fa-star"></i>
                 <div class="top-text">
-                    <strong data-i18n="produits">Produits</strong>
+                    <strong>Produits</strong>
                     <span>Premium</span>
                 </div>
             </div>
@@ -348,7 +345,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             <div class="top-item">
                 <i class="fas fa-undo-alt"></i>
                 <div class="top-text">
-                    <strong data-i18n="retours">Retours</strong>
+                    <strong>Retours</strong>
                     <span>30 jours</span>
                 </div>
             </div>
@@ -366,26 +363,26 @@ $user_role = $_SESSION['user_role'] ?? '';
                 </div>
             </div>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php" class="active" data-i18n="accueil">Accueil</a></li>
-                <li><a href="boutique.php" data-i18n="boutique">Boutique</a></li>
-                <li><a href="nouveautes.php" data-i18n="nouveautes">Nouveautés</a></li>
-                <li><a href="promotions.php" data-i18n="promotions">Promotions</a></li>
-                <li><a href="contact.php" data-i18n="contact">Contact</a></li>
+                <li><a href="index.php" class="active">Accueil</a></li>
+                <li><a href="boutique.php">Boutique</a></li>
+                <li><a href="nouveautes.php">Nouveautés</a></li>
+                <li><a href="promotions.php">Promotions</a></li>
+                <li><a href="contact.php">Contact</a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
                 <?php if ($user_connecte): ?>
-                    <a href="mon-compte.php" data-i18n="mon_compte" aria-label="Mon compte"><i class="fas fa-user"></i></a>
+                    <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
                 <?php else: ?>
-                    <a href="login.php" data-i18n="connexion" aria-label="Connexion"><i class="fas fa-user"></i></a>
+                    <a href="login.php" aria-label="Connexion"><i class="fas fa-user"></i></a>
                 <?php endif; ?>
-                <a href="panier.php" data-i18n="panier" aria-label="Panier" style="position:relative;">
+                <a href="panier.php" aria-label="Panier" style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
                 <?php if ($user_connecte && $user_role === 'admin'): ?>
-                    <a href="admin.php" data-i18n="admin" aria-label="Admin"><i class="fas fa-cog"></i></a>
+                    <a href="admin.php" aria-label="Admin"><i class="fas fa-cog"></i></a>
                 <?php endif; ?>
                 <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span><span></span><span></span>
@@ -405,10 +402,10 @@ $user_role = $_SESSION['user_role'] ?? '';
                     <span class="line2">TECHNOLOGIE</span>
                     <span class="line3">SIMPLIFIÉE.</span>
                 </h1>
-                <p data-i18n="description_hero">Découvrez les meilleurs accessoires tech sélectionnés avec soin pour améliorer votre quotidien, votre bureau et votre expérience numérique.</p>
+                <p>Découvrez les meilleurs accessoires tech sélectionnés avec soin pour améliorer votre quotidien, votre bureau et votre expérience numérique.</p>
                 <div class="hero-buttons">
-                    <a href="boutique.php" class="btn btn-primary" data-i18n="decouvrir_nos_produits">Découvrir nos produits</a>
-                    <a href="#" class="btn btn-secondary" data-i18n="voir_les_offres">Voir les offres</a>
+                    <a href="boutique.php" class="btn btn-primary">Découvrir nos produits</a>
+                    <a href="#" class="btn btn-secondary">Voir les offres</a>
                 </div>
             </div>
             <div class="hero-visual">
@@ -422,8 +419,8 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="container">
             <div class="story-grid">
                 <div class="story-text">
-                    <span class="badge" data-i18n="notre_histoire">Notre histoire</span>
-                    <h2>Une passion pour la tech, <br />une mission : <span data-i18n="simplifier_vos_choix">simplifier vos choix</span>.</h2>
+                    <span class="badge">Notre histoire</span>
+                    <h2>Une passion pour la tech, <br />une mission : <span>simplifier vos choix</span>.</h2>
                     <p>Fondée en <strong>2025</strong> par <strong>Sabeur Samy</strong>, EasyPick est bien plus qu'une simple boutique en ligne. C'est un véritable guide pour vous aider à <strong>"picker" (choisir)</strong> les meilleurs accessoires tech, sans prise de tête.</p>
                     <p>Fatigué de passer des heures à comparer des fiches techniques ? Sabeur et son équipe sélectionnent avec soin chaque produit pour vous garantir le meilleur rapport qualité-prix, en testant et en vérifiant rigoureusement chaque référence.</p>
                     <p>Notre promesse : vous offrir une expérience d'achat fluide, des produits premium et un accompagnement sur mesure, pour que vous puissiez équiper votre quotidien en toute confiance.</p>
@@ -446,35 +443,35 @@ $user_role = $_SESSION['user_role'] ?? '';
     <!-- ===== CATEGORIES ===== -->
     <section class="categories">
         <div class="container">
-            <h2 class="section-title" data-i18n="shop_par_categorie">Shop par <span>Catégorie</span></h2>
-            <p class="section-sub" data-i18n="trouvez_accessoire">Trouvez l'accessoire parfait pour votre setup</p>
+            <h2 class="section-title">Shop par <span>Catégorie</span></h2>
+            <p class="section-sub">Trouvez l'accessoire parfait pour votre setup</p>
             <div class="categories-grid">
                 <div class="category-card">
                     <img src="https://picsum.photos/seed/audio/400/300" alt="Audio" />
                     <div class="cat-content">
                         <h3>Audio & Casques</h3>
-                        <a href="boutique.php" class="btn-cat" data-i18n="decouvrir">Découvrir</a>
+                        <a href="boutique.php" class="btn-cat">Découvrir</a>
                     </div>
                 </div>
                 <div class="category-card">
                     <img src="https://picsum.photos/seed/clavier/400/300" alt="Clavier" />
                     <div class="cat-content">
                         <h3>Claviers & Souris</h3>
-                        <a href="boutique.php" class="btn-cat" data-i18n="decouvrir">Découvrir</a>
+                        <a href="boutique.php" class="btn-cat">Découvrir</a>
                     </div>
                 </div>
                 <div class="category-card">
                     <img src="https://picsum.photos/seed/chargeur/400/300" alt="Chargeur" />
                     <div class="cat-content">
                         <h3>Chargeurs & Batteries</h3>
-                        <a href="boutique.php" class="btn-cat" data-i18n="decouvrir">Découvrir</a>
+                        <a href="boutique.php" class="btn-cat">Découvrir</a>
                     </div>
                 </div>
                 <div class="category-card">
                     <img src="https://picsum.photos/seed/enceinte/400/300" alt="Enceinte" />
                     <div class="cat-content">
                         <h3>Enceintes & Son</h3>
-                        <a href="boutique.php" class="btn-cat" data-i18n="decouvrir">Découvrir</a>
+                        <a href="boutique.php" class="btn-cat">Découvrir</a>
                     </div>
                 </div>
             </div>
@@ -484,36 +481,36 @@ $user_role = $_SESSION['user_role'] ?? '';
     <!-- ===== PRODUITS VEDETTES ===== -->
     <section class="products">
         <div class="container">
-            <h2 class="section-title" data-i18n="best_sellers">Nos <span>Best Sellers</span></h2>
-            <p class="section-sub" data-i18n="produits_preferes">Les produits préférés de notre communauté</p>
+            <h2 class="section-title">Nos <span>Best Sellers</span></h2>
+            <p class="section-sub">Les produits préférés de notre communauté</p>
             <div class="products-grid">
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/casque/300/200" alt="Casque" />
                     <div class="product-name">Casque Bluetooth Pro</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
                     <div class="product-price"><span class="old">79,99 €</span> 59,99 €</div>
-                    <button class="btn-add" data-i18n="ajouter_au_panier">Ajouter au panier</button>
+                    <button class="btn-add">Ajouter au panier</button>
                 </div>
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/clavierrgb/300/200" alt="Clavier RGB" />
                     <div class="product-name">Clavier Mécanique RGB</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                     <div class="product-price"><span class="old">119,99 €</span> 89,99 €</div>
-                    <button class="btn-add" data-i18n="ajouter_au_panier">Ajouter au panier</button>
+                    <button class="btn-add">Ajouter au panier</button>
                 </div>
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/souris/300/200" alt="Souris" />
                     <div class="product-name">Souris Gaming Pro</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                     <div class="product-price"><span class="old">49,99 €</span> 39,99 €</div>
-                    <button class="btn-add" data-i18n="ajouter_au_panier">Ajouter au panier</button>
+                    <button class="btn-add">Ajouter au panier</button>
                 </div>
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/chargeursansfil/300/200" alt="Chargeur sans fil" />
                     <div class="product-name">Chargeur Sans Fil</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
                     <div class="product-price"><span class="old">39,99 €</span> 29,99 €</div>
-                    <button class="btn-add" data-i18n="ajouter_au_panier">Ajouter au panier</button>
+                    <button class="btn-add">Ajouter au panier</button>
                 </div>
             </div>
         </div>
@@ -523,9 +520,9 @@ $user_role = $_SESSION['user_role'] ?? '';
     <section class="promo-banner">
         <div class="container">
             <div class="promo-content">
-                <h2 data-i18n="jusqua_30">Jusqu'à <span>-30%</span> sur votre première commande</h2>
-                <p data-i18n="code_promo">Profitez de cette offre exclusive pour équiper votre setup tech. Code : <strong>EASYPICK30</strong></p>
-                <a href="boutique.php" class="btn-promo" data-i18n="profitez_offre">Je profite de l'offre</a>
+                <h2>Jusqu'à <span>-30%</span> sur votre première commande</h2>
+                <p>Profitez de cette offre exclusive pour équiper votre setup tech. Code : <strong>EASYPICK30</strong></p>
+                <a href="boutique.php" class="btn-promo">Je profite de l'offre</a>
             </div>
         </div>
     </section>
@@ -533,29 +530,29 @@ $user_role = $_SESSION['user_role'] ?? '';
     <!-- ===== AVIS ===== -->
     <section class="testimonials">
         <div class="container">
-            <h2 class="section-title" data-i18n="ils_nous_font_confiance">Ils nous <span>font confiance</span></h2>
-            <p class="section-sub" data-i18n="ce_que_clients_pensent">Ce que nos clients pensent de nous</p>
+            <h2 class="section-title">Ils nous <span>font confiance</span></h2>
+            <p class="section-sub">Ce que nos clients pensent de nous</p>
             <div class="testimonials-grid">
                 <div class="testimonial-card">
                     <img src="https://picsum.photos/seed/avatar1/100/100" alt="Avatar" class="avatar" />
                     <div class="name">Sophie L.</div>
                     <div class="role">Chef de projet</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment" data-i18n="avis_sophie">"Livraison ultra-rapide et produits de qualité. Le casque est incroyablement confortable, je recommande !"</div>
+                    <div class="comment">"Livraison ultra-rapide et produits de qualité. Le casque est incroyablement confortable, je recommande !"</div>
                 </div>
                 <div class="testimonial-card">
                     <img src="https://picsum.photos/seed/avatar2/100/100" alt="Avatar" class="avatar" />
                     <div class="name">Thomas R.</div>
                     <div class="role">Développeur</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment" data-i18n="avis_thomas">"Site très pro, paiement sécurisé, et le clavier mécanique est un vrai plaisir pour coder. Bravo !"</div>
+                    <div class="comment">"Site très pro, paiement sécurisé, et le clavier mécanique est un vrai plaisir pour coder. Bravo !"</div>
                 </div>
                 <div class="testimonial-card">
                     <img src="https://picsum.photos/seed/avatar3/100/100" alt="Avatar" class="avatar" />
                     <div class="name">Camille M.</div>
                     <div class="role">Designer UI</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment" data-i18n="avis_camille">"Le design du site est magnifique, et les produits sont parfaits pour mon home office. Service client au top !"</div>
+                    <div class="comment">"Le design du site est magnifique, et les produits sont parfaits pour mon home office. Service client au top !"</div>
                 </div>
             </div>
         </div>
@@ -565,11 +562,11 @@ $user_role = $_SESSION['user_role'] ?? '';
     <section class="newsletter">
         <div class="container">
             <div class="newsletter-content">
-                <h2 data-i18n="ne_ratez_aucune_offre">Ne ratez aucune <span style="color:#ff6a00;">offre</span></h2>
-                <p data-i18n="inscrivez_newsletter">Inscrivez-vous à notre newsletter et recevez en avant-première nos promotions exclusives.</p>
+                <h2>Ne ratez aucune <span style="color:#ff6a00;">offre</span></h2>
+                <p>Inscrivez-vous à notre newsletter et recevez en avant-première nos promotions exclusives.</p>
                 <form class="newsletter-form" onsubmit="return inscrireNewsletter(event)">
-                    <input type="email" id="newsletterEmail" data-i18n-placeholder="votre_email" placeholder="Votre adresse email" required />
-                    <button type="submit" data-i18n="s_abonner">S'abonner</button>
+                    <input type="email" id="newsletterEmail" placeholder="Votre adresse email" required />
+                    <button type="submit">S'abonner</button>
                 </form>
                 <div id="newsletterMessage" style="margin-top:10px; text-align:center;"></div>
             </div>
@@ -583,14 +580,14 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <div class="footer-col">
                     <h4>EasyPick</h4>
                     <ul>
-                        <li><a href="a-propos.php" data-i18n="a_propos">À propos</a></li>
-                        <li><a href="blog.php" data-i18n="blog">Blog</a></li>
-                        <li><a href="carrieres.php" data-i18n="carrieres">Carrières</a></li>
-                        <li><a href="contact.php" data-i18n="contact">Contact</a></li>
+                        <li><a href="a-propos.php">À propos</a></li>
+                        <li><a href="blog.php">Blog</a></li>
+                        <li><a href="carrieres.php">Carrières</a></li>
+                        <li><a href="contact.php">Contact</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h4 data-i18n="aide">Aide</h4>
+                    <h4>Aide</h4>
                     <ul>
                         <li><a href="#">Centre d'aide</a></li>
                         <li><a href="#">Suivi de commande</a></li>
@@ -599,16 +596,16 @@ $user_role = $_SESSION['user_role'] ?? '';
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h4 data-i18n="legal">Légal</h4>
+                    <h4>Légal</h4>
                     <ul>
-                        <li><a href="cgv.php" data-i18n="cgv">CGV</a></li>
-                        <li><a href="confidentialite.php" data-i18n="confidentialite">Politique de confidentialité</a></li>
-                        <li><a href="cookies.php" data-i18n="cookies">Cookies</a></li>
-                        <li><a href="mentions-legales.php" data-i18n="mentions_legales">Mentions légales</a></li>
+                        <li><a href="cgv.php">CGV</a></li>
+                        <li><a href="confidentialite.php">Politique de confidentialité</a></li>
+                        <li><a href="cookies.php">Cookies</a></li>
+                        <li><a href="mentions-legales.php">Mentions légales</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h4 data-i18n="suivez_nous">Suivez-nous</h4>
+                    <h4>Suivez-nous</h4>
                     <div class="footer-social">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
@@ -624,7 +621,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                 </div>
             </div>
             <div class="footer-bottom">
-                &copy; 2026 EasyPick – <span data-i18n="tous_droits_reserves">Tous droits réservés</span>. <span data-i18n="design_par">Design par</span> <a href="#">Sarah Sabeur</a>.
+                &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.
             </div>
         </div>
     </footer>
