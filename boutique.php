@@ -1,5 +1,5 @@
 ﻿<?php
-require_once __DIR__ . '/lang.php';
+session_start();
 require_once __DIR__ . '/db.php';
 
 // Variables navbar
@@ -58,11 +58,15 @@ $produits = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyPick – <?= __('boutique') ?></title>
+    <title>EasyPick – Boutique</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Langue JS -->
+    <script src="lang.js"></script>
+
     <style>
         /* ---------- TOUS LES STYLES EXISTANTS ---------- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -228,26 +232,26 @@ $produits = $stmt->fetchAll();
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php"><?= __('accueil') ?></a></li>
-                <li><a href="boutique.php" class="active"><?= __('boutique') ?></a></li>
-                <li><a href="nouveautes.php"><?= __('nouveautes') ?></a></li>
-                <li><a href="promotions.php"><?= __('promotions') ?></a></li>
-                <li><a href="contact.php"><?= __('contact') ?></a></li>
+                <li><a href="index.php" data-i18n="accueil">Accueil</a></li>
+                <li><a href="boutique.php" class="active" data-i18n="boutique">Boutique</a></li>
+                <li><a href="nouveautes.php" data-i18n="nouveautes">Nouveautés</a></li>
+                <li><a href="promotions.php" data-i18n="promotions">Promotions</a></li>
+                <li><a href="contact.php" data-i18n="contact">Contact</a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
                 <?php if ($user_connecte): ?>
-                    <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
+                    <a href="mon-compte.php" data-i18n="mon_compte" aria-label="Mon compte"><i class="fas fa-user"></i></a>
                 <?php else: ?>
-                    <a href="login.php" aria-label='<?= __('connexion') ?>'><i class="fas fa-user"></i></a>
+                    <a href="login.php" data-i18n="connexion" aria-label="Connexion"><i class="fas fa-user"></i></a>
                 <?php endif; ?>
-                <a href="panier.php" aria-label='<?= __('panier') ?>' style="position:relative;">
+                <a href="panier.php" data-i18n="panier" aria-label="Panier" style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
                 <?php if ($user_connecte && $user_role === 'admin'): ?>
-                    <a href="admin.php" aria-label="Admin"><i class="fas fa-cog"></i></a>
+                    <a href="admin.php" data-i18n="admin" aria-label="Admin"><i class="fas fa-cog"></i></a>
                 <?php endif; ?>
                 <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span><span></span><span></span>
@@ -265,8 +269,8 @@ $produits = $stmt->fetchAll();
             <div class="line"></div>
         </div>
         <div class="container">
-            <h1><span class="white">NOTRE</span> <span class="orange"><?= __('boutique') ?></span></h1>
-            <p>Découvrez notre sélection d'accessoires technologiques premium.</p>
+            <h1><span class="white">NOTRE</span> <span class="orange" data-i18n="notre_boutique">Boutique</span></h1>
+            <p data-i18n="description_boutique">Découvrez notre sélection d'accessoires technologiques premium.</p>
         </div>
     </section>
 
@@ -277,19 +281,19 @@ $produits = $stmt->fetchAll();
 
         <div class="container">
 
-            <!-- ===== BARRE DE RECHERCHE + TRI (UNIQUE) ===== -->
+            <!-- ===== BARRE DE RECHERCHE + TRI ===== -->
             <div class="search-toolbar">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
-                <input type="text" id="searchInput" placeholder="Rechercher un produit..." autocomplete="off" />
+                <input type="text" id="searchInput" data-i18n-placeholder="rechercher" placeholder="Rechercher un produit..." autocomplete="off" />
                 <div class="search-divider"></div>
                 <div class="sort-wrap">
-                    <label for="sortSelect">Trier par</label>
+                    <label for="sortSelect" data-i18n="trier_par">Trier par</label>
                     <select id="sortSelect" onchange="applyFilters()">
-                        <option value="relevance" <?= $sort === 'relevance' ? 'selected' : '' ?>>Pertinence</option>
-                        <option value="price-asc" <?= $sort === 'price-asc' ? 'selected' : '' ?>>Prix croissant</option>
-                        <option value="price-desc" <?= $sort === 'price-desc' ? 'selected' : '' ?>>Prix décroissant</option>
-                        <option value="rating" <?= $sort === 'rating' ? 'selected' : '' ?>>Meilleures notes</option>
-                        <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>><?= __('nouveautes') ?></option>
+                        <option value="relevance" <?= $sort === 'relevance' ? 'selected' : '' ?> data-i18n="pertinence">Pertinence</option>
+                        <option value="price-asc" <?= $sort === 'price-asc' ? 'selected' : '' ?> data-i18n="prix_croissant">Prix croissant</option>
+                        <option value="price-desc" <?= $sort === 'price-desc' ? 'selected' : '' ?> data-i18n="prix_decroissant">Prix décroissant</option>
+                        <option value="rating" <?= $sort === 'rating' ? 'selected' : '' ?> data-i18n="meilleures_notes">Meilleures notes</option>
+                        <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?> data-i18n="nouveautes">Nouveautés</option>
                     </select>
                 </div>
             </div>
@@ -309,7 +313,7 @@ $produits = $stmt->fetchAll();
                         <?php endif; ?>
 
                         <div class="filter-block active-filter">
-                            <h4 onclick="toggleFilter(this)"><?= __('categories') ?> <i class="fas fa-chevron-down"></i></h4>
+                            <h4 onclick="toggleFilter(this)" data-i18n="categories">Catégories <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <ul>
                                     <?php
@@ -324,7 +328,7 @@ $produits = $stmt->fetchAll();
                         </div>
 
                         <div class="filter-block">
-                            <h4 onclick="toggleFilter(this)">Prix <i class="fas fa-chevron-down"></i></h4>
+                            <h4 onclick="toggleFilter(this)" data-i18n="prix">Prix <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <div class="price-range">
                                     <input type="range" name="prix_max" min="0" max="300" value="<?= $prix_max ?: 150 ?>" onchange="this.form.submit()">
@@ -338,7 +342,7 @@ $produits = $stmt->fetchAll();
                         </div>
 
                         <div class="filter-block">
-                            <h4 onclick="toggleFilter(this)">Marques <i class="fas fa-chevron-down"></i></h4>
+                            <h4 onclick="toggleFilter(this)" data-i18n="marques">Marques <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <ul>
                                     <?php
@@ -353,18 +357,18 @@ $produits = $stmt->fetchAll();
                         </div>
 
                         <div class="filter-block">
-                            <h4 onclick="toggleFilter(this)">Note minimale <i class="fas fa-chevron-down"></i></h4>
+                            <h4 onclick="toggleFilter(this)" data-i18n="note_minimale">Note minimale <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <ul>
-                                    <li><label><input type="radio" name="note_min" value="5" <?= $note_min == 5 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> <span>5 étoiles</span></span></label></li>
-                                    <li><label><input type="radio" name="note_min" value="4" <?= $note_min == 4 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i> <span>4+ étoiles</span></span></label></li>
-                                    <li><label><input type="radio" name="note_min" value="3" <?= $note_min == 3 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i><i class="fas fa-star grey"></i> <span>3+ étoiles</span></span></label></li>
-                                    <li><label><input type="radio" name="note_min" value="" <?= !$note_min ? 'checked' : '' ?> onchange="this.form.submit()"> <span style="color:rgba(255,255,255,0.4);">Toutes les notes</span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="5" <?= $note_min == 5 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> <span data-i18n="5_etoiles">5 étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="4" <?= $note_min == 4 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i> <span data-i18n="4_etoiles">4+ étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="3" <?= $note_min == 3 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i><i class="fas fa-star grey"></i> <span data-i18n="3_etoiles">3+ étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="" <?= !$note_min ? 'checked' : '' ?> onchange="this.form.submit()"> <span style="color:rgba(255,255,255,0.4);" data-i18n="toutes_les_notes">Toutes les notes</span></label></li>
                                 </ul>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-apply-filter">Appliquer les filtres</button>
+                        <button type="submit" class="btn-apply-filter" data-i18n="appliquer_filtres">Appliquer les filtres</button>
                     </form>
                 </aside>
 
@@ -374,8 +378,8 @@ $produits = $stmt->fetchAll();
                         <?php if (empty($produits)): ?>
                             <div style="text-align:center; padding:60px 0; color:rgba(255,255,255,0.4); grid-column:1 / -1;">
                                 <i class="fas fa-box-open" style="font-size:48px; margin-bottom:16px;"></i>
-                                <p>Aucun produit ne correspond à vos critères.</p>
-                                <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Voir tous les <?= __('produits') ?></a>
+                                <p data-i18n="aucun_produit">Aucun produit ne correspond à vos critères.</p>
+                                <a href="boutique.php" style="color:#ff6a00; font-weight:600;" data-i18n="voir_tous_produits">Voir tous les produits</a>
                             </div>
                         <?php else: ?>
                             <?php foreach ($produits as $index => $produit):
@@ -421,7 +425,7 @@ $produits = $stmt->fetchAll();
                                         }
                                         ?>
                                     </span>
-                                    <span class="count">(<?= $produit['nb_avis'] ?> <?= __('avis') ?>)</span>
+                                    <span class="count">(<?= $produit['nb_avis'] ?> <span data-i18n="avis">avis</span>)</span>
                                 </div>
                                 <div class="product-price">
                                     <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
@@ -430,14 +434,14 @@ $produits = $stmt->fetchAll();
                                     <?php endif; ?>
                                 </div>
                                 <div class="card-actions">
-                                    <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
+                                    <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add" data-i18n="ajouter_au_panier">Ajouter au panier</a>
                                 </div>
                             </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
 
-                    <!-- Pagination (simulée) -->
+                    <!-- Pagination -->
                     <div class="pagination">
                         <a href="#"><i class="fas fa-chevron-left"></i></a>
                         <a href="#" class="active">1</a>
@@ -456,12 +460,12 @@ $produits = $stmt->fetchAll();
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col"><h4>EasyPick</h4><ul><li><a href="#"><?= __('a_propos') ?></a></li><li><a href="#"><?= __('blog') ?></a></li><li><a href="#"><?= __('carrieres') ?></a></li><li><a href="#"><?= __('contact') ?></a></li></ul></div>
-                <div class="footer-col"><h4>Aide</h4><ul><li><a href="#">Centre d'aide</a></li><li><a href="#">Suivi de commande</a></li><li><a href="#">Retours</a></li><li><a href="#">FAQ</a></li></ul></div>
-                <div class="footer-col"><h4>Légal</h4><ul><li><a href="#"><?= __('cgv') ?></a></li><li><a href="#"><?= __('confidentialite') ?></a></li><li><a href="#"><?= __('cookies') ?></a></li><li><a href="#"><?= __('mentions_legales') ?></a></li></ul></div>
-                <div class="footer-col"><h4><?= __('suivez_nous') ?></h4><div class="footer-social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div><div class="footer-payments"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div></div>
+                <div class="footer-col"><h4>EasyPick</h4><ul><li><a href="a-propos.php" data-i18n="a_propos">À propos</a></li><li><a href="blog.php" data-i18n="blog">Blog</a></li><li><a href="carrieres.php" data-i18n="carrieres">Carrières</a></li><li><a href="contact.php" data-i18n="contact">Contact</a></li></ul></div>
+                <div class="footer-col"><h4 data-i18n="aide">Aide</h4><ul><li><a href="#">Centre d'aide</a></li><li><a href="#">Suivi de commande</a></li><li><a href="#">Retours</a></li><li><a href="#">FAQ</a></li></ul></div>
+                <div class="footer-col"><h4 data-i18n="legal">Légal</h4><ul><li><a href="cgv.php" data-i18n="cgv">CGV</a></li><li><a href="confidentialite.php" data-i18n="confidentialite">Politique de confidentialité</a></li><li><a href="cookies.php" data-i18n="cookies">Cookies</a></li><li><a href="mentions-legales.php" data-i18n="mentions_legales">Mentions légales</a></li></ul></div>
+                <div class="footer-col"><h4 data-i18n="suivez_nous">Suivez-nous</h4><div class="footer-social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div><div class="footer-payments"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div></div>
             </div>
-            <div class="footer-bottom">&copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.</div>
+            <div class="footer-bottom">&copy; 2026 EasyPick – <span data-i18n="tous_droits_reserves">Tous droits réservés</span>. <span data-i18n="design_par">Design par</span> <a href="#">Sarah Sabeur</a>.</div>
         </div>
     </footer>
 
@@ -510,7 +514,6 @@ $produits = $stmt->fetchAll();
                 .then(response => response.text())
                 .then(html => {
                     productGrid.innerHTML = html;
-                    // Réappliquer les animations fade-up
                     document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
                 })
                 .catch(err => console.error('Erreur:', err));
@@ -522,7 +525,6 @@ $produits = $stmt->fetchAll();
             if (q.length > 0) {
                 loadProducts(q, sort);
             } else {
-                // Recharger la page pour afficher tous les produits avec les filtres
                 window.location.href = window.location.pathname + '?sort=' + encodeURIComponent(sort);
             }
         }
@@ -536,14 +538,13 @@ $produits = $stmt->fetchAll();
                     if (q.length > 0) {
                         loadProducts(q, sort);
                     } else {
-                        // Reload page to show all products
                         window.location.href = window.location.pathname + '?sort=' + encodeURIComponent(sort);
                     }
                 }, 400);
             });
         }
 
-        // ===== FADE-UP (Intersection Observer) =====
+        // ===== FADE-UP =====
         const fadeElements = document.querySelectorAll('.fade-up');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {

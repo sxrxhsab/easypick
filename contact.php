@@ -199,5 +199,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         const navMenu = document.getElementById('navMenu');
         hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
     </script>
+    <?php include __DIR__ . '/footer.php'; ?>
 </body>
 </html>

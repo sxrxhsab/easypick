@@ -18,22 +18,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $password_confirm) {
         $erreur = 'Les mots de passe ne correspondent pas.';
     } elseif (strlen($password) < 6) {
-        $erreur = 'Le mot de passe doit faire au moins 6 caractÃ¨res.';
+        $erreur = 'Le mot de passe doit faire au moins 6 caractères.';
     } else {
-        // 2. VÃ©rifier si l'email existe dÃ©jÃ  (sans insÃ©rer)
+        // 2. Vérifier si l'email existe déjà (sans insérer)
         $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
-            $erreur = 'Cet email est dÃ©jÃ  utilisÃ©.';
+            $erreur = 'Cet email est déjà utilisé.';
         } else {
             // 3. Hash du mot de passe
             $hash = password_hash($password, PASSWORD_DEFAULT);
 
-            // 4. Insertion correcte (5 colonnes â†’ 5 paramÃ¨tres)
+            // 4. Insertion correcte (5 colonnes ? 5 paramètres)
             $stmt = $pdo->prepare('INSERT INTO utilisateurs (prenom, nom, email, password, role) VALUES (?, ?, ?, ?, ?)');
-            $stmt->execute([$prenom, $nom, $email, $hash, 'user']); // 'user' par dÃ©faut
+            $stmt->execute([$prenom, $nom, $email, $hash, 'user']); // 'user' par défaut
 
-            $succes = 'Compte crÃ©Ã© avec succÃ¨s ! Vous pouvez vous connecter.';
+            $succes = 'Compte créé avec succès ! Vous pouvez vous connecter.';
         }
     }
 }
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick â€“ <?= __('inscription') ?></title>
+    <title>EasyPick – <?= __('inscription') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="register-box">
         <h1><span>EASY</span>PICK</h1>
-        <div class="sub">CrÃ©ez votre compte</div>
+        <div class="sub">Créez votre compte</div>
 
         <?php if ($erreur): ?>
             <div class="error"><?= htmlspecialchars($erreur) ?></div>
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!$succes): ?>
         <form method="POST">
             <div class="form-group">
-                <label>PrÃ©<?= __('nom') ?></label>
+                <label>Pré<?= __('nom') ?></label>
                 <input type="text" name="prenom" required placeholder="Jean" />
             </div>
             <div class="form-group">
@@ -98,13 +98,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="form-group">
                 <label><?= __('mot_de_passe') ?></label>
-                <input type="password" name="password" required placeholder="Min. 6 caractÃ¨res" />
+                <input type="password" name="password" required placeholder="Min. 6 caractères" />
             </div>
             <div class="form-group">
                 <label><?= __('confirmer_mot_de_passe') ?></label>
-                <input type="password" name="password_confirm" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" />
+                <input type="password" name="password_confirm" required placeholder="••••••••" />
             </div>
-            <button type="submit" class="btn-register">CrÃ©er <?= __('mon_compte') ?></button>
+            <button type="submit" class="btn-register">Créer <?= __('mon_compte') ?></button>
         </form>
         <?php endif; ?>
 
@@ -115,5 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> <?= __('retour_accueil') ?></a>
         </div>
     </div>
+    <?php include __DIR__ . '/footer.php'; ?>
 </body>
 </html>

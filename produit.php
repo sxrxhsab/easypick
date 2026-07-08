@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/lang.php';
+
 require_once __DIR__ . '/db.php';
 
 // Récupérer l'ID du produit depuis l'URL
@@ -482,6 +482,6 @@ $user_role = $_SESSION['user_role'] ?? '';
             });
         }
     </script>
-
+<?php include __DIR__ . '/footer.php'; ?>
 </body>
 </html>
