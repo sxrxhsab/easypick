@@ -1,5 +1,5 @@
 <?php
-// db.php - PostgreSQL Neon
+// db.php - PostgreSQL Neon (SANS ECHO)
 
 $host = 'ep-lingering-glade-atuudk2x.c-9.us-east-1.aws.neon.tech';
 $port = 5432;
@@ -18,7 +18,7 @@ try {
             PDO::ATTR_TIMEOUT => 30
         ]
     );
-    echo "✅ Connexion à la base de données réussie !";
+    // ← SUPPRIME LE ECHO ICI
 } catch (PDOException $e) {
     die('Erreur de connexion PostgreSQL : ' . $e->getMessage());
 }
