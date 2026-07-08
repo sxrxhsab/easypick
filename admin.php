@@ -3,13 +3,6 @@ ob_start();
 session_start();
 require_once 'db.php';
 
-// ✅ AJOUT DE LA FONCTION DE TRADUCTION
-if (!function_exists('__')) {
-    function __($text) {
-        return $text; // Retourne le texte sans le traduire
-    }
-}
-
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: login.php');
     exit;
@@ -20,7 +13,6 @@ $nb_produits = $pdo->query('SELECT COUNT(*) FROM produits')->fetchColumn();
 $nb_commandes = $pdo->query('SELECT COUNT(*) FROM commandes')->fetchColumn();
 $nb_utilisateurs = $pdo->query('SELECT COUNT(*) FROM utilisateurs')->fetchColumn();
 
-// ✅ Correction : utiliser la colonne "statut" avec la valeur "payée" (ou "payee" selon ta base)
 $chiffre_affaires = $pdo->query("SELECT SUM(total) FROM commandes WHERE statut = 'payee'")->fetchColumn();
 $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',', ' ') : '0,00';
 ?>
