@@ -1,29 +1,25 @@
 <?php
-// db.php - Version avec certificat CA
+// db.php - PostgreSQL Neon
 
-$host = getenv('DB_HOST') ?: 'easypick-db-sabeursamy66-2547.a.aivencloud.com';
-$port = getenv('DB_PORT') ?: 26003;
-$dbname = getenv('DB_NAME') ?: 'defaultdb';
-$username = getenv('DB_USER') ?: 'avnadmin';
-$password = getenv('DB_PASSWORD') ?: 'AVNS_JLGOdhJG2I8e9xkhs99';
-
-// Télécharger le certificat depuis Aiven
-$ca_cert = __DIR__ . '/ca.pem';  // Mets le fichier ca.pem dans le même dossier
+$host = 'ep-lingering-glade-atuudk2x.c-9.us-east-1.aws.neon.tech';
+$port = 5432;
+$dbname = 'neondb';
+$username = 'neondb_owner';
+$password = 'npg_CYJQH82shmin';
 
 try {
     $pdo = new PDO(
-        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+        "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require",
         $username,
         $password,
         [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_TIMEOUT => 30,
-            PDO::MYSQL_ATTR_SSL_CA => $ca_cert,
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false
+            PDO::ATTR_TIMEOUT => 30
         ]
     );
+    echo "✅ Connexion à la base de données réussie !";
 } catch (PDOException $e) {
-    die('Erreur de connexion MySQL : ' . $e->getMessage());
+    die('Erreur de connexion PostgreSQL : ' . $e->getMessage());
 }
 ?>
