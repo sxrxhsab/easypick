@@ -292,26 +292,83 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
                                     <li><strong>Nombre d'avis</strong> <?= $produit['nb_avis'] ?></li>
                                 </ul>
                             </div>
-                            <div class="tab-pane" id="tab-reviews">
-                                <div class="review-item">
-                                    <div class="review-header">
-                                        <div class="review-avatar">SL</div>
-                                        <span class="review-name">Sophie L.</span>
-                                        <span class="review-date">15 mars 2026</span>
-                                    </div>
-                                    <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                                    <div class="review-text">Excellent produit, je recommande !</div>
-                                </div>
-                                <div class="review-item">
-                                    <div class="review-header">
-                                        <div class="review-avatar">TR</div>
-                                        <span class="review-name">Thomas R.</span>
-                                        <span class="review-date">2 mars 2026</span>
-                                    </div>
-                                    <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                                    <div class="review-text">Très bon rapport qualité-prix.</div>
-                                </div>
-                            </div>
+                           <div class="tab-pane" id="tab-reviews">
+    <?php
+    // Récupérer les avis du produit
+    $stmt = $pdo->prepare('SELECT * FROM avis WHERE produit_id = ? ORDER BY created_at DESC');
+    $stmt->execute([$id]);
+    $avis = $stmt->fetchAll();
+    ?>
+
+    <?php if (empty($avis)): ?>
+        <p style="color:rgba(255,255,255,0.4);">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
+    <?php else: ?>
+        <?php foreach ($avis as $a): ?>
+        <div class="review-item">
+            <div class="review-header">
+                <div class="review-avatar"><?= strtoupper(substr($a['nom'], 0, 2)) ?></div>
+                <span class="review-name"><?= htmlspecialchars($a['nom']) ?></span>
+                <span class="review-date"><?= date('d/m/Y', strtotime($a['created_at'])) ?></span>
+            </div>
+            <div class="review-stars">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <?php if ($i <= $a['note']): ?>
+                        <i class="fas fa-star"></i>
+                    <?php else: ?>
+                        <i class="fas fa-star grey"></i>
+                    <?php endif; ?>
+                <?php endfor; ?>
+            </div>
+            <div class="review-text"><?= nl2br(htmlspecialchars($a['commentaire'])) ?></div>
+        </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <!-- Formulaire pour les utilisateurs connectés -->
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <?php if (isset($_SESSION['succes_avis'])): ?>
+            <div style="background:rgba(0,184,148,0.1); border:1px solid rgba(0,184,148,0.2); color:#00b894; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
+                <?= htmlspecialchars($_SESSION['succes_avis']) ?>
+                <?php unset($_SESSION['succes_avis']); ?>
+            </div>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['erreur_avis'])): ?>
+            <div style="background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.2); color:#ff4444; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
+                <?= htmlspecialchars($_SESSION['erreur_avis']) ?>
+                <?php unset($_SESSION['erreur_avis']); ?>
+            </div>
+        <?php endif; ?>
+
+        <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
+            <h4 style="font-size:18px; font-weight:700; margin-bottom:12px;">Donnez votre avis</h4>
+            <form method="POST" action="ajouter-avis.php">
+                <input type="hidden" name="produit_id" value="<?= $produit['id'] ?>" />
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Note :</label>
+                    <div style="display:flex; gap:12px; font-size:24px; color:#ffb800;">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <label style="cursor:pointer;">
+                                <input type="radio" name="note" value="<?= $i ?>" required style="display:none;" />
+                                <i class="fas fa-star" style="transition:color 0.3s; color:#444;"></i>
+                            </label>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Commentaire :</label>
+                    <textarea name="commentaire" required placeholder="Partagez votre expérience avec ce produit..." style="width:100%; padding:12px 16px; background:#0F0F0F; border:1px solid rgba(255,255,255,0.06); border-radius:12px; color:#fff; font-size:14px; font-family:'Poppins', sans-serif; outline:none; min-height:80px; resize:vertical;"></textarea>
+                </div>
+                <button type="submit" style="padding:10px 24px; background:linear-gradient(135deg, #ff6a00, #ff7d1a); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.3s; font-family:'Poppins', sans-serif;">
+                    <i class="fas fa-paper-plane"></i> Publier mon avis
+                </button>
+            </form>
+        </div>
+    <?php else: ?>
+        <div style="margin-top:20px; padding:16px; background:rgba(255,255,255,0.03); border-radius:12px; text-align:center; color:rgba(255,255,255,0.4);">
+            <p><a href="login.php" style="color:#ff6a00;">Connectez-vous</a> pour laisser un avis.</p>
+        </div>
+    <?php endif; ?>
+</div>
                         </div>
                     </div>
                 </div>
@@ -395,6 +452,34 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
             });
         });
     </script>
+// Gestion des étoiles du formulaire d'avis
+document.querySelectorAll('input[name="note"]').forEach((radio, index) => {
+    radio.addEventListener('change', function() {
+        const stars = this.closest('div').querySelectorAll('i');
+        const value = parseInt(this.value);
+        stars.forEach((star, i) => {
+            star.style.color = i < value ? '#ffb800' : '#444';
+        });
+    });
+});
 
+// Effet hover sur les étoiles
+document.querySelectorAll('.form-group label').forEach(label => {
+    label.addEventListener('mouseenter', function() {
+        const stars = this.closest('div').querySelectorAll('i');
+        const index = Array.from(this.parentElement.children).indexOf(this);
+        stars.forEach((star, i) => {
+            star.style.color = i <= index ? '#ffb800' : '#444';
+        });
+    });
+    label.addEventListener('mouseleave', function() {
+        const stars = this.closest('div').querySelectorAll('i');
+        const checked = this.closest('div').querySelector('input:checked');
+        const value = checked ? parseInt(checked.value) : 0;
+        stars.forEach((star, i) => {
+            star.style.color = i < value ? '#ffb800' : '#444';
+        });
+    });
+});
 </body>
 </html>
