@@ -1,24 +1,96 @@
 <?php
-// Activer l'affichage des erreurs
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 require_once 'db.php';
 
-// Récupérer le nombre d'articles du panier
+// Variables navbar
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
-// Vérifier si l'utilisateur est connecté
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
 
-// Récupérer tous les produits
-$stmt = $pdo->query('SELECT * FROM produits ORDER BY id ASC');
+// ==================== RECHERCHE & FILTRES ====================
+
+// Récupérer les paramètres GET
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$categorie = isset($_GET['categorie']) ? (int)$_GET['categorie'] : null;
+$prix_min = isset($_GET['prix_min']) ? (int)$_GET['prix_min'] : null;
+$prix_max = isset($_GET['prix_max']) ? (int)$_GET['prix_max'] : null;
+$marque = isset($_GET['marque']) ? (int)$_GET['marque'] : null;
+$note_min = isset($_GET['note_min']) ? (int)$_GET['note_min'] : null;
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'relevance';
+
+// Construire la requête SQL
+$sql = 'SELECT * FROM produits WHERE 1=1';
+$params = [];
+
+// Recherche
+if (!empty($search)) {
+    $sql .= ' AND (nom LIKE ? OR description LIKE ?)';
+    $params[] = '%' . $search . '%';
+    $params[] = '%' . $search . '%';
+}
+
+// Catégorie
+if ($categorie) {
+    $sql .= ' AND categorie_id = ?';
+    $params[] = $categorie;
+}
+
+// Prix min
+if ($prix_min !== null && $prix_min > 0) {
+    $sql .= ' AND prix >= ?';
+    $params[] = $prix_min;
+}
+
+// Prix max
+if ($prix_max !== null && $prix_max > 0) {
+    $sql .= ' AND prix <= ?';
+    $params[] = $prix_max;
+}
+
+// Marque
+if ($marque) {
+    $sql .= ' AND marque_id = ?';
+    $params[] = $marque;
+}
+
+// Note minimale
+if ($note_min && $note_min > 0) {
+    $sql .= ' AND note >= ?';
+    $params[] = $note_min;
+}
+
+// Tri
+switch ($sort) {
+    case 'price-asc':
+        $sql .= ' ORDER BY prix ASC';
+        break;
+    case 'price-desc':
+        $sql .= ' ORDER BY prix DESC';
+        break;
+    case 'rating':
+        $sql .= ' ORDER BY note DESC, nb_avis DESC';
+        break;
+    case 'newest':
+        $sql .= ' ORDER BY created_at DESC';
+        break;
+    default:
+        $sql .= ' ORDER BY id ASC'; // Pertinence = par défaut
+        break;
+}
+
+// Exécuter la requête
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $produits = $stmt->fetchAll();
+
+// Compter les résultats
+$total_produits = count($produits);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- ... le reste du head -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EasyPick – Boutique Premium</title>
@@ -30,8 +102,7 @@ $produits = $stmt->fetchAll();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
     <style>
-        /* ---- (Tous tes styles CSS existants, que tu as déjà ---- */
-        /* Je les reprends ici en une seule fois pour gagner de la place. Si tu as déjà ton CSS, tu peux garder le même. */
+        /* ---- (Tous tes styles CSS existants) ---- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
@@ -190,25 +261,32 @@ $produits = $stmt->fetchAll();
 </head>
 <body>
 
-    <!-- ===== NAVBAR ===== -->
+    <!-- ===== NAVBAR (CORRIGÉE) ===== -->
     <nav class="navbar-simple">
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.php">Accueil</a></li>
                 <li><a href="boutique.php" class="active">Boutique</a></li>
-                <li><a href="#">Nouveautés</a></li>
-                <li><a href="#">Promotions</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="nouveautes.php">Nouveautés</a></li>
+                <li><a href="promotions.php">Promotions</a></li>
+                <li><a href="contact.php">Contact</a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
-                <a href="#" aria-label="Compte"><i class="far fa-user"></i></a>
+                <?php if ($user_connecte): ?>
+                    <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
+                <?php else: ?>
+                    <a href="login.php" aria-label="Connexion"><i class="fas fa-user"></i></a>
+                <?php endif; ?>
                 <a href="panier.php" aria-label="Panier" style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
+                <?php if ($user_connecte && $user_role === 'admin'): ?>
+                    <a href="admin.php" aria-label="Admin"><i class="fas fa-cog"></i></a>
+                <?php endif; ?>
                 <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -237,127 +315,162 @@ $produits = $stmt->fetchAll();
 
         <div class="container">
 
-            <!-- Barre de recherche -->
-            <div class="search-toolbar">
+            <!-- Barre de recherche (fonctionnelle) -->
+            <form method="GET" action="" class="search-toolbar">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
-                <input type="text" placeholder="Rechercher un produit..." />
+                <input type="text" name="search" placeholder="Rechercher un produit..." value="<?= htmlspecialchars($search) ?>" />
                 <div class="search-divider"></div>
                 <div class="sort-wrap">
                     <label for="sortSelect">Trier par</label>
-                    <select id="sortSelect">
-                        <option value="relevance">Pertinence</option>
-                        <option value="price-asc">Prix croissant</option>
-                        <option value="price-desc">Prix décroissant</option>
-                        <option value="rating">Meilleures notes</option>
-                        <option value="newest">Nouveautés</option>
+                    <select name="sort" id="sortSelect" onchange="this.form.submit()">
+                        <option value="relevance" <?= $sort === 'relevance' ? 'selected' : '' ?>>Pertinence</option>
+                        <option value="price-asc" <?= $sort === 'price-asc' ? 'selected' : '' ?>>Prix croissant</option>
+                        <option value="price-desc" <?= $sort === 'price-desc' ? 'selected' : '' ?>>Prix décroissant</option>
+                        <option value="rating" <?= $sort === 'rating' ? 'selected' : '' ?>>Meilleures notes</option>
+                        <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Nouveautés</option>
                     </select>
-                    <button class="btn-search"><i class="fas fa-arrow-right"></i></button>
+                    <button type="submit" class="btn-search"><i class="fas fa-arrow-right"></i></button>
                 </div>
-            </div>
+            </form>
 
             <!-- LAYOUT FILTRES + PRODUITS -->
             <div class="shop-layout">
 
-                <!-- SIDEBAR FILTRES (statique pour l'instant) -->
+                <!-- SIDEBAR FILTRES -->
                 <aside class="shop-sidebar">
-                    <div class="filter-block active-filter">
-                        <h4 onclick="toggleFilter(this)">Catégories <i class="fas fa-chevron-down"></i></h4>
-                        <div class="filter-content">
-                            <ul>
-                                <li><label><input type="checkbox" checked /> Audio & Casques <span class="count">(24)</span></label></li>
-                                <li><label><input type="checkbox" /> Claviers & Souris <span class="count">(18)</span></label></li>
-                                <li><label><input type="checkbox" /> Chargeurs & Batteries <span class="count">(12)</span></label></li>
-                                <li><label><input type="checkbox" /> Enceintes & Son <span class="count">(9)</span></label></li>
-                                <li><label><input type="checkbox" /> Accessoires Gaming <span class="count">(15)</span></label></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="filter-block">
-                        <h4 onclick="toggleFilter(this)">Prix <i class="fas fa-chevron-down"></i></h4>
-                        <div class="filter-content">
-                            <div class="price-range">
-                                <input type="range" min="0" max="300" value="150" id="priceSlider" />
-                                <div class="price-labels"><span>0 €</span><span id="priceDisplay">150 €</span><span>300 €+</span></div>
+                    <form method="GET" action="">
+                        <!-- Garder les paramètres de recherche et tri -->
+                        <?php if (!empty($search)): ?>
+                            <input type="hidden" name="search" value="<?= htmlspecialchars($search) ?>" />
+                        <?php endif; ?>
+                        <?php if ($sort !== 'relevance'): ?>
+                            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>" />
+                        <?php endif; ?>
+
+                        <!-- Catégories -->
+                        <div class="filter-block active-filter">
+                            <h4 onclick="toggleFilter(this)">Catégories <i class="fas fa-chevron-down"></i></h4>
+                            <div class="filter-content">
+                                <ul>
+                                    <?php
+                                    $categories = $pdo->query('SELECT * FROM categories')->fetchAll();
+                                    foreach ($categories as $cat):
+                                        $checked = ($categorie == $cat['id']) ? 'checked' : '';
+                                    ?>
+                                        <li><label><input type="checkbox" name="categorie" value="<?= $cat['id'] ?>" <?= $checked ?> onchange="this.form.submit()" /> <?= htmlspecialchars($cat['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE categorie_id = ' . $cat['id'])->fetchColumn() ?>)</span></label></li>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
                         </div>
-                    </div>
-                    <div class="filter-block">
-                        <h4 onclick="toggleFilter(this)">Marques <i class="fas fa-chevron-down"></i></h4>
-                        <div class="filter-content">
-                            <ul>
-                                <li><label><input type="checkbox" /> Sony <span class="count">(8)</span></label></li>
-                                <li><label><input type="checkbox" /> Logitech <span class="count">(12)</span></label></li>
-                                <li><label><input type="checkbox" /> Razer <span class="count">(7)</span></label></li>
-                                <li><label><input type="checkbox" /> Anker <span class="count">(6)</span></label></li>
-                                <li><label><input type="checkbox" /> JBL <span class="count">(5)</span></label></li>
-                            </ul>
+
+                        <!-- Prix -->
+                        <div class="filter-block">
+                            <h4 onclick="toggleFilter(this)">Prix <i class="fas fa-chevron-down"></i></h4>
+                            <div class="filter-content">
+                                <div class="price-range">
+                                    <input type="range" name="prix_max" min="0" max="300" value="<?= $prix_max ?: 150 ?>" onchange="this.form.submit()" />
+                                    <div class="price-labels">
+                                        <span>0 €</span>
+                                        <span id="priceDisplay"><?= $prix_max ?: 150 ?> €</span>
+                                        <span>300 €+</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="filter-block">
-                        <h4 onclick="toggleFilter(this)">Note minimale <i class="fas fa-chevron-down"></i></h4>
-                        <div class="filter-content">
-                            <ul>
-                                <li><label><input type="radio" name="rating" checked /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> <span>5 étoiles</span></span></label></li>
-                                <li><label><input type="radio" name="rating" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i> <span>4+ étoiles</span></span></label></li>
-                                <li><label><input type="radio" name="rating" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i><i class="fas fa-star grey"></i> <span>3+ étoiles</span></span></label></li>
-                            </ul>
+
+                        <!-- Marques -->
+                        <div class="filter-block">
+                            <h4 onclick="toggleFilter(this)">Marques <i class="fas fa-chevron-down"></i></h4>
+                            <div class="filter-content">
+                                <ul>
+                                    <?php
+                                    $marques = $pdo->query('SELECT * FROM marques')->fetchAll();
+                                    foreach ($marques as $m):
+                                        $checked = ($marque == $m['id']) ? 'checked' : '';
+                                    ?>
+                                        <li><label><input type="checkbox" name="marque" value="<?= $m['id'] ?>" <?= $checked ?> onchange="this.form.submit()" /> <?= htmlspecialchars($m['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE marque_id = ' . $m['id'])->fetchColumn() ?>)</span></label></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <button class="btn-apply-filter">Appliquer les filtres</button>
+
+                        <!-- Note minimale -->
+                        <div class="filter-block">
+                            <h4 onclick="toggleFilter(this)">Note minimale <i class="fas fa-chevron-down"></i></h4>
+                            <div class="filter-content">
+                                <ul>
+                                    <li><label><input type="radio" name="note_min" value="5" <?= $note_min == 5 ? 'checked' : '' ?> onchange="this.form.submit()" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> <span>5 étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="4" <?= $note_min == 4 ? 'checked' : '' ?> onchange="this.form.submit()" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i> <span>4+ étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="3" <?= $note_min == 3 ? 'checked' : '' ?> onchange="this.form.submit()" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i><i class="fas fa-star grey"></i> <span>3+ étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="" <?= !$note_min ? 'checked' : '' ?> onchange="this.form.submit()" /> <span style="color:rgba(255,255,255,0.4);">Toutes les notes</span></label></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-apply-filter">Appliquer les filtres</button>
+                    </form>
                 </aside>
 
-                <!-- PRODUITS DYNAMIQUES -->
+                <!-- PRODUITS -->
                 <div>
-                    <div class="products-grid">
-                        <?php foreach ($produits as $index => $produit): ?>
-                        <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
-                            <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay" aria-label="Voir le produit"></a>
-                            <div class="product-image-wrap">
-                                <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
-                                <div class="badges">
-                                    <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
-                                        <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
-                                    <?php endif; ?>
-                                    <?php if ($produit['est_nouveau']): ?>
-                                        <span class="badge new">Nouveau</span>
-                                    <?php endif; ?>
-                                    <?php if ($produit['est_top']): ?>
-                                        <span class="badge top">Top vente</span>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="action-buttons">
-                                    <button class="fav-btn" onclick="event.stopPropagation(); toggleFav(this)"><i class="far fa-heart"></i></button>
-                                    <button onclick="event.stopPropagation(); quickView(this)"><i class="fas fa-eye"></i></button>
-                                </div>
-                            </div>
-                            <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
-                            <div class="product-rating">
-                                <span class="stars">
-                                    <?php
-                                    $note = round($produit['note'] * 2) / 2;
-                                    for ($i = 1; $i <= 5; $i++) {
-                                        if ($i <= $note) echo '<i class="fas fa-star"></i>';
-                                        elseif ($i - 0.5 <= $note) echo '<i class="fas fa-star-half-alt"></i>';
-                                        else echo '<i class="fas fa-star grey"></i>';
-                                    }
-                                    ?>
-                                </span>
-                                <span class="count">(<?= $produit['nb_avis'] ?> avis)</span>
-                            </div>
-                            <div class="product-price">
-                                <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
-                                <?php if ($produit['prix_old']): ?>
-                                    <span class="old"><?= number_format($produit['prix_old'], 2, ',', ' ') ?> €</span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="card-actions">
-                                <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add">Ajouter au panier</a>
-                            </div>
+                    <?php if (empty($produits)): ?>
+                        <div style="text-align:center; padding:60px 0; color:rgba(255,255,255,0.4);">
+                            <i class="fas fa-box-open" style="font-size:48px; margin-bottom:16px;"></i>
+                            <p>Aucun produit ne correspond à vos critères.</p>
+                            <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Voir tous les produits</a>
                         </div>
-                        <?php endforeach; ?>
-                    </div>
+                    <?php else: ?>
+                        <div class="products-grid">
+                            <?php foreach ($produits as $index => $produit): ?>
+                            <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
+                                <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay" aria-label="Voir le produit"></a>
+                                <div class="product-image-wrap">
+                                    <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
+                                    <div class="badges">
+                                        <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
+                                            <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
+                                        <?php endif; ?>
+                                        <?php if ($produit['est_nouveau']): ?>
+                                            <span class="badge new">Nouveau</span>
+                                        <?php endif; ?>
+                                        <?php if ($produit['est_top']): ?>
+                                            <span class="badge top">Top vente</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="fav-btn" onclick="event.stopPropagation(); toggleFav(this)"><i class="far fa-heart"></i></button>
+                                        <button onclick="event.stopPropagation(); quickView(this)"><i class="fas fa-eye"></i></button>
+                                    </div>
+                                </div>
+                                <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
+                                <div class="product-rating">
+                                    <span class="stars">
+                                        <?php
+                                        $note = round($produit['note'] * 2) / 2;
+                                        for ($i = 1; $i <= 5; $i++) {
+                                            if ($i <= $note) echo '<i class="fas fa-star"></i>';
+                                            elseif ($i - 0.5 <= $note) echo '<i class="fas fa-star-half-alt"></i>';
+                                            else echo '<i class="fas fa-star grey"></i>';
+                                        }
+                                        ?>
+                                    </span>
+                                    <span class="count">(<?= $produit['nb_avis'] ?> avis)</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
+                                    <?php if ($produit['prix_old']): ?>
+                                        <span class="old"><?= number_format($produit['prix_old'], 2, ',', ' ') ?> €</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="card-actions">
+                                    <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add">Ajouter au panier</a>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
 
-                    <!-- Pagination (simulée) -->
+                    <!-- Pagination -->
                     <div class="pagination">
                         <a href="#"><i class="fas fa-chevron-left"></i></a>
                         <a href="#" class="active">1</a>
@@ -426,7 +539,6 @@ $produits = $stmt->fetchAll();
     </footer>
 
     <script>
-        // (Tous les scripts identiques à avant)
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
         hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
@@ -438,24 +550,6 @@ $produits = $stmt->fetchAll();
             icon.classList.toggle('fa-chevron-down');
             icon.classList.toggle('fa-chevron-up');
             header.classList.toggle('open');
-        }
-
-        const priceSlider = document.getElementById('priceSlider');
-        const priceDisplay = document.getElementById('priceDisplay');
-        if (priceSlider && priceDisplay) {
-            priceSlider.addEventListener('input', function() {
-                priceDisplay.textContent = this.value + ' €';
-            });
-        }
-
-        function addToCart(btn) {
-            const original = btn.textContent;
-            btn.textContent = '✅ Ajouté !';
-            btn.classList.add('added');
-            setTimeout(() => {
-                btn.textContent = original;
-                btn.classList.remove('added');
-            }, 2000);
         }
 
         function toggleFav(btn) {
