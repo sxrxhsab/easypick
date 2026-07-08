@@ -1,11 +1,11 @@
 <?php
-// db.php - PostgreSQL Neon (SANS ECHO)
+// db.php - Connexion à PostgreSQL sur Neon
 
-$host = 'ep-lingering-glade-atuudk2x.c-9.us-east-1.aws.neon.tech';
-$port = 5432;
-$dbname = 'neondb';
-$username = 'neondb_owner';
-$password = 'npg_CYJQH82shmin';
+$host = getenv('DB_HOST') ?: 'ep-lingering-glade-atuudk2x.c-9.us-east-1.aws.neon.tech';
+$port = getenv('DB_PORT') ?: 5432;
+$dbname = getenv('DB_NAME') ?: 'neondb';
+$username = getenv('DB_USER') ?: 'neondb_owner';
+$password = getenv('DB_PASSWORD') ?: 'npg_CYJQH82shmin';
 
 try {
     $pdo = new PDO(
@@ -18,7 +18,6 @@ try {
             PDO::ATTR_TIMEOUT => 30
         ]
     );
-    // ← SUPPRIME LE ECHO ICI
 } catch (PDOException $e) {
     die('Erreur de connexion PostgreSQL : ' . $e->getMessage());
 }
