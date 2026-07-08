@@ -1,5 +1,6 @@
 <?php
 // panier-maj.php - Met à jour les quantités dans le panier
+ob_start();
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quantites'])) {
@@ -7,13 +8,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quantites'])) {
         $id = (int)$id;
         $qte = max(1, (int)$qte);
         if ($qte <= 0) {
-            unset($_SESSION['<?= __('panier') ?>'][$id]);
+            unset($_SESSION['panier'][$id]);
         } else {
-            $_SESSION['<?= __('panier') ?>'][$id] = $qte;
+            $_SESSION['panier'][$id] = $qte;
         }
     }
 }
 
-// Rediriger vers le <?= __('panier') ?>
-header('Location: <?= __('panier') ?>.php');
+// Rediriger vers le panier
+header('Location: panier.php');
 exit;
+?>

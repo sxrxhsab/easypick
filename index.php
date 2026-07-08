@@ -204,7 +204,59 @@ $user_role = $_SESSION['user_role'] ?? '';
         .promo-content p { font-size: 20px; color: rgba(255,255,255,0.7); max-width: 600px; }
         .promo-content .btn-promo { background: #ff6a00; color: #fff; padding: 16px 50px; border-radius: 60px; font-weight: 700; font-size: 20px; transition: all 0.3s; box-shadow: 0 8px 30px rgba(255,106,0,0.3); text-transform: uppercase; letter-spacing: 1px; }
         .promo-content .btn-promo:hover { background: #ff8833; transform: scale(1.05); box-shadow: 0 12px 40px rgba(255,106,0,0.5); }
+<!-- ===== AVIS DYNAMIQUES ===== -->
+<section class="testimonials">
+    <div class="container">
+        <h2 class="section-title">Ils nous <span>font confiance</span></h2>
+        <p class="section-sub">Ce que nos clients pensent de nous</p>
+        <div class="testimonials-grid">
+            <?php
+            // Récupérer les 3 derniers avis 5 étoiles
+            $stmt = $pdo->prepare("SELECT a.*, u.nom as utilisateur_nom, u.prenom as utilisateur_prenom 
+                                   FROM avis a 
+                                   JOIN utilisateurs u ON a.utilisateur_id = u.id 
+                                   WHERE a.note >= 4 
+                                   ORDER BY a.created_at DESC 
+                                   LIMIT 3");
+            $stmt->execute();
+            $avis = $stmt->fetchAll();
 
+            if (!empty($avis)):
+                foreach ($avis as $avis_item):
+            ?>
+            <div class="testimonial-card">
+                <div class="avatar">
+                    <?php 
+                    $initials = strtoupper(substr($avis_item['utilisateur_prenom'] ?? 'U', 0, 1) . substr($avis_item['utilisateur_nom'] ?? 'N', 0, 1));
+                    ?>
+                    <span style="display:flex; align-items:center; justify-content:center; width:60px; height:60px; border-radius:50%; background:#ff6a00; color:#fff; font-weight:700; font-size:20px;">
+                        <?= $initials ?>
+                    </span>
+                </div>
+                <div class="name"><?= htmlspecialchars($avis_item['utilisateur_prenom'] . ' ' . $avis_item['utilisateur_nom']) ?></div>
+                <div class="role">Client EasyPick</div>
+                <div class="stars">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <?php if ($i <= $avis_item['note']): ?>
+                            <i class="fas fa-star"></i>
+                        <?php else: ?>
+                            <i class="fas fa-star grey"></i>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+                </div>
+                <div class="comment">"<?= htmlspecialchars($avis_item['commentaire']) ?>"</div>
+            </div>
+            <?php 
+                endforeach;
+            else:
+            ?>
+            <div class="testimonial-card" style="grid-column:1/-1; text-align:center; color:rgba(255,255,255,0.4); padding:40px;">
+                <p>Pas encore d'avis. Soyez le premier à donner votre avis !</p>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
         /* AVIS */
         .testimonials { padding: 80px 0; background: #0d0d0d; }
         .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; }

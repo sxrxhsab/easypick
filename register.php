@@ -1,4 +1,5 @@
-<?php
+Ôªø<?php
+ob_start();
 session_start();
 require_once 'db.php';
 
@@ -6,34 +7,36 @@ $erreur = '';
 $succes = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $pre<?= __('nom') ?> = trim($_POST['pre<?= __('nom') ?>']);
-    $<?= __('nom') ?> = trim($_POST['<?= __('nom') ?>']);
-    $<?= __('email') ?> = trim($_POST['<?= __('email') ?>']);
-    $password = $_POST['password'];
-    $password_confirm = $_POST['password_confirm'];
+    $prenom = trim($_POST['prenom'] ?? '');
+    $nom = trim($_POST['nom'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $password_confirm = $_POST['password_confirm'] ?? '';
 
     // 1. Validations
-    if (empty($pre<?= __('nom') ?>) || empty($<?= __('nom') ?>) || empty($<?= __('email') ?>) || empty($password)) {
+    if (empty($prenom) || empty($nom) || empty($email) || empty($password)) {
         $erreur = 'Tous les champs sont obligatoires.';
     } elseif ($password !== $password_confirm) {
         $erreur = 'Les mots de passe ne correspondent pas.';
     } elseif (strlen($password) < 6) {
-        $erreur = 'Le mot de passe doit faire au moins 6 caractËres.';
+        $erreur = 'Le mot de passe doit faire au moins 6 caract√®res.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $erreur = 'L\'adresse email est invalide.';
     } else {
-        // 2. VÈrifier si l'email existe dÈj‡ (sans insÈrer)
+        // 2. V√©rifier si l'email existe d√©j√†
         $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
-            $erreur = 'Cet email est dÈj‡ utilisÈ.';
+            $erreur = 'Cet email est d√©j√† utilis√©.';
         } else {
             // 3. Hash du mot de passe
             $hash = password_hash($password, PASSWORD_DEFAULT);
 
-            // 4. Insertion correcte (5 colonnes ? 5 paramËtres)
+            // 4. Insertion
             $stmt = $pdo->prepare('INSERT INTO utilisateurs (prenom, nom, email, password, role) VALUES (?, ?, ?, ?, ?)');
-            $stmt->execute([$prenom, $nom, $email, $hash, 'user']); // 'user' par dÈfaut
+            $stmt->execute([$prenom, $nom, $email, $hash, 'user']);
 
-            $succes = 'Compte crÈÈ avec succËs ! Vous pouvez vous connecter.';
+            $succes = 'Compte cr√©√© avec succ√®s ! Vous pouvez vous connecter.';
         }
     }
 }
@@ -43,17 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick ñ <?= __('inscription') ?></title>
+    <title>EasyPick ‚Äì Inscription</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .register-box { background: #1A1A1A; padding: 40px 35px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); width: 100%; max-width: 440px; }
         .register-box h1 { font-size: 28px; font-weight: 900; text-align: center; margin-bottom: 6px; }
-        .register-box h1 span { color: #ff6a00; }
+        .register-box h1 .easy { color: #ff6a00; }
+        .register-box h1 .pick { color: #fff; }
         .register-box .sub { text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 25px; }
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: rgba(255,255,255,0.7); }
@@ -66,14 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .links { text-align: center; margin-top: 16px; color: rgba(255,255,255,0.3); font-size: 14px; }
         .links a { color: #ff6a00; transition: color 0.3s; }
         .links a:hover { color: #ff8833; }
-        .back-home { display: inline-block; margin-top: 16px; color: rgba(255,255,255,0.2); font-size: 13px; transition: color 0.3s; }
+        .back-home { display: inline-block; margin-top: 16px; color: rgba(255,255,255,0.2); font-size: 13px; transition: color 0.3s; text-align: center; width: 100%; }
         .back-home:hover { color: #fff; }
+        .footer { background: transparent; padding: 20px 0 10px; text-align: center; color: rgba(255,255,255,0.12); font-size: 12px; width: 100%; max-width: 440px; margin-top: 20px; }
+        .footer a { color: #ff6a00; }
     </style>
 </head>
 <body>
     <div class="register-box">
-        <h1><span>EASY</span>PICK</h1>
-        <div class="sub">CrÈez votre compte</div>
+        <h1><span class="easy">EASY</span><span class="pick">PICK</span></h1>
+        <div class="sub">Cr√©ez votre compte</div>
 
         <?php if ($erreur): ?>
             <div class="error"><?= htmlspecialchars($erreur) ?></div>
@@ -85,36 +91,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!$succes): ?>
         <form method="POST">
             <div class="form-group">
-                <label>PrÈ<?= __('nom') ?></label>
-                <input type="text" name="prenom" required placeholder="Jean" />
+                <label>Pr√©nom</label>
+                <input type="text" name="prenom" required placeholder="Jean" value="<?= htmlspecialchars($_POST['prenom'] ?? '') ?>" />
             </div>
             <div class="form-group">
-                <label><?= __('nom') ?></label>
-                <input type="text" name="nom" required placeholder="Dupont" />
+                <label>Nom</label>
+                <input type="text" name="nom" required placeholder="Dupont" value="<?= htmlspecialchars($_POST['nom'] ?? '') ?>" />
             </div>
             <div class="form-group">
-                <label><?= __('email') ?></label>
-                <input type="email" name="email" required placeholder="vous@exemple.com" />
+                <label>Email</label>
+                <input type="email" name="email" required placeholder="vous@exemple.com" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
             </div>
             <div class="form-group">
-                <label><?= __('mot_de_passe') ?></label>
-                <input type="password" name="password" required placeholder="Min. 6 caractËres" />
+                <label>Mot de passe</label>
+                <input type="password" name="password" required placeholder="Min. 6 caract√®res" />
             </div>
             <div class="form-group">
-                <label><?= __('confirmer_mot_de_passe') ?></label>
-                <input type="password" name="password_confirm" required placeholder="ïïïïïïïï" />
+                <label>Confirmer le mot de passe</label>
+                <input type="password" name="password_confirm" required placeholder="R√©p√©tez le mot de passe" />
             </div>
-            <button type="submit" class="btn-register">CrÈer <?= __('mon_compte') ?></button>
+            <button type="submit" class="btn-register">Cr√©er mon compte</button>
         </form>
         <?php endif; ?>
 
         <div class="links">
-            <?= __('deja_compte') ?> <a href="login.php"><?= __('se_connecter') ?></a>
+            D√©j√† un compte ? <a href="login.php">Se connecter</a>
         </div>
-        <div style="text-align:center;">
-            <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> <?= __('retour_accueil') ?></a>
-        </div>
+        <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> Retour √† l'accueil</a>
     </div>
-    <?php include __DIR__ . '/footer.php'; ?>
+
+    <footer class="footer">
+        &copy; 2026 EasyPick ‚Äì Tous droits r√©serv√©s. Design par <a href="#">Samy Sabeur</a>.
+    </footer>
 </body>
 </html>

@@ -1,17 +1,18 @@
 <?php
+ob_start();
 session_start();
 require_once 'db.php';
 
 // Vérifier que le formulaire est soumis
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: <?= __('boutique') ?>.php');
+    header('Location: boutique.php');
     exit;
 }
 
 $produit_id = isset($_POST['produit_id']) ? (int)$_POST['produit_id'] : 0;
-$<?= __('nom') ?> = trim($_POST['<?= __('nom') ?>']);                    // ← Récupéré depuis le formulaire
+$nom = trim($_POST['nom'] ?? '');
 $note = isset($_POST['note']) ? (int)$_POST['note'] : 0;
-$commentaire = trim($_POST['commentaire']);
+$commentaire = trim($_POST['commentaire'] ?? '');
 
 // Validation
 if ($produit_id <= 0 || $note < 1 || $note > 5 || empty($nom) || empty($commentaire)) {
@@ -49,6 +50,7 @@ $result = $stmt->fetch();
 $stmt = $pdo->prepare('UPDATE produits SET note = ?, nb_avis = ? WHERE id = ?');
 $stmt->execute([round($result['avg_note'], 1), $result['nb'], $produit_id]);
 
-$_SESSION['succes_<?= __('avis') ?>'] = 'Merci pour votre <?= __('avis') ?> !';
+$_SESSION['succes_avis'] = 'Merci pour votre avis !';
 header('Location: produit.php?id=' . $produit_id);
 exit;
+?>
