@@ -1,15 +1,12 @@
 ﻿<?php
-// ===== MULTILANGUE =====
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Variables pour la navbar
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
 
-// Charger la langue
 $lang = $_GET['lang'] ?? $_SESSION['lang'] ?? 'fr';
 $_SESSION['lang'] = $lang;
 $translations = [];
@@ -21,8 +18,8 @@ function __($key) {
     return $translations[$key] ?? $key;
 }
 ?>
-
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />

@@ -1,6 +1,5 @@
 ﻿<?php
 return [
-    // Navbar
     'accueil' => 'Accueil',
     'boutique' => 'Boutique',
     'nouveautes' => 'Nouveautés',
@@ -12,9 +11,6 @@ return [
     'deconnexion' => 'Déconnexion',
     'panier' => 'Panier',
     'rechercher' => 'Rechercher...',
-    'admin' => 'Admin',
-    
-    // Produits
     'ajouter_au_panier' => 'Ajouter au panier',
     'acheter_maintenant' => 'Acheter maintenant',
     'voir_le_produit' => 'Voir le produit',
@@ -23,8 +19,6 @@ return [
     'avis' => 'Avis',
     'donner_votre_avis' => 'Donnez votre avis',
     'publier' => 'Publier',
-    
-    // Panier & Checkout
     'total' => 'Total',
     'sous_total' => 'Sous-total',
     'livraison' => 'Livraison',
@@ -35,8 +29,6 @@ return [
     'quantite' => 'Quantité',
     'supprimer' => 'Supprimer',
     'mettre_a_jour' => 'Mettre à jour',
-    
-    // Authentification
     'email' => 'Email',
     'mot_de_passe' => 'Mot de passe',
     'confirmer_mot_de_passe' => 'Confirmer le mot de passe',
@@ -47,8 +39,6 @@ return [
     'deja_compte' => 'Déjà un compte ?',
     'pas_encore_compte' => 'Pas encore de compte ?',
     'retour_accueil' => 'Retour à l\'accueil',
-    
-    // Admin
     'tableau_de_bord' => 'Tableau de bord',
     'produits' => 'Produits',
     'commandes' => 'Commandes',
@@ -56,11 +46,8 @@ return [
     'categories' => 'Catégories',
     'ajouter' => 'Ajouter',
     'modifier' => 'Modifier',
-    'supprimer' => 'Supprimer',
     'enregistrer' => 'Enregistrer',
     'annuler' => 'Annuler',
-    
-    // Footer
     'a_propos' => 'À propos',
     'blog' => 'Blog',
     'carrieres' => 'Carrières',
@@ -70,5 +57,5 @@ return [
     'mentions_legales' => 'Mentions légales',
     'suivez_nous' => 'Suivez-nous',
     'tous_droits_reserves' => 'Tous droits réservés',
-    'design_par' => '<?= __('design_par') ?>',
+    'design_par' => 'Design par'
 ];
