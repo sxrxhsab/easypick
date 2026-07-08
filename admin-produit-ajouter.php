@@ -1,9 +1,11 @@
 <?php
+ob_start();
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once 'db.php';
 
+// Vérifier si l'utilisateur est admin
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: login.php');
     exit;
@@ -18,13 +20,13 @@ $marques = $pdo->query('SELECT * FROM marques')->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupération des champs texte
-    $nom = trim($_POST['nom']);
+    $nom = trim($_POST['nom'] ?? '');
     $slug = strtolower(trim(str_replace(' ', '-', $nom)));
-    $description = trim($_POST['description']);
-    $prix = (float) $_POST['prix'];
+    $description = trim($_POST['description'] ?? '');
+    $prix = (float) ($_POST['prix'] ?? 0);
     $prix_old = !empty($_POST['prix_old']) ? (float) $_POST['prix_old'] : null;
-    $stock = (int) $_POST['stock'];
-    $categorie_id = (int) $_POST['categorie_id'];
+    $stock = (int) ($_POST['stock'] ?? 0);
+    $categorie_id = (int) ($_POST['categorie_id'] ?? 0);
     $marque_id = !empty($_POST['marque_id']) ? (int) $_POST['marque_id'] : null;
     $est_promo = isset($_POST['est_promo']) ? 1 : 0;
     $est_nouveau = isset($_POST['est_nouveau']) ? 1 : 0;
@@ -46,36 +48,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif ($file['size'] > $max_size) {
             $erreur = 'L\'image est trop lourde. Maximum 5 Mo.';
         } else {
-            $nom_fichier = uniqid() . '.' . $extension;
-            $destination = 'uploads/' . $nom_fichier;
-            // Avant la ligne move_uploaded_file
-$upload_dir = 'uploads/';
-if (!is_dir($upload_dir)) {
-    mkdir($upload_dir, 0755, true);
-}
-            
-// Dans la partie upload
-$images_paths = [];
-if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
-    $upload_dir = 'uploads/';
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
-    
-    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-        $extension = strtolower(pathinfo($_FILES['images']['name'][$key], PATHINFO_EXTENSION));
-        if (in_array($extension, $allowed)) {
-            $nom_fichier = uniqid() . '.' . $extension;
-            if (move_uploaded_file($tmp_name, $upload_dir . $nom_fichier)) {
-                $images_paths[] = $upload_dir . $nom_fichier;
+            // Créer le dossier uploads s'il n'existe pas
+            $upload_dir = 'uploads/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
             }
-        }
-    }
-}
-
-// Dans la requête INSERT, ajouter le champ images
-$images_json = !empty($images_paths) ? json_encode($images_paths) : null;
-$stmt = $pdo->prepare('INSERT INTO produits (nom, slug, description, prix, prix_old, stock, categorie_id, marque_id, image, images, est_promo, est_nouveau, est_top) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-$stmt->execute([$<?= __('nom') ?>, $slug, $description, $prix, $prix_old, $stock, $categorie_id, $marque_id, $image_path, $images_json, $est_promo, $est_nouveau, $est_top]);
+            
+            $nom_fichier = uniqid() . '.' . $extension;
+            $destination = $upload_dir . $nom_fichier;
+            
             if (move_uploaded_file($file['tmp_name'], $destination)) {
                 $image_path = $destination;
             } else {
@@ -86,27 +67,51 @@ $stmt->execute([$<?= __('nom') ?>, $slug, $description, $prix, $prix_old, $stock
         $erreur = 'Veuillez sélectionner une image.';
     }
 
+    // ---- Gestion des images multiples (optionnel) ----
+    $images_paths = [];
+    if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+        $upload_dir = 'uploads/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+        
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+            if (!empty($_FILES['images']['name'][$key])) {
+                $extension = strtolower(pathinfo($_FILES['images']['name'][$key], PATHINFO_EXTENSION));
+                if (in_array($extension, $allowed)) {
+                    $nom_fichier = uniqid() . '.' . $extension;
+                    if (move_uploaded_file($tmp_name, $upload_dir . $nom_fichier)) {
+                        $images_paths[] = $upload_dir . $nom_fichier;
+                    }
+                }
+            }
+        }
+    }
+
     // Si tout est bon, on insère dans la BDD
     if (empty($erreur) && !empty($image_path)) {
-        if (empty($<?= __('nom') ?>) || empty($description) || $prix <= 0) {
+        if (empty($nom) || empty($description) || $prix <= 0) {
             $erreur = 'Veuillez remplir tous les champs obligatoires (*).';
         } else {
+            $images_json = !empty($images_paths) ? json_encode($images_paths) : null;
+            
             $stmt = $pdo->prepare('INSERT INTO produits 
-                (nom, slug, description, prix, prix_old, stock, categorie_id, marque_id, image, est_promo, est_nouveau, est_top) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                (nom, slug, description, prix, prix_old, stock, categorie_id, marque_id, image, images, est_promo, est_nouveau, est_top) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
             $stmt->execute([
                 $nom, $slug, $description, $prix, $prix_old, $stock,
-                $categorie_id, $marque_id, $image_path,
+                $categorie_id, $marque_id, $image_path, $images_json,
                 $est_promo, $est_nouveau, $est_top
             ]);
-            $succes = 'Produit ajouté avec succès !'; 
+            $succes = 'Produit ajouté avec succès !';
+            
+            // Notification newsletter si 10 produits
+            if (file_exists('newsletter-notification.php')) {
+                require_once 'newsletter-notification.php';
+                if (function_exists('envoyerNotificationNouveauxProduits')) {
+                    envoyerNotificationNouveauxProduits(1);
+                }
             }
-            // À la fin du script, après l'insertion du produit
-
-// Ajouter cette ligne
-require_once 'newsletter-notification.php';
-envoyerNotificationNouveauxProduits(1);
-        
+        }
     }
 }
 ?>
@@ -115,7 +120,7 @@ envoyerNotificationNouveauxProduits(1);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – <?= __('ajouter') ?> un produit</title>
+    <title>EasyPick – Ajouter un produit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -131,9 +136,19 @@ envoyerNotificationNouveauxProduits(1);
         .navbar-simple .logo-text { font-weight: 900; font-size: 22px; letter-spacing: 1px; }
         .navbar-simple .logo-text .easy { color: #ff6a00; }
         .navbar-simple .logo-text .pick { color: #fff; }
-        .navbar-simple .nav-icons { display: flex; gap: 20px; }
-        .navbar-simple .nav-icons a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.3s; }
+        .navbar-simple .nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
+        .navbar-simple .nav-menu li a { font-weight: 500; font-size: 14px; color: rgba(255,255,255,0.6); transition: color 0.3s; padding: 4px 0; position: relative; }
+        .navbar-simple .nav-menu li a::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 0; height: 2px; background: #ff6a00; border-radius: 10px; transition: width 0.3s; }
+        .navbar-simple .nav-menu li a:hover { color: #fff; }
+        .navbar-simple .nav-menu li a:hover::after { width: 100%; }
+        .navbar-simple .nav-menu li a.active { color: #fff; }
+        .navbar-simple .nav-menu li a.active::after { width: 100%; }
+        .navbar-simple .nav-icons { display: flex; gap: 20px; align-items: center; }
+        .navbar-simple .nav-icons a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.3s; position: relative; }
         .navbar-simple .nav-icons a:hover { color: #ff6a00; }
+        .navbar-simple .cart-badge { position: absolute; top: -6px; right: -8px; background: #ff6a00; color: #fff; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .navbar-simple .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
+        .navbar-simple .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 10px; transition: 0.3s; }
 
         .section { padding: 40px 0 80px; }
         .form-box { background: #1A1A1A; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); }
@@ -189,23 +204,48 @@ envoyerNotificationNouveauxProduits(1);
         .back-link { display: inline-block; margin-top: 16px; color: rgba(255,255,255,0.3); transition: color 0.3s; }
         .back-link:hover { color: #fff; }
 
-        @media (max-width:768px) { .container { padding: 0 16px; } .form-box { padding: 24px 16px; } }
+        @media (max-width:768px) { .container { padding: 0 16px; } .form-box { padding: 24px 16px; } 
+            .navbar-simple { height: 60px; padding: 0 16px; }
+            .navbar-simple .logo-text { font-size: 18px; }
+            .navbar-simple .nav-menu { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; width: 100%; background: #181818; padding: 24px 20px; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+            .navbar-simple .nav-menu.open { display: flex; }
+            .navbar-simple .nav-menu li a { font-size: 16px; color: rgba(255,255,255,0.7); }
+            .navbar-simple .hamburger { display: flex; }
+            .navbar-simple .nav-icons { gap: 14px; }
+            .navbar-simple .nav-icons a { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
 
-    <?php
-    // Variables pour la navbar
-    $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
-    $user_connecte = isset($_SESSION['user_id']);
-    $user_role = $_SESSION['user_role'] ?? '';
-    include 'header.php';
-    ?>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar-simple">
+        <div class="nav-container">
+            <div class="logo-text">
+                <span class="easy">EASY</span><span class="pick">PICK</span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="admin.php">Dashboard</a></li>
+                <li><a href="admin-produits.php">Produits</a></li>
+                <li><a href="admin-produit-ajouter.php" class="active">Ajouter</a></li>
+                <li><a href="admin-commandes.php">Commandes</a></li>
+                <li><a href="admin-utilisateurs.php">Utilisateurs</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="index.php"><i class="fas fa-home"></i></a>
+                <a href="logout.php"><i class="fas fa-sign-out-alt"></i></a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
+    <!-- ===== CONTENU ===== -->
     <section class="section">
         <div class="container">
             <div class="form-box">
-                <h1><?= __('ajouter') ?> un <span>produit</span></h1>
+                <h1>Ajouter un <span>produit</span></h1>
                 <div class="sub">Remplissez les informations du nouveau produit.</div>
 
                 <?php if ($erreur): ?>
@@ -219,7 +259,7 @@ envoyerNotificationNouveauxProduits(1);
                 <form method="POST" enctype="multipart/form-data">
 
                     <div class="form-group">
-                        <label><?= __('nom') ?> du produit <span class="required">*</span></label>
+                        <label>Nom du produit <span class="required">*</span></label>
                         <input type="text" name="nom" required placeholder="Ex: Casque Bluetooth Pro" />
                     </div>
 
@@ -281,7 +321,7 @@ envoyerNotificationNouveauxProduits(1);
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> <?= __('ajouter') ?> le produit</button>
+                    <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Ajouter le produit</button>
                 </form>
                 <?php endif; ?>
 
