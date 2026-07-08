@@ -58,4 +58,6 @@ return [
     'suivez_nous' => 'Suivez-nous',
     'tous_droits_reserves' => 'Tous droits réservés',
     'design_par' => 'Design par'
+    
+    
 ];
