@@ -2,12 +2,6 @@
 session_start();
 require_once 'db.php';
 
-// Vérifier que l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
-
 // Vérifier que le formulaire est soumis
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: boutique.php');
@@ -15,11 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $produit_id = isset($_POST['produit_id']) ? (int)$_POST['produit_id'] : 0;
+$nom = trim($_POST['nom']);                    // ← Récupéré depuis le formulaire
 $note = isset($_POST['note']) ? (int)$_POST['note'] : 0;
 $commentaire = trim($_POST['commentaire']);
 
 // Validation
-if ($produit_id <= 0 || $note < 1 || $note > 5 || empty($commentaire)) {
+if ($produit_id <= 0 || $note < 1 || $note > 5 || empty($nom) || empty($commentaire)) {
     $_SESSION['erreur_avis'] = 'Veuillez remplir tous les champs correctement.';
     header('Location: produit.php?id=' . $produit_id);
     exit;
@@ -34,12 +29,14 @@ if (!$stmt->fetch()) {
     exit;
 }
 
-// Insérer l'avis
+// Insérer l'avis (avec ou sans utilisateur_id)
+$utilisateur_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
 $stmt = $pdo->prepare('INSERT INTO avis (produit_id, utilisateur_id, nom, note, commentaire) VALUES (?, ?, ?, ?, ?)');
 $stmt->execute([
     $produit_id,
-    $_SESSION['user_id'],
-    $_SESSION['user_prenom'] . ' ' . $_SESSION['user_nom'],
+    $utilisateur_id,
+    $nom,
     $note,
     $commentaire
 ]);
