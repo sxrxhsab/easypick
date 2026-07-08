@@ -1,11 +1,15 @@
 ﻿<?php
-ob_start(); // ← AJOUTÉ
+ob_start();
 session_start();
 require_once 'db.php';
 
-// Récupérer les produits
-$stmt = $pdo->query('SELECT * FROM produits ORDER BY id DESC');
-$produits = $stmt->fetchAll();
+// ==================== RECHERCHE & FILTRES ====================
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$categorie = isset($_GET['categorie']) ? (int)$_GET['categorie'] : null;
+$prix_max = isset($_GET['prix_max']) ? (int)$_GET['prix_max'] : null;
+$marque = isset($_GET['marque']) ? (int)$_GET['marque'] : null;
+$note_min = isset($_GET['note_min']) ? (int)$_GET['note_min'] : null;
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'relevance';
 
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
@@ -17,6 +21,53 @@ if (!function_exists('__')) {
         return $text;
     }
 }
+
+// Requête SQL de base
+$sql = 'SELECT * FROM produits WHERE 1=1';
+$params = [];
+
+if (!empty($search)) {
+    $sql .= ' AND (nom LIKE ? OR description LIKE ?)';
+    $params[] = '%' . $search . '%';
+    $params[] = '%' . $search . '%';
+}
+if ($categorie) {
+    $sql .= ' AND categorie_id = ?';
+    $params[] = $categorie;
+}
+if ($prix_max && $prix_max > 0) {
+    $sql .= ' AND prix <= ?';
+    $params[] = $prix_max;
+}
+if ($marque) {
+    $sql .= ' AND marque_id = ?';
+    $params[] = $marque;
+}
+if ($note_min && $note_min > 0) {
+    $sql .= ' AND note >= ?';
+    $params[] = $note_min;
+}
+
+switch ($sort) {
+    case 'price-asc':
+        $sql .= ' ORDER BY prix ASC';
+        break;
+    case 'price-desc':
+        $sql .= ' ORDER BY prix DESC';
+        break;
+    case 'rating':
+        $sql .= ' ORDER BY note DESC, nb_avis DESC';
+        break;
+    case 'newest':
+        $sql .= ' ORDER BY created_at DESC';
+        break;
+    default:
+        $sql .= ' ORDER BY id ASC';
+}
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$produits = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -359,23 +410,23 @@ if (!function_exists('__')) {
                             <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
                                 <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay"></a>
                                 <div class="product-image-wrap">
-                                    <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>">
+                                    <img src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/300/200') ?>" alt="<?= htmlspecialchars($produit['nom']) ?>">
                                     <div class="badges">
-                                        <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
+                                        <?php if (isset($produit['est_promo']) && $produit['est_promo'] && isset($produit['prix_old']) && $produit['prix_old']): ?>
                                             <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
                                         <?php endif; ?>
-                                        <?php if ($produit['est_nouveau']): ?>
+                                        <?php if (isset($produit['est_nouveau']) && $produit['est_nouveau']): ?>
                                             <span class="badge new">Nouveau</span>
                                         <?php endif; ?>
-                                        <?php if ($produit['est_top']): ?>
+                                        <?php if (isset($produit['est_top']) && $produit['est_top']): ?>
                                             <span class="badge top">Top vente</span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="action-buttons">
-                                        <button class="fav-btn" onclick="toggleFav(<?= $produit['id'] ?>, this)">
+                                        <button class="fav-btn" onclick="event.stopPropagation(); toggleFav(<?= $produit['id'] ?>, this)">
                                             <i class="<?= $est_favori ? 'fas' : 'far' ?> fa-heart"></i>
                                         </button>
-                                        <button onclick="quickView(this)"><i class="fas fa-eye"></i></button>
+                                        <button onclick="event.stopPropagation(); quickView(this)"><i class="fas fa-eye"></i></button>
                                     </div>
                                 </div>
                                 <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
@@ -394,7 +445,7 @@ if (!function_exists('__')) {
                                 </div>
                                 <div class="product-price">
                                     <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
-                                    <?php if ($produit['prix_old']): ?>
+                                    <?php if (isset($produit['prix_old']) && $produit['prix_old']): ?>
                                         <span class="old"><?= number_format($produit['prix_old'], 2, ',', ' ') ?> €</span>
                                     <?php endif; ?>
                                 </div>
@@ -430,7 +481,7 @@ if (!function_exists('__')) {
                 <div class="footer-col"><h4 data-i18n="legal">Légal</h4><ul><li><a href="cgv.php" data-i18n="cgv">CGV</a></li><li><a href="confidentialite.php" data-i18n="confidentialite">Politique de confidentialité</a></li><li><a href="cookies.php" data-i18n="cookies">Cookies</a></li><li><a href="mentions-legales.php" data-i18n="mentions_legales">Mentions légales</a></li></ul></div>
                 <div class="footer-col"><h4 data-i18n="suivez_nous">Suivez-nous</h4><div class="footer-social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div><div class="footer-payments"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div></div>
             </div>
-            <div class="footer-bottom">&copy; 2026 EasyPick – <span data-i18n="tous_droits_reserves">Tous droits réservés</span>. <span data-i18n="design_par">Design par</span> <a href="#">Sarah Sabeur</a>.</div>
+            <div class="footer-bottom">&copy; 2026 EasyPick – <span data-i18n="tous_droits_reserves">Tous droits réservés</span>. <span data-i18n="design_par">Design par</span> <a href="#">Samy Sabeur</a>.</div>
         </div>
     </footer>
 
@@ -438,7 +489,9 @@ if (!function_exists('__')) {
         // ===== HAMBURGER =====
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
 
         // ===== FILTRES (accordéon) =====
         function toggleFilter(header) {
@@ -520,6 +573,6 @@ if (!function_exists('__')) {
         }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
         fadeElements.forEach(el => observer.observe(el));
     </script>
-    <?php include __DIR__ . '/footer.php'; ?>
+
 </body>
 </html>
