@@ -1,11 +1,27 @@
 ﻿<?php
-session_start();
+// ===== MULTILANGUE =====
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Variables pour la navbar
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
+
+// Charger la langue
+$lang = $_GET['lang'] ?? $_SESSION['lang'] ?? 'fr';
+$_SESSION['lang'] = $lang;
+$translations = [];
+if (file_exists(__DIR__ . '/lang/' . $lang . '.php')) {
+    $translations = require_once __DIR__ . '/lang/' . $lang . '.php';
+}
+function __($key) {
+    global $translations;
+    return $translations[$key] ?? $key;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
