@@ -1,7 +1,16 @@
 ﻿<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 ob_start();
 session_start();
 require_once 'db.php';
+
+// Fonction de traduction
+if (!function_exists('__')) {
+    function __($text) {
+        return $text;
+    }
+}
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
@@ -45,7 +54,6 @@ try {
         a { text-decoration: none; color: inherit; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
 
-        /* NAVBAR */
         .navbar-simple {
             width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06);
             display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px;
@@ -68,12 +76,10 @@ try {
         .navbar-simple .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
         .navbar-simple .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 10px; transition: 0.3s; }
 
-        /* PAGE HERO */
         .page-hero { padding: 30px 0 20px; background: linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 60%, #252525 100%); border-bottom: 1px solid rgba(255,255,255,0.04); text-align: center; }
         .page-hero h1 { font-size: 34px; font-weight: 900; }
         .page-hero h1 span { color: #ff6a00; }
 
-        /* COMPTE */
         .account-section { padding: 50px 0 80px; background: #151515; }
         .account-grid { display: grid; grid-template-columns: 280px 1fr; gap: 50px; }
         .account-sidebar { background: #1A1A1A; border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); height: fit-content; }
@@ -96,7 +102,7 @@ try {
         .info-item label { display: block; color: rgba(255,255,255,0.3); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         .info-item .value { font-size: 16px; font-weight: 600; color: #fff; }
 
-        .btn-deconnexion { display: inline-block; margin-top: 20px; padding: 12px 30px; background: #ff4444; color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s; }
+        .btn-deconnexion { display: inline-block; margin-top: 20px; padding: 12px 30px; background: #ff4444; color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
         .btn-deconnexion:hover { background: #ff6666; transform: scale(1.02); }
 
         .footer { background: #0F0F0F; padding: 40px 0 20px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; color: rgba(255,255,255,0.12); font-size: 13px; }
