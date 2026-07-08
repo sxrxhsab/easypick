@@ -48,6 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $nom_fichier = uniqid() . '.' . $extension;
             $destination = 'uploads/' . $nom_fichier;
+            // Avant la ligne move_uploaded_file
+$upload_dir = 'uploads/';
+if (!is_dir($upload_dir)) {
+    mkdir($upload_dir, 0755, true);
+}
+            
             if (move_uploaded_file($file['tmp_name'], $destination)) {
                 $image_path = $destination;
             } else {
