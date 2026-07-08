@@ -3,8 +3,8 @@ ob_start();
 session_start();
 require_once 'db.php';
 
-// Récupérer les produits en promotion (prix_original > prix_actuel)
-$stmt = $pdo->query('SELECT * FROM produits WHERE prix_original > prix_actuel ORDER BY id DESC');
+// Récupérer les produits en promotion (prix_old > prix)
+$stmt = $pdo->query('SELECT * FROM produits WHERE prix_old > 0 AND prix_old > prix ORDER BY id DESC');
 $promotions = $stmt->fetchAll();
 
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
@@ -99,7 +99,6 @@ if (!function_exists('__')) {
         .footer { background: #0F0F0F; padding: 40px 0 20px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; color: rgba(255,255,255,0.12); font-size: 13px; }
         .footer a { color: #ff6a00; }
 
-        /* RESPONSIVE */
         @media (max-width: 1200px) { .products-grid { grid-template-columns: repeat(3,1fr); gap: 30px; } }
         @media (max-width: 992px) { .products-grid { grid-template-columns: repeat(2,1fr); gap: 28px; } }
         @media (max-width: 768px) {
@@ -174,11 +173,11 @@ if (!function_exists('__')) {
             <?php else: ?>
                 <div class="products-grid">
                     <?php foreach ($promotions as $produit): 
-                        $reduction = round((($produit['prix_original'] - $produit['prix_actuel']) / $produit['prix_original']) * 100);
+                        $reduction = round((($produit['prix_old'] - $produit['prix']) / $produit['prix_old']) * 100);
                     ?>
                     <div class="product-card">
                         <div class="product-image-wrap">
-                            <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
+                            <img src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/300/200') ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
                             <div class="badges">
                                 <span class="badge promo">-<?= $reduction ?>%</span>
                             </div>
@@ -202,8 +201,8 @@ if (!function_exists('__')) {
                             <span class="count">(<?= $produit['nb_avis'] ?> avis)</span>
                         </div>
                         <div class="product-price">
-                            <span class="current"><?= number_format($produit['prix_actuel'], 2, ',', ' ') ?> €</span>
-                            <span class="old"><?= number_format($produit['prix_original'], 2, ',', ' ') ?> €</span>
+                            <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
+                            <span class="old"><?= number_format($produit['prix_old'], 2, ',', ' ') ?> €</span>
                             <span class="reduction">-<?= $reduction ?>%</span>
                         </div>
                         <div class="card-actions">
@@ -224,7 +223,6 @@ if (!function_exists('__')) {
     </footer>
 
     <script>
-        // Menu hamburger
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
         if (hamburger && navMenu) {
