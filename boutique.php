@@ -2,8 +2,6 @@
 ob_start();
 session_start();
 require_once 'db.php';
-
-// ==================== RECHERCHE & FILTRES ====================
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $categorie = isset($_GET['categorie']) ? (int)$_GET['categorie'] : null;
 $prix_max = isset($_GET['prix_max']) ? (int)$_GET['prix_max'] : null;
