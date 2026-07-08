@@ -1,4 +1,5 @@
 <?php
+ob_start(); // ← AJOUTÉ pour éviter l'erreur session_start()
 session_start();
 require_once 'db.php';
 
@@ -9,23 +10,32 @@ $produits = $stmt->fetchAll();
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
+
+// Fonction de traduction si elle n'existe pas
+if (!function_exists('__')) {
+    function __($text) {
+        return $text;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – <?= __('nouveautes') ?></title>
+    <title>EasyPick – Nouveautés</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* (reprendre les styles de <?= __('boutique') ?>.php) */
+        /* ---- TOUS TES STYLES ---- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; }
         a { text-decoration: none; color: inherit; }
         .container { max-width: 1500px; margin: 0 auto; padding: 0 30px; }
+        
+        /* NAVBAR */
         .navbar-simple {
             width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06);
             display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px;
@@ -34,22 +44,28 @@ $user_role = $_SESSION['user_role'] ?? '';
         .navbar-simple .logo-text { font-weight: 900; font-size: 22px; letter-spacing: 1px; }
         .navbar-simple .logo-text .easy { color: #ff6a00; }
         .navbar-simple .logo-text .pick { color: #fff; }
+        .navbar-simple .logo-text .sub { font-weight: 300; font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; margin-top: -2px; display: block; }
         .navbar-simple .nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
         .navbar-simple .nav-menu li a { font-weight: 500; font-size: 14px; color: rgba(255,255,255,0.6); transition: color 0.3s; padding: 4px 0; position: relative; }
         .navbar-simple .nav-menu li a::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 0; height: 2px; background: #ff6a00; border-radius: 10px; transition: width 0.3s; }
         .navbar-simple .nav-menu li a:hover { color: #fff; }
         .navbar-simple .nav-menu li a:hover::after { width: 100%; }
-        .navbar-simple .nav-icons { display: flex; gap: 20px; }
+        .navbar-simple .nav-menu li a.active { color: #ff6a00; }
+        .navbar-simple .nav-menu li a.active::after { width: 100%; }
+        .navbar-simple .nav-icons { display: flex; gap: 20px; align-items: center; }
         .navbar-simple .nav-icons a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.3s; position: relative; }
         .navbar-simple .nav-icons a:hover { color: #ff6a00; }
+        .navbar-simple .cart-badge { position: absolute; top: -8px; right: -10px; background: #ff6a00; color: #fff; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .navbar-simple .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
         .navbar-simple .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 10px; transition: 0.3s; }
 
+        /* HERO */
         .page-hero { padding: 30px 0 20px; background: linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 60%, #252525 100%); border-bottom: 1px solid rgba(255,255,255,0.04); text-align: center; }
         .page-hero h1 { font-size: 34px; font-weight: 900; }
         .page-hero h1 span { color: #ff6a00; }
         .page-hero p { color: rgba(255,255,255,0.4); font-size: 15px; }
 
+        /* PRODUCTS */
         .products-section { padding: 40px 0 80px; background: #151515; }
         .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 35px; }
         .product-card { background: #202020; border-radius: 20px; overflow: hidden; padding: 24px 24px 28px; border: 1px solid rgba(255,255,255,0.06); transition: transform 0.4s, box-shadow 0.4s; position: relative; }
@@ -79,9 +95,11 @@ $user_role = $_SESSION['user_role'] ?? '';
         .empty { text-align: center; padding: 60px 0; color: rgba(255,255,255,0.4); }
         .empty i { font-size: 48px; margin-bottom: 16px; }
 
+        /* FOOTER */
         .footer { background: #0F0F0F; padding: 40px 0 20px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; color: rgba(255,255,255,0.12); font-size: 13px; }
         .footer a { color: #ff6a00; }
 
+        /* RESPONSIVE */
         @media (max-width: 1200px) { .products-grid { grid-template-columns: repeat(3,1fr); gap: 30px; } }
         @media (max-width: 992px) { .products-grid { grid-template-columns: repeat(2,1fr); gap: 28px; } }
         @media (max-width: 768px) {
@@ -101,15 +119,51 @@ $user_role = $_SESSION['user_role'] ?? '';
 </head>
 <body>
 
-    <?php include 'header.php'; ?>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar-simple">
+        <div class="nav-container">
+            <div class="logo-text">
+                <span><span class="easy">EASY</span><span class="pick">PICK</span></span>
+                <span class="sub">By Samy Sabeur</span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.php">Accueil</a></li>
+                <li><a href="boutique.php">Boutique</a></li>
+                <li><a href="nouveautes.php" class="active">Nouveautés</a></li>
+                <li><a href="promotions.php">Promotions</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#"><i class="fas fa-search"></i></a>
+                <a href="#"><i class="far fa-heart"></i></a>
+                <?php if ($user_connecte): ?>
+                    <a href="mon-compte.php"><i class="fas fa-user"></i></a>
+                <?php else: ?>
+                    <a href="login.php"><i class="fas fa-user"></i></a>
+                <?php endif; ?>
+                <a href="panier.php" style="position:relative;">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge"><?= $nb_articles ?></span>
+                </a>
+                <?php if ($user_connecte && $user_role === 'admin'): ?>
+                    <a href="admin.php"><i class="fas fa-cog"></i></a>
+                <?php endif; ?>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
+    <!-- ===== PAGE HERO ===== -->
     <section class="page-hero">
         <div class="container">
-            <h1><span><?= __('nouveautes') ?></span></h1>
-            <p>Découvrez les derniers <?= __('produits') ?> ajoutés à notre catalogue.</p>
+            <h1><span>Nouveautés</span></h1>
+            <p>Découvrez les derniers produits ajoutés à notre catalogue.</p>
         </div>
     </section>
 
+    <!-- ===== PRODUCTS ===== -->
     <section class="products-section">
         <div class="container">
             <?php if (empty($produits)): ?>
@@ -143,7 +197,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 }
                                 ?>
                             </span>
-                            <span class="count">(<?= $produit['nb_avis'] ?> <?= __('avis') ?>)</span>
+                            <span class="count">(<?= $produit['nb_avis'] ?> avis)</span>
                         </div>
                         <div class="product-price">
                             <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
@@ -152,7 +206,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <?php endif; ?>
                         </div>
                         <div class="card-actions">
-                            <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
+                            <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add">Ajouter au panier</a>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -161,9 +215,10 @@ $user_role = $_SESSION['user_role'] ?? '';
         </div>
     </section>
 
+    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
-            &copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.
+            &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.
         </div>
     </footer>
 
@@ -171,7 +226,9 @@ $user_role = $_SESSION['user_role'] ?? '';
         // Menu hamburger
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
 
         function toggleFav(btn) {
             const icon = btn.querySelector('i');
@@ -186,5 +243,6 @@ $user_role = $_SESSION['user_role'] ?? '';
             alert('🖥️ Aperçu rapide : ' + name);
         }
     </script>
+
 </body>
 </html>
