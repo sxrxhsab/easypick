@@ -1,7 +1,7 @@
-﻿<?php
+<?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-ob_start();
+ob_start(); // Cette ligne est cruciale pour résoudre le problème d'en-têtes
 session_start();
 require_once 'db.php';
 
