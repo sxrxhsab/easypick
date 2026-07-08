@@ -1,6 +1,5 @@
 <?php
 // footer.php - Pied de page commun à toutes les pages
-// (la variable $lang doit être définie AVANT d'inclure ce fichier)
 ?>
 <footer class="footer">
     <div class="container">
@@ -8,32 +7,32 @@
             <div class="footer-col">
                 <h4>EasyPick</h4>
                 <ul>
-                    <li><a href="a-propos.php?lang=<?= $lang ?>"><?= __('a_propos') ?></a></li>
-                    <li><a href="blog.php?lang=<?= $lang ?>"><?= __('blog') ?></a></li>
-                    <li><a href="carrieres.php?lang=<?= $lang ?>"><?= __('carrieres') ?></a></li>
-                    <li><a href="contact.php?lang=<?= $lang ?>"><?= __('contact') ?></a></li>
+                    <li><a href="a-propos.php">À propos</a></li>
+                    <li><a href="blog.php">Blog</a></li>
+                    <li><a href="carrieres.php">Carrières</a></li>
+                    <li><a href="contact.php">Contact</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4><?= __('aide') ?></h4>
+                <h4>Aide</h4>
                 <ul>
-                    <li><a href="centre-aide.php?lang=<?= $lang ?>">Centre d'aide</a></li>
-                    <li><a href="suivi-commande.php?lang=<?= $lang ?>">Suivi de commande</a></li>
-                    <li><a href="retours.php?lang=<?= $lang ?>">Retours</a></li>
-                    <li><a href="faq.php?lang=<?= $lang ?>">FAQ</a></li>
+                    <li><a href="centre-aide.php">Centre d'aide</a></li>
+                    <li><a href="suivi-commande.php">Suivi de commande</a></li>
+                    <li><a href="retours.php">Retours</a></li>
+                    <li><a href="faq.php">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4><?= __('legal') ?></h4>
+                <h4>Légal</h4>
                 <ul>
-                    <li><a href="cgv.php?lang=<?= $lang ?>"><?= __('cgv') ?></a></li>
-                    <li><a href="confidentialite.php?lang=<?= $lang ?>"><?= __('confidentialite') ?></a></li>
-                    <li><a href="cookies.php?lang=<?= $lang ?>"><?= __('cookies') ?></a></li>
-                    <li><a href="mentions-legales.php?lang=<?= $lang ?>"><?= __('mentions_legales') ?></a></li>
+                    <li><a href="cgv.php">CGV</a></li>
+                    <li><a href="confidentialite.php">Politique de confidentialité</a></li>
+                    <li><a href="cookies.php">Cookies</a></li>
+                    <li><a href="mentions-legales.php">Mentions légales</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4><?= __('suivez_nous') ?></h4>
+                <h4>Suivez-nous</h4>
                 <div class="footer-social">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-instagram"></i></a>
@@ -49,7 +48,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.
+            &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.
         </div>
     </div>
 </footer>
