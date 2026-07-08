@@ -1,21 +1,40 @@
 <?php
+// db.php - Version avec fallback
 
-// 🔧 CORRECTION : Utiliser 127.0.0.1 au lieu de localhost
-$host = getenv('DB_HOST') ?: '127.0.0.1';  // ← CHANGÉ
-$port = getenv('DB_PORT') ?: 3306;
-$dbname = getenv('DB_NAME') ?: 'easypick';
-$username = getenv('DB_USER') ?: 'root';
-$password = getenv('DB_PASSWORD') ?: 'sarah';  // ← VIDE pour WAMP
+// Essayer d'abord avec le nom d'hôte, puis avec l'IP directe
+$hosts = [
+    getenv('DB_HOST') ?: 'easypick-db-sabeursamy66-2547.a.aivencloud.com',
+    'XXX.XXX.XXX.XXX'  // ← REMPLACE PAR L'IP TROUVÉE
+];
 
-try {
-    $pdo = new PDO(
-        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
-        $username,
-        $password
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die('Erreur de connexion MySQL : ' . $e->getMessage());
+$port = getenv('DB_PORT') ?: 26003;
+$dbname = getenv('DB_NAME') ?: 'defaultdb';
+$username = getenv('DB_USER') ?: 'avnadmin';
+$password = getenv('DB_PASSWORD') ?: 'AVNS_JLGOdhJG2I8e9xkhs99';
+
+$pdo = null;
+$lastError = null;
+
+foreach ($hosts as $host) {
+    try {
+        $pdo = new PDO(
+            "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+            $username,
+            $password,
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 30
+            ]
+        );
+        break; // Connexion réussie
+    } catch (PDOException $e) {
+        $lastError = $e->getMessage();
+        continue; // Essayer le prochain host
+    }
+}
+
+if (!$pdo) {
+    die('Erreur de connexion MySQL : ' . $lastError);
 }
 ?>
