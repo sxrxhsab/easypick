@@ -363,12 +363,12 @@ $user_role = $_SESSION['user_role'] ?? '';
 
             <!-- Menu -->
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php" class="active">Accueil</a></li>
-                <li><a href="boutique.php">Boutique</a></li>
-                <li><a href="#">Nouveautés</a></li>
-                <li><a href="#">Promotions</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
+    <li><a href="index.php" class="active">Accueil</a></li>
+    <li><a href="boutique.php">Boutique</a></li>
+    <li><a href="nouveautes.php">Nouveautés</a></li>
+    <li><a href="promotions.php">Promotions</a></li>
+    <li><a href="contact.php">Contact</a></li>
+</ul>
 
             <!-- Icônes (avec variables PHP dynamiques) -->
             <div class="nav-icons">
