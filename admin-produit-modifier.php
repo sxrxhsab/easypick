@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -27,8 +27,8 @@ $erreur = '';
 $succes = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = trim($_POST['nom']);
-    $slug = strtolower(trim(str_replace(' ', '-', $nom)));
+    $<?= __('nom') ?> = trim($_POST['<?= __('nom') ?>']);
+    $slug = strtolower(trim(str_replace(' ', '-', $<?= __('nom') ?>)));
     $description = trim($_POST['description']);
     $prix = (float) $_POST['prix'];
     $prix_old = !empty($_POST['prix_old']) ? (float) $_POST['prix_old'] : null;
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $est_nouveau = isset($_POST['est_nouveau']) ? 1 : 0;
     $est_top = isset($_POST['est_top']) ? 1 : 0;
 
-    if (empty($nom) || empty($description) || $prix <= 0 || empty($image)) {
+    if (empty($<?= __('nom') ?>) || empty($description) || $prix <= 0 || empty($image)) {
         $erreur = 'Veuillez remplir tous les champs obligatoires.';
     } else {
         $stmt = $pdo->prepare('UPDATE produits SET nom=?, slug=?, description=?, prix=?, prix_old=?, stock=?, categorie_id=?, image=?, est_promo=?, est_nouveau=?, est_top=? WHERE id=?');
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Modifier produit</title>
+    <title>EasyPick – <?= __('modifier') ?> produit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section class="section">
         <div class="container">
             <div class="form-box">
-                <h1>Modifier le <span>produit</span></h1>
+                <h1><?= __('modifier') ?> le <span>produit</span></h1>
                 <div class="sub">ID #<?= $produit['id'] ?> – <?= htmlspecialchars($produit['nom']) ?></div>
 
                 <?php if ($erreur): ?>
@@ -124,8 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form method="POST">
                     <div class="form-group">
-                        <label>Nom du produit *</label>
-                        <input type="text" name="nom" required value="<?= htmlspecialchars($produit['nom']) ?>" />
+                        <label><?= __('nom') ?> du produit *</label>
+                        <input type="text" name="<?= __('nom') ?>" required value="<?= htmlspecialchars($produit['nom']) ?>" />
                     </div>
                     <div class="form-group">
                         <label>Description *</label>
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label><input type="checkbox" name="est_top" <?= $produit['est_top'] ? 'checked' : '' ?> /> Top vente</label>
                         </div>
                     </div>
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Enregistrer les modifications</button>
+                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> <?= __('enregistrer') ?> les modifications</button>
                 </form>
 
                 <div style="margin-top:16px;">

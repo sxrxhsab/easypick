@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -135,13 +135,13 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <?= htmlspecialchars($commande['telephone']) ?>
                     </div>
                     <div class="info">
-                        <strong>Adresse de livraison</strong><br>
+                        <strong>Adresse de <?= __('livraison') ?></strong><br>
                         <?= htmlspecialchars($commande['adresse']) ?><br>
                         <?= htmlspecialchars($commande['code_postal'] . ' ' . $commande['ville']) ?><br>
                         <?= htmlspecialchars($commande['pays']) ?>
                     </div>
                     <div class="info">
-                        <strong>Total</strong><br>
+                        <strong><?= __('total') ?></strong><br>
                         <span style="font-size:24px; font-weight:900; color:#ff6a00;"><?= number_format($commande['total'], 2, ',', ' ') ?> €</span>
                     </div>
                     <div class="info">
@@ -155,7 +155,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 <option value="livree" <?= $commande['statut'] === 'livree' ? 'selected' : '' ?>>Livrée</option>
                                 <option value="annulee" <?= $commande['statut'] === 'annulee' ? 'selected' : '' ?>>Annulée</option>
                             </select>
-                            <button type="submit" class="btn-save">Mettre à jour</button>
+                            <button type="submit" class="btn-save"><?= __('mettre_a_jour') ?></button>
                         </form>
                     </div>
                 </div>
@@ -168,9 +168,9 @@ $user_role = $_SESSION['user_role'] ?? '';
                     <thead>
                         <tr>
                             <th style="text-align:left; padding:12px 16px; color:rgba(255,255,255,0.3); font-weight:600; font-size:13px; text-transform:uppercase;">Produit</th>
-                            <th style="text-align:center; padding:12px 16px; color:rgba(255,255,255,0.3); font-weight:600; font-size:13px; text-transform:uppercase;">Quantité</th>
+                            <th style="text-align:center; padding:12px 16px; color:rgba(255,255,255,0.3); font-weight:600; font-size:13px; text-transform:uppercase;"><?= __('quantite') ?></th>
                             <th style="text-align:right; padding:12px 16px; color:rgba(255,255,255,0.3); font-weight:600; font-size:13px; text-transform:uppercase;">Prix unitaire</th>
-                            <th style="text-align:right; padding:12px 16px; color:rgba(255,255,255,0.3); font-weight:600; font-size:13px; text-transform:uppercase;">Total</th>
+                            <th style="text-align:right; padding:12px 16px; color:rgba(255,255,255,0.3); font-weight:600; font-size:13px; text-transform:uppercase;"><?= __('total') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -193,7 +193,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="3" style="text-align:right; padding:12px 16px; font-weight:700; font-size:18px; border-top:1px solid rgba(255,255,255,0.06);">Total</td>
+                            <td colspan="3" style="text-align:right; padding:12px 16px; font-weight:700; font-size:18px; border-top:1px solid rgba(255,255,255,0.06);"><?= __('total') ?></td>
                             <td style="text-align:right; padding:12px 16px; font-weight:700; font-size:18px; color:#ff6a00; border-top:1px solid rgba(255,255,255,0.06);">
                                 <?= number_format($commande['total'], 2, ',', ' ') ?> €
                             </td>
@@ -202,7 +202,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                 </table>
             </div>
 
-            <a href="admin-commandes.php" class="back-link"><i class="fas fa-arrow-left"></i> Retour à la liste des commandes</a>
+            <a href="admin-commandes.php" class="back-link"><i class="fas fa-arrow-left"></i> Retour à la liste des <?= __('commandes') ?></a>
 
         </div>
     </section>

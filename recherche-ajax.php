@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -12,14 +12,14 @@ if (!empty($search)) {
 }
 ?>
 <?php if (empty($produits)): ?>
-    <p style="text-align:center; padding:40px 0; color:rgba(255,255,255,0.4);">
+    <div style="text-align:center; padding:60px 0; color:rgba(255,255,255,0.4);">
         <i class="fas fa-box-open" style="font-size:48px; display:block; margin-bottom:16px;"></i>
-        Aucun produit trouvé pour "<?= htmlspecialchars($search) ?>".
-    </p>
+        <p>Aucun produit trouvé pour "<?= htmlspecialchars($search) ?>".</p>
+    </div>
 <?php else: ?>
     <?php foreach ($produits as $index => $produit): ?>
     <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
-        <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay" aria-label="Voir le produit"></a>
+        <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay" aria-label='<?= __('voir_le_produit') ?>'></a>
         <div class="product-image-wrap">
             <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
             <div class="badges">
@@ -50,7 +50,7 @@ if (!empty($search)) {
                 }
                 ?>
             </span>
-            <span class="count">(<?= $produit['nb_avis'] ?> avis)</span>
+            <span class="count">(<?= $produit['nb_avis'] ?> <?= __('avis') ?>)</span>
         </div>
         <div class="product-price">
             <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
@@ -59,7 +59,7 @@ if (!empty($search)) {
             <?php endif; ?>
         </div>
         <div class="card-actions">
-            <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add">Ajouter au panier</a>
+            <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
         </div>
     </div>
     <?php endforeach; ?>

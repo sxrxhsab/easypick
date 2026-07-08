@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -20,7 +20,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin Utilisateurs</title>
+    <title>EasyPick – Admin <?= __('utilisateurs') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -95,7 +95,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <section class="admin-hero">
         <div class="container">
-            <h1>Gestion des <span>utilisateurs</span></h1>
+            <h1>Gestion des <span><?= __('utilisateurs') ?></span></h1>
             <p>Consultez et gérez les comptes des clients inscrits.</p>
         </div>
     </section>
@@ -104,10 +104,10 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="container">
 
             <div class="admin-menu">
-                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
-                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
-                <a href="admin-utilisateurs.php" class="active"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
+                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
+                <a href="admin-utilisateurs.php" class="active"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
             </div>
 
             <div class="table-wrap">
@@ -118,8 +118,8 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Nom</th>
-                                <th>Email</th>
+                                <th><?= __('nom') ?></th>
+                                <th><?= __('email') ?></th>
                                 <th>Rôle</th>
                                 <th>Inscrit le</th>
                                 <th>Actions</th>
@@ -135,8 +135,8 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 <td><?= date('d/m/Y', strtotime($user['created_at'])) ?></td>
                                 <td>
                                     <div class="btn-actions">
-                                        <a href="admin-utilisateur-modifier.php?id=<?= $user['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Modifier</a>
-                                        <a href="admin-utilisateur-supprimer.php?id=<?= $user['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="fas fa-trash"></i> Supprimer</a>
+                                        <a href="admin-utilisateur-<?= __('modifier') ?>.php?id=<?= $user['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> <?= __('modifier') ?></a>
+                                        <a href="admin-utilisateur-<?= __('supprimer') ?>.php?id=<?= $user['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="fas fa-trash"></i> <?= __('supprimer') ?></a>
                                     </div>
                                 </td>
                             </tr>

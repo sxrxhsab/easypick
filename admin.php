@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -86,15 +86,15 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">Accueil</a></li>
-                <li><a href="boutique.php">Boutique</a></li>
-                <li><a href="#">Nouveautés</a></li>
-                <li><a href="#">Promotions</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="index.php"><?= __('accueil') ?></a></li>
+                <li><a href="boutique.php"><?= __('boutique') ?></a></li>
+                <li><a href="#"><?= __('nouveautes') ?></a></li>
+                <li><a href="#"><?= __('promotions') ?></a></li>
+                <li><a href="#"><?= __('contact') ?></a></li>
             </ul>
             <div class="nav-icons">
-                <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
-                <a href="logout.php" aria-label="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+                <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
+                <a href="logout.php" aria-label='<?= __('deconnexion') ?>'><i class="fas fa-sign-out-alt"></i></a>
                 <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -105,8 +105,8 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
     <!-- ===== HERO ===== -->
     <section class="admin-hero">
         <div class="container">
-            <h1>Tableau de bord <span>Admin</span></h1>
-            <p>Gérez vos produits, commandes et utilisateurs.</p>
+            <h1><?= __('tableau_de_bord') ?> <span>Admin</span></h1>
+            <p>Gérez vos <?= __('produits') ?>, <?= __('commandes') ?> et <?= __('utilisateurs') ?>.</p>
         </div>
     </section>
 
@@ -116,25 +116,25 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
 
             <!-- Menu admin (une seule fois) -->
             <div class="admin-menu">
-                <a href="admin.php" class="active"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
-                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
-                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a href="admin.php" class="active"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
+                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
+                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
             </div>
 
             <!-- Statistiques -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="number"><?= $nb_produits ?></div>
-                    <div class="label">Produits</div>
+                    <div class="label"><?= __('produits') ?></div>
                 </div>
                 <div class="stat-card">
                     <div class="number"><?= $nb_commandes ?></div>
-                    <div class="label">Commandes</div>
+                    <div class="label"><?= __('commandes') ?></div>
                 </div>
                 <div class="stat-card">
                     <div class="number"><?= $nb_utilisateurs ?></div>
-                    <div class="label">Utilisateurs</div>
+                    <div class="label"><?= __('utilisateurs') ?></div>
                 </div>
                 <div class="stat-card">
                     <div class="number"><?= $chiffre_affaires ?> €</div>
@@ -143,7 +143,7 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
             </div>
 
             <div style="background:#1A1A1A; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.06);">
-                <p style="color:rgba(255,255,255,0.4); font-size:14px;">Bienvenue dans votre espace d'administration. Utilisez le menu ci-dessus pour gérer votre boutique.</p>
+                <p style="color:rgba(255,255,255,0.4); font-size:14px;">Bienvenue dans votre espace d'administration. Utilisez le menu ci-dessus pour gérer votre <?= __('boutique') ?>.</p>
             </div>
 
         </div>

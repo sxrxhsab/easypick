@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -19,7 +19,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin Catégories</title>
+    <title>EasyPick – Admin <?= __('categories') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -91,8 +91,8 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <section class="admin-hero">
         <div class="container">
-            <h1>Gestion des <span>catégories</span></h1>
-            <p>Ajoutez, modifiez ou supprimez des catégories de produits.</p>
+            <h1>Gestion des <span><?= __('categories') ?></span></h1>
+            <p>Ajoutez, modifiez ou supprimez des <?= __('categories') ?> de <?= __('produits') ?>.</p>
         </div>
     </section>
 
@@ -100,14 +100,14 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="container">
 
             <div class="admin-menu">
-                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
-                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
-                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> Utilisateurs</a>
-                <a href="admin-categories.php" class="active"><i class="fas fa-tags"></i> Catégories</a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
+                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
+                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
+                <a href="admin-categories.php" class="active"><i class="fas fa-tags"></i> <?= __('categories') ?></a>
             </div>
 
-            <a href="admin-categorie-ajouter.php" class="btn-add"><i class="fas fa-plus"></i> Ajouter une catégorie</a>
+            <a href="admin-categorie-ajouter.php" class="btn-add"><i class="fas fa-plus"></i> <?= __('ajouter') ?> une catégorie</a>
 
             <div class="table-wrap">
                 <?php if (empty($categories)): ?>
@@ -117,9 +117,9 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Nom</th>
+                                <th><?= __('nom') ?></th>
                                 <th>Slug</th>
-                                <th>Produits associés</th>
+                                <th><?= __('produits') ?> associés</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -135,8 +135,8 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 <td><?= $nb_produits ?></td>
                                 <td>
                                     <div class="btn-actions">
-                                        <a href="admin-categorie-modifier.php?id=<?= $cat['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Modifier</a>
-                                        <a href="admin-categorie-supprimer.php?id=<?= $cat['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cette catégorie ? Les produits ne seront pas supprimés.')"><i class="fas fa-trash"></i> Supprimer</a>
+                                        <a href="admin-categorie-<?= __('modifier') ?>.php?id=<?= $cat['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> <?= __('modifier') ?></a>
+                                        <a href="admin-categorie-<?= __('supprimer') ?>.php?id=<?= $cat['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cette catégorie ? Les produits ne seront pas supprimés.')"><i class="fas fa-trash"></i> <?= __('supprimer') ?></a>
                                     </div>
                                 </td>
                             </tr>

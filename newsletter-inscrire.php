@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -13,6 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$email]);
         echo json_encode(['success' => true, 'message' => '✅ Inscription réussie !']);
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => '⚠️ Cet email est déjà inscrit.']);
+        echo json_encode(['success' => false, 'message' => '⚠️ Cet <?= __('email') ?> est déjà inscrit.']);
     }
 }

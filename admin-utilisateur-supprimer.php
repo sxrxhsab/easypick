@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -14,5 +14,5 @@ if ($id > 0 && $id != $_SESSION['user_id']) {
     $stmt->execute([$id]);
 }
 
-header('Location: admin-utilisateurs.php');
+header('Location: admin-<?= __('utilisateurs') ?>.php');
 exit;

@@ -1,6 +1,4 @@
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -10,99 +8,64 @@ $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
 
 // ==================== RECHERCHE & FILTRES ====================
-
-// Récupérer les paramètres GET
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $categorie = isset($_GET['categorie']) ? (int)$_GET['categorie'] : null;
-$prix_min = isset($_GET['prix_min']) ? (int)$_GET['prix_min'] : null;
 $prix_max = isset($_GET['prix_max']) ? (int)$_GET['prix_max'] : null;
 $marque = isset($_GET['marque']) ? (int)$_GET['marque'] : null;
 $note_min = isset($_GET['note_min']) ? (int)$_GET['note_min'] : null;
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'relevance';
 
-// Construire la requête SQL
+// Requête SQL de base
 $sql = 'SELECT * FROM produits WHERE 1=1';
 $params = [];
 
-// Recherche
 if (!empty($search)) {
     $sql .= ' AND (nom LIKE ? OR description LIKE ?)';
     $params[] = '%' . $search . '%';
     $params[] = '%' . $search . '%';
 }
-
-// Catégorie
 if ($categorie) {
     $sql .= ' AND categorie_id = ?';
     $params[] = $categorie;
 }
-
-// Prix min
-if ($prix_min !== null && $prix_min > 0) {
-    $sql .= ' AND prix >= ?';
-    $params[] = $prix_min;
-}
-
-// Prix max
-if ($prix_max !== null && $prix_max > 0) {
+if ($prix_max && $prix_max > 0) {
     $sql .= ' AND prix <= ?';
     $params[] = $prix_max;
 }
-
-// Marque
 if ($marque) {
     $sql .= ' AND marque_id = ?';
     $params[] = $marque;
 }
-
-// Note minimale
 if ($note_min && $note_min > 0) {
     $sql .= ' AND note >= ?';
     $params[] = $note_min;
 }
 
-// Tri
 switch ($sort) {
-    case 'price-asc':
-        $sql .= ' ORDER BY prix ASC';
-        break;
-    case 'price-desc':
-        $sql .= ' ORDER BY prix DESC';
-        break;
-    case 'rating':
-        $sql .= ' ORDER BY note DESC, nb_avis DESC';
-        break;
-    case 'newest':
-        $sql .= ' ORDER BY created_at DESC';
-        break;
-    default:
-        $sql .= ' ORDER BY id ASC'; // Pertinence = par défaut
-        break;
+    case 'price-asc': $sql .= ' ORDER BY prix ASC'; break;
+    case 'price-desc': $sql .= ' ORDER BY prix DESC'; break;
+    case 'rating': $sql .= ' ORDER BY note DESC, nb_avis DESC'; break;
+    case 'newest': $sql .= ' ORDER BY created_at DESC'; break;
+    default: $sql .= ' ORDER BY id ASC';
 }
 
-// Exécuter la requête
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $produits = $stmt->fetchAll();
-
-// Compter les résultats
-$total_produits = count($produits);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Boutique Premium</title>
-
-    <!-- Google Fonts : Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyPick – <?= __('boutique') ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ---- (Tous tes styles CSS existants) ---- */
+        /* ---------- TOUS LES STYLES EXISTANTS ---------- */
+        /* On garde exactement les mêmes styles que précédemment pour ne rien casser */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
@@ -261,26 +224,26 @@ $total_produits = count($produits);
 </head>
 <body>
 
-    <!-- ===== NAVBAR (CORRIGÉE) ===== -->
+    <!-- ===== NAVBAR ===== -->
     <nav class="navbar-simple">
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">Accueil</a></li>
-                <li><a href="boutique.php" class="active">Boutique</a></li>
-                <li><a href="nouveautes.php">Nouveautés</a></li>
-                <li><a href="promotions.php">Promotions</a></li>
-                <li><a href="contact.php">Contact</a></li>
+                <li><a href="index.php"><?= __('accueil') ?></a></li>
+                <li><a href="boutique.php" class="active"><?= __('boutique') ?></a></li>
+                <li><a href="nouveautes.php"><?= __('nouveautes') ?></a></li>
+                <li><a href="promotions.php"><?= __('promotions') ?></a></li>
+                <li><a href="contact.php"><?= __('contact') ?></a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
                 <?php if ($user_connecte): ?>
-                    <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
+                    <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
                 <?php else: ?>
-                    <a href="login.php" aria-label="Connexion"><i class="fas fa-user"></i></a>
+                    <a href="login.php" aria-label='<?= __('connexion') ?>'><i class="fas fa-user"></i></a>
                 <?php endif; ?>
-                <a href="panier.php" aria-label="Panier" style="position:relative;">
+                <a href="panier.php" aria-label='<?= __('panier') ?>' style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
@@ -303,7 +266,7 @@ $total_produits = count($produits);
             <div class="line"></div>
         </div>
         <div class="container">
-            <h1><span class="white">NOTRE</span> <span class="orange">BOUTIQUE</span></h1>
+            <h1><span class="white">NOTRE</span> <span class="orange"><?= __('boutique') ?></span></h1>
             <p>Découvrez notre sélection d'accessoires technologiques premium.</p>
         </div>
     </section>
@@ -315,60 +278,39 @@ $total_produits = count($produits);
 
         <div class="container">
 
-            <!-- Barre de recherche (fonctionnelle) -->
-            <form method="GET" action="" class="search-toolbar">
+            <!-- ===== BARRE DE RECHERCHE + TRI (UNIQUE) ===== -->
+            <div class="search-toolbar">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
-                <input type="text" name="search" placeholder="Rechercher un produit..." value="<?= htmlspecialchars($search) ?>" />
-                <div class="search-toolbar">
-    <span class="search-icon"><i class="fas fa-search"></i></span>
-    <input type="text" id="searchInput" placeholder="Rechercher un produit..." autocomplete="off" />
-    <div class="search-divider"></div>
-    <div class="sort-wrap">
-        <label for="sortSelect">Trier par</label>
-        <select id="sortSelect" onchange="applyFilters()">
-            <option value="relevance">Pertinence</option>
-            <option value="price-asc">Prix croissant</option>
-            <option value="price-desc">Prix décroissant</option>
-            <option value="rating">Meilleures notes</option>
-            <option value="newest">Nouveautés</option>
-        </select>
-    </div>
-</div>
-<div id="productGrid" class="products-grid">
-    <?php foreach ($produits as $index => $produit): ?>
-        <!-- les cartes existantes -->
-    <?php endforeach; ?>
-</div>
+                <input type="text" id="searchInput" placeholder="Rechercher un produit..." autocomplete="off" />
+                <div class="search-divider"></div>
                 <div class="sort-wrap">
                     <label for="sortSelect">Trier par</label>
-                    <select name="sort" id="sortSelect" onchange="this.form.submit()">
+                    <select id="sortSelect" onchange="applyFilters()">
                         <option value="relevance" <?= $sort === 'relevance' ? 'selected' : '' ?>>Pertinence</option>
                         <option value="price-asc" <?= $sort === 'price-asc' ? 'selected' : '' ?>>Prix croissant</option>
                         <option value="price-desc" <?= $sort === 'price-desc' ? 'selected' : '' ?>>Prix décroissant</option>
                         <option value="rating" <?= $sort === 'rating' ? 'selected' : '' ?>>Meilleures notes</option>
-                        <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Nouveautés</option>
+                        <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>><?= __('nouveautes') ?></option>
                     </select>
-                    <button type="submit" class="btn-search"><i class="fas fa-arrow-right"></i></button>
                 </div>
-            </form>
+            </div>
 
-            <!-- LAYOUT FILTRES + PRODUITS -->
+            <!-- ===== FILTRES + GRILLE ===== -->
             <div class="shop-layout">
 
                 <!-- SIDEBAR FILTRES -->
                 <aside class="shop-sidebar">
-                    <form method="GET" action="">
-                        <!-- Garder les paramètres de recherche et tri -->
+                    <form method="GET" action="" id="filterForm">
+                        <!-- Paramètres de recherche et tri (pour rechargement) -->
                         <?php if (!empty($search)): ?>
-                            <input type="hidden" name="search" value="<?= htmlspecialchars($search) ?>" />
+                            <input type="hidden" name="search" value="<?= htmlspecialchars($search) ?>">
                         <?php endif; ?>
                         <?php if ($sort !== 'relevance'): ?>
-                            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>" />
+                            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
                         <?php endif; ?>
 
-                        <!-- Catégories -->
                         <div class="filter-block active-filter">
-                            <h4 onclick="toggleFilter(this)">Catégories <i class="fas fa-chevron-down"></i></h4>
+                            <h4 onclick="toggleFilter(this)"><?= __('categories') ?> <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <ul>
                                     <?php
@@ -376,18 +318,17 @@ $total_produits = count($produits);
                                     foreach ($categories as $cat):
                                         $checked = ($categorie == $cat['id']) ? 'checked' : '';
                                     ?>
-                                        <li><label><input type="checkbox" name="categorie" value="<?= $cat['id'] ?>" <?= $checked ?> onchange="this.form.submit()" /> <?= htmlspecialchars($cat['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE categorie_id = ' . $cat['id'])->fetchColumn() ?>)</span></label></li>
+                                        <li><label><input type="checkbox" name="categorie" value="<?= $cat['id'] ?>" <?= $checked ?> onchange="this.form.submit()"> <?= htmlspecialchars($cat['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE categorie_id = ' . $cat['id'])->fetchColumn() ?>)</span></label></li>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
                         </div>
 
-                        <!-- Prix -->
                         <div class="filter-block">
                             <h4 onclick="toggleFilter(this)">Prix <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <div class="price-range">
-                                    <input type="range" name="prix_max" min="0" max="300" value="<?= $prix_max ?: 150 ?>" onchange="this.form.submit()" />
+                                    <input type="range" name="prix_max" min="0" max="300" value="<?= $prix_max ?: 150 ?>" onchange="this.form.submit()">
                                     <div class="price-labels">
                                         <span>0 €</span>
                                         <span id="priceDisplay"><?= $prix_max ?: 150 ?> €</span>
@@ -397,7 +338,6 @@ $total_produits = count($produits);
                             </div>
                         </div>
 
-                        <!-- Marques -->
                         <div class="filter-block">
                             <h4 onclick="toggleFilter(this)">Marques <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
@@ -407,21 +347,20 @@ $total_produits = count($produits);
                                     foreach ($marques as $m):
                                         $checked = ($marque == $m['id']) ? 'checked' : '';
                                     ?>
-                                        <li><label><input type="checkbox" name="marque" value="<?= $m['id'] ?>" <?= $checked ?> onchange="this.form.submit()" /> <?= htmlspecialchars($m['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE marque_id = ' . $m['id'])->fetchColumn() ?>)</span></label></li>
+                                        <li><label><input type="checkbox" name="marque" value="<?= $m['id'] ?>" <?= $checked ?> onchange="this.form.submit()"> <?= htmlspecialchars($m['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE marque_id = ' . $m['id'])->fetchColumn() ?>)</span></label></li>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
                         </div>
 
-                        <!-- Note minimale -->
                         <div class="filter-block">
                             <h4 onclick="toggleFilter(this)">Note minimale <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <ul>
-                                    <li><label><input type="radio" name="note_min" value="5" <?= $note_min == 5 ? 'checked' : '' ?> onchange="this.form.submit()" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> <span>5 étoiles</span></span></label></li>
-                                    <li><label><input type="radio" name="note_min" value="4" <?= $note_min == 4 ? 'checked' : '' ?> onchange="this.form.submit()" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i> <span>4+ étoiles</span></span></label></li>
-                                    <li><label><input type="radio" name="note_min" value="3" <?= $note_min == 3 ? 'checked' : '' ?> onchange="this.form.submit()" /> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i><i class="fas fa-star grey"></i> <span>3+ étoiles</span></span></label></li>
-                                    <li><label><input type="radio" name="note_min" value="" <?= !$note_min ? 'checked' : '' ?> onchange="this.form.submit()" /> <span style="color:rgba(255,255,255,0.4);">Toutes les notes</span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="5" <?= $note_min == 5 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> <span>5 étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="4" <?= $note_min == 4 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i> <span>4+ étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="3" <?= $note_min == 3 ? 'checked' : '' ?> onchange="this.form.submit()"> <span class="filter-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star grey"></i><i class="fas fa-star grey"></i> <span>3+ étoiles</span></span></label></li>
+                                    <li><label><input type="radio" name="note_min" value="" <?= !$note_min ? 'checked' : '' ?> onchange="this.form.submit()"> <span style="color:rgba(255,255,255,0.4);">Toutes les notes</span></label></li>
                                 </ul>
                             </div>
                         </div>
@@ -430,58 +369,29 @@ $total_produits = count($produits);
                     </form>
                 </aside>
 
-                <!-- PRODUITS -->
+                <!-- GRILLE PRODUITS -->
                 <div>
-                    <?php if (empty($produits)): ?>
-                        <div style="text-align:center; padding:60px 0; color:rgba(255,255,255,0.4);">
-                            <i class="fas fa-box-open" style="font-size:48px; margin-bottom:16px;"></i>
-                            <p>Aucun produit ne correspond à vos critères.</p>
-                            <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Voir tous les produits</a>
-                        </div>
-                    <?php else: ?>
-                        <div class="products-grid">
-                            <?php foreach ($produits as $index => $produit): ?>
-                                <?php foreach ($produits as $index => $produit): ?>
-    <?php 
-    // VÉRIFICATION DES FAVORIS (AJOUTE ICI)
-    $est_favori = false;
-    if (isset($_SESSION['user_id'])) {
-        $stmt = $pdo->prepare('SELECT produit_id FROM wishlist WHERE utilisateur_id = ? AND produit_id = ?');
-        $stmt->execute([$_SESSION['user_id'], $produit['id']]);
-        $est_favori = $stmt->fetch();
-    }
-    ?>
-    <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
-    <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay"></a>
-    <div class="product-image-wrap">
-        <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
-        <div class="badges">
-            <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
-                <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
-            <?php endif; ?>
-            <?php if ($produit['est_nouveau']): ?>
-                <span class="badge new">Nouveau</span>
-            <?php endif; ?>
-            <?php if ($produit['est_top']): ?>
-                <span class="badge top">Top vente</span>
-            <?php endif; ?>
-        </div>
-        <div class="action-buttons">
-            <!-- ✅ BOUTON FAVORIS AJOUTÉ ICI -->
-            <button class="fav-btn" onclick="toggleFav(<?= $produit['id'] ?>, this)">
-                <i class="<?= $est_favori ? 'fas' : 'far' ?> fa-heart"></i>
-            </button>
-            <button onclick="quickView(this)"><i class="fas fa-eye"></i></button>
-        </div>
-    </div>
-    <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
-    <!-- ... -->
-</div>
-<?php endforeach; ?>
+                    <div id="productGrid" class="products-grid">
+                        <?php if (empty($produits)): ?>
+                            <div style="text-align:center; padding:60px 0; color:rgba(255,255,255,0.4); grid-column:1 / -1;">
+                                <i class="fas fa-box-open" style="font-size:48px; margin-bottom:16px;"></i>
+                                <p>Aucun produit ne correspond à vos critères.</p>
+                                <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Voir tous les <?= __('produits') ?></a>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($produits as $index => $produit):
+                                // Vérification des favoris
+                                $est_favori = false;
+                                if (isset($_SESSION['user_id'])) {
+                                    $stmt = $pdo->prepare('SELECT produit_id FROM wishlist WHERE utilisateur_id = ? AND produit_id = ?');
+                                    $stmt->execute([$_SESSION['user_id'], $produit['id']]);
+                                    $est_favori = $stmt->fetch();
+                                }
+                            ?>
                             <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
-                                <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay" aria-label="Voir le produit"></a>
+                                <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay"></a>
                                 <div class="product-image-wrap">
-                                    <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
+                                    <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>">
                                     <div class="badges">
                                         <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
                                             <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
@@ -494,13 +404,11 @@ $total_produits = count($produits);
                                         <?php endif; ?>
                                     </div>
                                     <div class="action-buttons">
-    <!-- AJOUTE CE BOUTON POUR LES FAVORIS -->
-    <button class="fav-btn" onclick="toggleFav(<?= $produit['id'] ?>, this)">
-        <i class="<?= $est_favori ? 'fas' : 'far' ?> fa-heart"></i>
-    </button>
-    <!-- Conserve l'ancien bouton favoris si tu veux, ou remplace-le -->
-    <button onclick="quickView(this)"><i class="fas fa-eye"></i></button>
-</div>
+                                        <button class="fav-btn" onclick="toggleFav(<?= $produit['id'] ?>, this)">
+                                            <i class="<?= $est_favori ? 'fas' : 'far' ?> fa-heart"></i>
+                                        </button>
+                                        <button onclick="quickView(this)"><i class="fas fa-eye"></i></button>
+                                    </div>
                                 </div>
                                 <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
                                 <div class="product-rating">
@@ -514,7 +422,7 @@ $total_produits = count($produits);
                                         }
                                         ?>
                                     </span>
-                                    <span class="count">(<?= $produit['nb_avis'] ?> avis)</span>
+                                    <span class="count">(<?= $produit['nb_avis'] ?> <?= __('avis') ?>)</span>
                                 </div>
                                 <div class="product-price">
                                     <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
@@ -523,14 +431,14 @@ $total_produits = count($produits);
                                     <?php endif; ?>
                                 </div>
                                 <div class="card-actions">
-                                    <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add">Ajouter au panier</a>
+                                    <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
                                 </div>
                             </div>
                             <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
 
-                    <!-- Pagination -->
+                    <!-- Pagination (simulée) -->
                     <div class="pagination">
                         <a href="#"><i class="fas fa-chevron-left"></i></a>
                         <a href="#" class="active">1</a>
@@ -549,60 +457,22 @@ $total_produits = count($produits);
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>EasyPick</h4>
-                    <ul>
-                        <li><a href="#">À propos</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Carrières</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Aide</h4>
-                    <ul>
-                        <li><a href="#">Centre d'aide</a></li>
-                        <li><a href="#">Suivi de commande</a></li>
-                        <li><a href="#">Retours</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Légal</h4>
-                    <ul>
-                        <li><a href="#">CGV</a></li>
-                        <li><a href="#">Politique de confidentialité</a></li>
-                        <li><a href="#">Cookies</a></li>
-                        <li><a href="#">Mentions légales</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Suivez-nous</h4>
-                    <div class="footer-social">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                    </div>
-                    <div class="footer-payments">
-                        <i class="fab fa-cc-visa"></i>
-                        <i class="fab fa-cc-mastercard"></i>
-                        <i class="fab fa-cc-paypal"></i>
-                        <i class="fab fa-cc-apple-pay"></i>
-                    </div>
-                </div>
+                <div class="footer-col"><h4>EasyPick</h4><ul><li><a href="#"><?= __('a_propos') ?></a></li><li><a href="#"><?= __('blog') ?></a></li><li><a href="#"><?= __('carrieres') ?></a></li><li><a href="#"><?= __('contact') ?></a></li></ul></div>
+                <div class="footer-col"><h4>Aide</h4><ul><li><a href="#">Centre d'aide</a></li><li><a href="#">Suivi de commande</a></li><li><a href="#">Retours</a></li><li><a href="#">FAQ</a></li></ul></div>
+                <div class="footer-col"><h4>Légal</h4><ul><li><a href="#"><?= __('cgv') ?></a></li><li><a href="#"><?= __('confidentialite') ?></a></li><li><a href="#"><?= __('cookies') ?></a></li><li><a href="#"><?= __('mentions_legales') ?></a></li></ul></div>
+                <div class="footer-col"><h4><?= __('suivez_nous') ?></h4><div class="footer-social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div><div class="footer-payments"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div></div>
             </div>
-            <div class="footer-bottom">
-                &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.
-            </div>
+            <div class="footer-bottom">&copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.</div>
         </div>
     </footer>
 
     <script>
+        // ===== HAMBURGER =====
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
         hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
 
+        // ===== FILTRES (accordéon) =====
         function toggleFilter(header) {
             const content = header.nextElementSibling;
             const icon = header.querySelector('i');
@@ -612,20 +482,69 @@ $total_produits = count($produits);
             header.classList.toggle('open');
         }
 
-        function toggleFav(btn) {
+        // ===== FAVORIS =====
+        function toggleFav(productId, btn) {
             const icon = btn.querySelector('i');
-            icon.classList.toggle('far');
-            icon.classList.toggle('fas');
-            btn.classList.toggle('fav-active');
+            if (icon.classList.contains('fas')) {
+                window.location.href = 'wishlist-supprimer.php?id=' + productId;
+            } else {
+                window.location.href = 'wishlist-ajouter.php?id=' + productId;
+            }
         }
 
+        // ===== APERÇU RAPIDE =====
         function quickView(btn) {
             const card = btn.closest('.product-card');
             const name = card.querySelector('.product-name').textContent;
             alert('🖥️ Aperçu rapide : ' + name);
         }
 
-        // Fade-up
+        // ===== LIVE SEARCH (AJAX) =====
+        const searchInput = document.getElementById('searchInput');
+        const productGrid = document.getElementById('productGrid');
+        const sortSelect = document.getElementById('sortSelect');
+        let searchTimeout;
+
+        function loadProducts(query, sort) {
+            const url = 'recherche-ajax.php?q=' + encodeURIComponent(query) + '&sort=' + encodeURIComponent(sort);
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    productGrid.innerHTML = html;
+                    // Réappliquer les animations fade-up
+                    document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+                })
+                .catch(err => console.error('Erreur:', err));
+        }
+
+        function applyFilters() {
+            const q = searchInput.value.trim();
+            const sort = sortSelect.value;
+            if (q.length > 0) {
+                loadProducts(q, sort);
+            } else {
+                // Recharger la page pour afficher tous les produits avec les filtres
+                window.location.href = window.location.pathname + '?sort=' + encodeURIComponent(sort);
+            }
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const q = this.value.trim();
+                const sort = sortSelect.value;
+                searchTimeout = setTimeout(() => {
+                    if (q.length > 0) {
+                        loadProducts(q, sort);
+                    } else {
+                        // Reload page to show all products
+                        window.location.href = window.location.pathname + '?sort=' + encodeURIComponent(sort);
+                    }
+                }, 400);
+            });
+        }
+
+        // ===== FADE-UP (Intersection Observer) =====
         const fadeElements = document.querySelectorAll('.fade-up');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -635,52 +554,6 @@ $total_produits = count($produits);
             });
         }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
         fadeElements.forEach(el => observer.observe(el));
-        function toggleFav(productId, btn) {
-        const icon = btn.querySelector('i');
-        if (icon.classList.contains('fas')) {
-            // Si déjà en favori → supprimer
-            window.location.href = 'wishlist-supprimer.php?id=' + productId;
-        } else {
-            // Sinon → ajouter
-            window.location.href = 'wishlist-ajouter.php?id=' + productId;
-        }
-    }
-
     </script>
-<script>
-    let searchTimeout;
-    const searchInput = document.getElementById('searchInput');
-    const productGrid = document.getElementById('productGrid');
-
-    function loadProducts(q = '', sort = 'relevance') {
-        const url = `recherche-ajax.php?q=${encodeURIComponent(q)}&sort=${sort}`;
-        fetch(url)
-            .then(response => response.text())
-            .then(html => {
-                productGrid.innerHTML = html;
-                // Réappliquer les animations fade-up
-                document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
-            })
-            .catch(err => console.error('Erreur:', err));
-    }
-
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        const q = this.value.trim();
-        searchTimeout = setTimeout(() => {
-            const sort = document.getElementById('sortSelect').value;
-            loadProducts(q, sort);
-        }, 300); // délai pour éviter trop de requêtes
-    });
-
-    function applyFilters() {
-        const q = searchInput.value.trim();
-        const sort = document.getElementById('sortSelect').value;
-        loadProducts(q, sort);
-    }
-
-    // Initialisation : charger les produits par défaut (déjà chargés via PHP, mais on peut garder)
-    // Pour le tri, on peut aussi recharger avec ajax
-</script>
 </body>
 </html>

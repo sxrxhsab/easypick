@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Modifier la catégorie</title>
+    <title><?= __('modifier') ?> la catégorie</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section class="section">
         <div class="container">
             <div class="form-box">
-                <h2>Modifier la <span>catégorie</span></h2>
+                <h2><?= __('modifier') ?> la <span>catégorie</span></h2>
                 <div class="sub">ID #<?= $categorie['id'] ?> – <?= htmlspecialchars($categorie['nom']) ?></div>
 
                 <?php if ($erreur): ?>
@@ -112,10 +112,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form method="POST">
                     <div class="form-group">
-                        <label>Nom de la catégorie *</label>
-                        <input type="text" name="nom" required value="<?= htmlspecialchars($categorie['nom']) ?>" />
+                        <label><?= __('nom') ?> de la catégorie *</label>
+                        <input type="text" name="<?= __('nom') ?>" required value="<?= htmlspecialchars($categorie['nom']) ?>" />
                     </div>
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Enregistrer</button>
+                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> <?= __('enregistrer') ?></button>
                 </form>
 
                 <div style="margin-top:16px;">

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ajouter une catégorie</title>
+    <title><?= __('ajouter') ?> une catégorie</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -83,8 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section class="section">
         <div class="container">
             <div class="form-box">
-                <h2>Ajouter une <span>catégorie</span></h2>
-                <div class="sub">Créez une nouvelle catégorie pour organiser vos produits.</div>
+                <h2><?= __('ajouter') ?> une <span>catégorie</span></h2>
+                <div class="sub">Créez une nouvelle catégorie pour organiser vos <?= __('produits') ?>.</div>
 
                 <?php if ($erreur): ?>
                     <div class="error"><?= htmlspecialchars($erreur) ?></div>
@@ -96,10 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if (!$succes): ?>
                 <form method="POST">
                     <div class="form-group">
-                        <label>Nom de la catégorie *</label>
+                        <label><?= __('nom') ?> de la catégorie *</label>
                         <input type="text" name="nom" required placeholder="Ex: Accessoires Gaming" />
                     </div>
-                    <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Ajouter</button>
+                    <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> <?= __('ajouter') ?></button>
                 </form>
                 <?php endif; ?>
 

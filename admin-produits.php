@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -16,7 +16,7 @@ $produits = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin Produits</title>
+    <title>EasyPick – Admin <?= __('produits') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -91,8 +91,8 @@ $produits = $stmt->fetchAll();
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">Accueil</a></li>
-                <li><a href="boutique.php">Boutique</a></li>
+                <li><a href="index.php"><?= __('accueil') ?></a></li>
+                <li><a href="boutique.php"><?= __('boutique') ?></a></li>
             </ul>
             <div class="nav-icons">
                 <a href="mon-compte.php"><i class="fas fa-user"></i></a>
@@ -106,8 +106,8 @@ $produits = $stmt->fetchAll();
 
     <section class="admin-hero">
         <div class="container">
-            <h1>Gestion des <span>produits</span></h1>
-            <p>Ajoutez, modifiez ou supprimez des produits.</p>
+            <h1>Gestion des <span><?= __('produits') ?></span></h1>
+            <p>Ajoutez, modifiez ou supprimez des <?= __('produits') ?>.</p>
         </div>
     </section>
 
@@ -115,13 +115,13 @@ $produits = $stmt->fetchAll();
         <div class="container">
 
             <div class="admin-menu">
-                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
-                <a href="admin-produits.php" class="active"><i class="fas fa-box"></i> Produits</a>
-                <a href="#"><i class="fas fa-shopping-bag"></i> Commandes</a>
-                <a href="#"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
+                <a href="admin-produits.php" class="active"><i class="fas fa-box"></i> <?= __('produits') ?></a>
+                <a href="#"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
+                <a href="#"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
             </div>
 
-            <a href="admin-produit-ajouter.php" class="btn-add"><i class="fas fa-plus"></i> Ajouter un produit</a>
+            <a href="admin-produit-ajouter.php" class="btn-add"><i class="fas fa-plus"></i> <?= __('ajouter') ?> un produit</a>
 
             <div class="table-wrap">
                 <table>
@@ -129,7 +129,7 @@ $produits = $stmt->fetchAll();
                         <tr>
                             <th>ID</th>
                             <th>Image</th>
-                            <th>Nom</th>
+                            <th><?= __('nom') ?></th>
                             <th>Prix</th>
                             <th>Ancien prix</th>
                             <th>Stock</th>
@@ -154,9 +154,18 @@ $produits = $stmt->fetchAll();
                                 <?php if ($p['est_top']): ?><span class="badge top">Top</span> <?php endif; ?>
                             </td>
                             <td>
+    <?php if ($p['stock'] <= 0): ?>
+        <span style="color:#ff4444; font-weight:700;">❌ Rupture</span>
+    <?php elseif ($p['stock'] < 5): ?>
+        <span style="color:#ffc107; font-weight:700;">⚠️ <?= $p['stock'] ?></span>
+    <?php else: ?>
+        <?= $p['stock'] ?>
+    <?php endif; ?>
+</td>
+                            <td>
                                 <div class="btn-actions">
-                                    <a href="admin-produit-modifier.php?id=<?= $p['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Modifier</a>
-                                    <a href="admin-produit-supprimer.php?id=<?= $p['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer ce produit ?')"><i class="fas fa-trash"></i> Supprimer</a>
+                                    <a href="admin-produit-<?= __('modifier') ?>.php?id=<?= $p['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> <?= __('modifier') ?></a>
+                                    <a href="admin-produit-<?= __('supprimer') ?>.php?id=<?= $p['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer ce produit ?')"><i class="fas fa-trash"></i> <?= __('supprimer') ?></a>
                                 </div>
                             </td>
                         </tr>

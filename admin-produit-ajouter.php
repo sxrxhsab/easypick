@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -54,6 +54,28 @@ if (!is_dir($upload_dir)) {
     mkdir($upload_dir, 0755, true);
 }
             
+// Dans la partie upload
+$images_paths = [];
+if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+    $upload_dir = 'uploads/';
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+    
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+        $extension = strtolower(pathinfo($_FILES['images']['name'][$key], PATHINFO_EXTENSION));
+        if (in_array($extension, $allowed)) {
+            $nom_fichier = uniqid() . '.' . $extension;
+            if (move_uploaded_file($tmp_name, $upload_dir . $nom_fichier)) {
+                $images_paths[] = $upload_dir . $nom_fichier;
+            }
+        }
+    }
+}
+
+// Dans la requête INSERT, ajouter le champ images
+$images_json = !empty($images_paths) ? json_encode($images_paths) : null;
+$stmt = $pdo->prepare('INSERT INTO produits (nom, slug, description, prix, prix_old, stock, categorie_id, marque_id, image, images, est_promo, est_nouveau, est_top) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+$stmt->execute([$<?= __('nom') ?>, $slug, $description, $prix, $prix_old, $stock, $categorie_id, $marque_id, $image_path, $images_json, $est_promo, $est_nouveau, $est_top]);
             if (move_uploaded_file($file['tmp_name'], $destination)) {
                 $image_path = $destination;
             } else {
@@ -66,7 +88,7 @@ if (!is_dir($upload_dir)) {
 
     // Si tout est bon, on insère dans la BDD
     if (empty($erreur) && !empty($image_path)) {
-        if (empty($nom) || empty($description) || $prix <= 0) {
+        if (empty($<?= __('nom') ?>) || empty($description) || $prix <= 0) {
             $erreur = 'Veuillez remplir tous les champs obligatoires (*).';
         } else {
             $stmt = $pdo->prepare('INSERT INTO produits 
@@ -77,8 +99,14 @@ if (!is_dir($upload_dir)) {
                 $categorie_id, $marque_id, $image_path,
                 $est_promo, $est_nouveau, $est_top
             ]);
-            $succes = 'Produit ajouté avec succès !';
-        }
+            $succes = 'Produit ajouté avec succès !'; 
+            }
+            // À la fin du script, après l'insertion du produit
+
+// Ajouter cette ligne
+require_once 'newsletter-notification.php';
+envoyerNotificationNouveauxProduits(1);
+        
     }
 }
 ?>
@@ -87,7 +115,7 @@ if (!is_dir($upload_dir)) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Ajouter un produit</title>
+    <title>EasyPick – <?= __('ajouter') ?> un produit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -177,7 +205,7 @@ if (!is_dir($upload_dir)) {
     <section class="section">
         <div class="container">
             <div class="form-box">
-                <h1>Ajouter un <span>produit</span></h1>
+                <h1><?= __('ajouter') ?> un <span>produit</span></h1>
                 <div class="sub">Remplissez les informations du nouveau produit.</div>
 
                 <?php if ($erreur): ?>
@@ -191,7 +219,7 @@ if (!is_dir($upload_dir)) {
                 <form method="POST" enctype="multipart/form-data">
 
                     <div class="form-group">
-                        <label>Nom du produit <span class="required">*</span></label>
+                        <label><?= __('nom') ?> du produit <span class="required">*</span></label>
                         <input type="text" name="nom" required placeholder="Ex: Casque Bluetooth Pro" />
                     </div>
 
@@ -253,7 +281,7 @@ if (!is_dir($upload_dir)) {
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Ajouter le produit</button>
+                    <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> <?= __('ajouter') ?> le produit</button>
                 </form>
                 <?php endif; ?>
 

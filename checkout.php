@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 require_once 'config-stripe.php';
@@ -159,8 +159,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .order-summary .item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: rgba(255,255,255,0.6); border-bottom: 1px solid rgba(255,255,255,0.04); }
         .order-summary .item:last-child { border-bottom: none; }
         .order-summary .item .qty { color: rgba(255,255,255,0.3); }
-        .order-summary .total { display: flex; justify-content: space-between; padding: 16px 0 0; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 20px; font-weight: 700; }
-        .order-summary .total .amount { color: #ff6a00; }
+        .order-summary .<?= __('total') ?> { display: flex; justify-content: space-between; padding: 16px 0 0; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 20px; font-weight: 700; }
+        .order-summary .<?= __('total') ?> .amount { color: #ff6a00; }
 
         .payment-section { margin-top: 24px; }
         .payment-section h4 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
@@ -223,21 +223,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="checkout-grid">
 
                     <div>
-                        <h2 style="font-size:22px; font-weight:700; margin-bottom:20px;">Informations de livraison</h2>
+                        <h2 style="font-size:22px; font-weight:700; margin-bottom:20px;">Informations de <?= __('livraison') ?></h2>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Prénom *</label>
+                                <label>Pré<?= __('nom') ?> *</label>
                                 <input type="text" name="prenom" required placeholder="Jean" />
                             </div>
                             <div class="form-group">
-                                <label>Nom *</label>
+                                <label><?= __('nom') ?> *</label>
                                 <input type="text" name="nom" required placeholder="Dupont" />
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Email *</label>
+                            <label><?= __('email') ?> *</label>
                             <input type="email" name="email" required placeholder="jean.dupont@email.com" />
                         </div>
 
@@ -300,12 +300,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php endforeach; ?>
 
                             <div class="item" style="color:rgba(255,255,255,0.3);">
-                                <span>Livraison</span>
+                                <span><?= __('livraison') ?></span>
                                 <span>Offerte</span>
                             </div>
 
                             <div class="total">
-                                <span>Total</span>
+                                <span><?= __('total') ?></span>
                                 <span class="amount"><?= number_format($total, 2, ',', ' ') ?> €</span>
                             </div>
 
@@ -314,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </button>
 
                             <div style="text-align:center; margin-top:12px;">
-                                <a href="panier.php" class="btn-back"><i class="fas fa-arrow-left"></i> Retour au panier</a>
+                                <a href="panier.php" class="btn-back"><i class="fas fa-arrow-left"></i> Retour au <?= __('panier') ?></a>
                             </div>
                         </div>
                     </div>
@@ -326,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </section>
 
     <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.12); font-size:13px;">
-        <div class="container">&copy; 2026 EasyPick – Tous droits réservés.</div>
+        <div class="container">&copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>.</div>
     </footer>
 
     <script>

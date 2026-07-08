@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -12,5 +12,5 @@ if ($id > 0) {
     $stmt = $pdo->prepare('DELETE FROM produits WHERE id = ?');
     $stmt->execute([$id]);
 }
-header('Location: admin-produits.php');
+header('Location: admin-<?= __('produits') ?>.php');
 exit;

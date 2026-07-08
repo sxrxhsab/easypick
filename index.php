@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Variables pour la navbar
@@ -11,7 +11,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Accueil</title>
+    <title>EasyPick – <?= __('accueil') ?></title>
 
     <!-- Google Fonts : Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -65,27 +65,15 @@ $user_role = $_SESSION['user_role'] ?? '';
         .top-text strong { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: 0.3px; }
         .top-text span { font-weight: 300; font-size: 11px; color: #aaa; }
 
-        /* NAVBAR FLOTTANTE (version accueil) */
-       .navbar-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 0;        /* ← on met 0 */
-    position: relative;
-    z-index: 100;
-    padding: 0 20px;
-}
-.hero {
-    position: relative;
-    min-height: 620px;
-    height: 85vh;
-    max-height: 750px;
-    display: flex;
-    align-items: center;
-    margin-top: -68px;    /* ← laisse comme ça, c'est bon */
-    padding: 0 60px;
-    background: #0d0d0d;
-    overflow: hidden;
-}
+        /* NAVBAR FLOTTANTE (version <?= __('accueil') ?>) */
+        .navbar-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 0;
+            position: relative;
+            z-index: 100;
+            padding: 0 20px;
+        }
         .navbar {
             width: 90%;
             max-width: 1400px;
@@ -172,7 +160,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .founder-card .quote { font-style: italic; color: rgba(255,255,255,0.75); font-size: 15px; line-height: 1.6; }
         .founder-card .quote i { color: #ff6a00; opacity: 0.6; }
 
-        /* CATÉGORIES */
+        /* <?= __('categories') ?> */
         .categories { padding: 80px 0 60px; background: #0d0d0d; }
         .section-title { font-size: 36px; font-weight: 700; text-align: center; margin-bottom: 12px; }
         .section-title span { color: #ff6a00; }
@@ -187,7 +175,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .category-card .cat-content .btn-cat { display: inline-block; margin-top: 15px; padding: 10px 25px; border-radius: 50px; background: #ff6a00; color: #fff; font-weight: 600; font-size: 14px; opacity: 0; transform: translateY(10px); transition: all 0.3s; }
         .category-card:hover .btn-cat { opacity: 1; transform: translateY(0); }
 
-        /* PRODUITS VEDETTES */
+        /* <?= __('produits') ?> VEDETTES */
         .products { padding: 60px 0 80px; background: #111; }
         .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; }
         .product-card { background: #1a1a1a; border-radius: 16px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 8px 25px rgba(0,0,0,0.3); padding: 20px 20px 25px; text-align: center; }
@@ -209,7 +197,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .promo-content .btn-promo { background: #ff6a00; color: #fff; padding: 16px 50px; border-radius: 60px; font-weight: 700; font-size: 20px; transition: all 0.3s; box-shadow: 0 8px 30px rgba(255,106,0,0.3); text-transform: uppercase; letter-spacing: 1px; }
         .promo-content .btn-promo:hover { background: #ff8833; transform: scale(1.05); box-shadow: 0 12px 40px rgba(255,106,0,0.5); }
 
-        /* AVIS */
+        /* <?= __('avis') ?> */
         .testimonials { padding: 80px 0; background: #0d0d0d; }
         .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; }
         .testimonial-card { background: #1a1a1a; border-radius: 20px; padding: 30px 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: transform 0.3s; }
@@ -328,7 +316,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="top-bar-container">
             <div class="top-item">
                 <i class="fas fa-truck"></i>
-                <div class="top-text"><strong>Livraison</strong><span>Internationale</span></div>
+                <div class="top-text"><strong><?= __('livraison') ?></strong><span>Internationale</span></div>
             </div>
             <div class="top-item">
                 <i class="fas fa-shield-alt"></i>
@@ -336,7 +324,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             </div>
             <div class="top-item">
                 <i class="fas fa-star"></i>
-                <div class="top-text"><strong>Produits</strong><span>Premium</span></div>
+                <div class="top-text"><strong><?= __('produits') ?></strong><span>Premium</span></div>
             </div>
             <div class="top-item">
                 <i class="fas fa-headset"></i>
@@ -363,30 +351,29 @@ $user_role = $_SESSION['user_role'] ?? '';
 
             <!-- Menu -->
             <ul class="nav-menu" id="navMenu">
-    <li><a href="index.php" class="active">Accueil</a></li>
-    <li><a href="boutique.php">Boutique</a></li>
-    <li><a href="nouveautes.php">Nouveautés</a></li>
-    <li><a href="promotions.php">Promotions</a></li>
-    <li><a href="contact.php">Contact</a></li>
-</ul>
+                <li><a href="index.php" class="active"><?= __('accueil') ?></a></li>
+                <li><a href="boutique.php"><?= __('boutique') ?></a></li>
+                <li><a href="nouveautes.php"><?= __('nouveautes') ?></a></li>
+                <li><a href="promotions.php"><?= __('promotions') ?></a></li>
+                <li><a href="contact.php"><?= __('contact') ?></a></li>
+            </ul>
 
-            <!-- Icônes (avec variables PHP dynamiques) -->
+            <!-- Icônes -->
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
                 <?php if ($user_connecte): ?>
-                    <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
+                    <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
                 <?php else: ?>
-                    <a href="login.php" aria-label="Connexion"><i class="fas fa-user"></i></a>
+                    <a href="login.php" aria-label='<?= __('connexion') ?>'><i class="fas fa-user"></i></a>
                 <?php endif; ?>
-                <a href="panier.php" aria-label="Panier" style="position:relative;">
+                <a href="panier.php" aria-label='<?= __('panier') ?>' style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
                 <?php if ($user_connecte && $user_role === 'admin'): ?>
                     <a href="admin.php" aria-label="Admin"><i class="fas fa-cog"></i></a>
                 <?php endif; ?>
-                <!-- Hamburger -->
                 <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -409,7 +396,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                     Découvrez les meilleurs accessoires tech sélectionnés avec soin pour améliorer votre quotidien, votre bureau et votre expérience numérique.
                 </p>
                 <div class="hero-buttons">
-                    <a href="boutique.php" class="btn btn-primary">Découvrir nos produits</a>
+                    <a href="boutique.php" class="btn btn-primary">Découvrir nos <?= __('produits') ?></a>
                     <a href="#" class="btn btn-secondary">Voir les offres</a>
                 </div>
             </div>
@@ -426,9 +413,9 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <div class="story-text">
                     <span class="badge">Notre histoire</span>
                     <h2>Une passion pour la tech, <br />une mission : <span>simplifier vos choix</span>.</h2>
-                    <p>Fondée en <strong>2025</strong> par <strong>Sabeur Samy</strong>, EasyPick est bien plus qu'une simple boutique en ligne. C'est un véritable guide pour vous aider à <strong>"picker" (choisir)</strong> les meilleurs accessoires tech, sans prise de tête.</p>
+                    <p>Fondée en <strong>2025</strong> par <strong>Sabeur Samy</strong>, EasyPick est bien plus qu'une simple <?= __('boutique') ?> en ligne. C'est un véritable guide pour vous aider à <strong>"picker" (choisir)</strong> les meilleurs accessoires tech, sans prise de tête.</p>
                     <p>Fatigué de passer des heures à comparer des fiches techniques ? Sabeur et son équipe sélectionnent avec soin chaque produit pour vous garantir le meilleur rapport qualité-prix, en testant et en vérifiant rigoureusement chaque référence.</p>
-                    <p>Notre promesse : vous offrir une expérience d'achat fluide, des produits premium et un accompagnement sur mesure, pour que vous puissiez équiper votre quotidien en toute confiance.</p>
+                    <p>Notre promesse : vous offrir une expérience d'achat fluide, des <?= __('produits') ?> premium et un accompagnement sur mesure, pour que vous puissiez équiper votre quotidien en toute confiance.</p>
                     <div class="signature">— <span>EasyPick</span>, votre guide tech depuis 2025.</div>
                 </div>
                 <div class="story-visual">
@@ -487,35 +474,35 @@ $user_role = $_SESSION['user_role'] ?? '';
     <section class="products">
         <div class="container">
             <h2 class="section-title">Nos <span>Best Sellers</span></h2>
-            <p class="section-sub">Les produits préférés de notre communauté</p>
+            <p class="section-sub">Les <?= __('produits') ?> préférés de notre communauté</p>
             <div class="products-grid">
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/casque/300/200" alt="Casque" />
                     <div class="product-name">Casque Bluetooth Pro</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
                     <div class="product-price"><span class="old">79,99 €</span> 59,99 €</div>
-                    <button class="btn-add">Ajouter au panier</button>
+                    <button class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></button>
                 </div>
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/clavierrgb/300/200" alt="Clavier RGB" />
                     <div class="product-name">Clavier Mécanique RGB</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                     <div class="product-price"><span class="old">119,99 €</span> 89,99 €</div>
-                    <button class="btn-add">Ajouter au panier</button>
+                    <button class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></button>
                 </div>
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/souris/300/200" alt="Souris" />
                     <div class="product-name">Souris Gaming Pro</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                     <div class="product-price"><span class="old">49,99 €</span> 39,99 €</div>
-                    <button class="btn-add">Ajouter au panier</button>
+                    <button class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></button>
                 </div>
                 <div class="product-card">
                     <img src="https://picsum.photos/seed/chargeursansfil/300/200" alt="Chargeur sans fil" />
                     <div class="product-name">Chargeur Sans Fil</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
                     <div class="product-price"><span class="old">39,99 €</span> 29,99 €</div>
-                    <button class="btn-add">Ajouter au panier</button>
+                    <button class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></button>
                 </div>
             </div>
         </div>
@@ -543,7 +530,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                     <div class="name">Sophie L.</div>
                     <div class="role">Chef de projet</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment">"Livraison ultra-rapide et produits de qualité. Le casque est incroyablement confortable, je recommande !"</div>
+                    <div class="comment">"<?= __('livraison') ?> ultra-rapide et <?= __('produits') ?> de qualité. Le casque est incroyablement confortable, je recommande !"</div>
                 </div>
                 <div class="testimonial-card">
                     <img src="https://picsum.photos/seed/avatar2/100/100" alt="Avatar" class="avatar" />
@@ -557,7 +544,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                     <div class="name">Camille M.</div>
                     <div class="role">Designer UI</div>
                     <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment">"Le design du site est magnifique, et les produits sont parfaits pour mon home office. Service client au top !"</div>
+                    <div class="comment">"Le design du site est magnifique, et les <?= __('produits') ?> sont parfaits pour mon home office. Service client au top !"</div>
                 </div>
             </div>
         </div>
@@ -568,60 +555,12 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="container">
             <div class="newsletter-content">
                 <h2>Ne ratez aucune <span style="color:#ff6a00;">offre</span></h2>
-                <p>Inscrivez-vous à notre newsletter et recevez en avant-première nos promotions exclusives.</p>
+                <p>Inscrivez-vous à notre newsletter et recevez en avant-première nos <?= __('promotions') ?> exclusives.</p>
                 <form class="newsletter-form" onsubmit="return inscrireNewsletter(event)">
-    <input type="email" id="newsletterEmail" placeholder="Votre adresse email" required />
-    <button type="submit">S'abonner</button>
-</form>
-<div id="newsletterMessage"></div>
-
-<script>
-function inscrireNewsletter(e) {
-    e.preventDefault();
-    const email = document.getElementById('newsletterEmail').value;
-    const msg = document.getElementById('newsletterMessage');
-    
-    fetch('newsletter-inscrire.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'email=' + encodeURIComponent(email)
-    })
-    .then(r => r.json())
-    .then(data => {
-        msg.textContent = data.message;
-        msg.style.color = data.success ? '#00b894' : '#ff4444';
-        if (data.success) document.getElementById('newsletterEmail').value = '';
-        setTimeout(() => msg.textContent = '', 4000);
-    })
-    .catch(() => {
-        msg.textContent = '⚠️ Une erreur est survenue.';
-        msg.style.color = '#ff4444';
-    });
-}
-</script>
-function inscrireNewsletter(e) {
-    e.preventDefault();
-    const email = document.getElementById('newsletterEmail').value;
-    const msg = document.getElementById('newsletterMessage');
-    
-    fetch('newsletter-inscrire.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'email=' + encodeURIComponent(email)
-    })
-    .then(r => r.json())
-    .then(data => {
-        msg.textContent = data.message;
-        msg.style.color = data.success ? '#00b894' : '#ff4444';
-        if (data.success) document.getElementById('newsletterEmail').value = '';
-        setTimeout(() => msg.textContent = '', 4000);
-    })
-    .catch(() => {
-        msg.textContent = '⚠️ Une erreur est survenue.';
-        msg.style.color = '#ff4444';
-    });
-}
-</script>
+                    <input type="email" id="newsletterEmail" placeholder="Votre adresse email" required />
+                    <button type="submit">S'abonner</button>
+                </form>
+                <div id="newsletterMessage" style="margin-top:10px; text-align:center;"></div>
             </div>
         </div>
     </section>
@@ -633,10 +572,10 @@ function inscrireNewsletter(e) {
                 <div class="footer-col">
                     <h4>EasyPick</h4>
                     <ul>
-                        <li><a href="#">À propos</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Carrières</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="#"><?= __('a_propos') ?></a></li>
+                        <li><a href="#"><?= __('blog') ?></a></li>
+                        <li><a href="#"><?= __('carrieres') ?></a></li>
+                        <li><a href="#"><?= __('contact') ?></a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -651,14 +590,14 @@ function inscrireNewsletter(e) {
                 <div class="footer-col">
                     <h4>Légal</h4>
                     <ul>
-                        <li><a href="#">CGV</a></li>
-                        <li><a href="#">Politique de confidentialité</a></li>
-                        <li><a href="#">Cookies</a></li>
-                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#"><?= __('cgv') ?></a></li>
+                        <li><a href="#"><?= __('confidentialite') ?></a></li>
+                        <li><a href="#"><?= __('cookies') ?></a></li>
+                        <li><a href="#"><?= __('mentions_legales') ?></a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h4>Suivez-nous</h4>
+                    <h4><?= __('suivez_nous') ?></h4>
                     <div class="footer-social">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
@@ -674,17 +613,16 @@ function inscrireNewsletter(e) {
                 </div>
             </div>
             <div class="footer-bottom">
-                &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.
+                &copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.
             </div>
         </div>
     </footer>
 
     <!-- ===== JAVASCRIPT ===== -->
     <script>
-        // Hamburger
+        // ===== HAMBURGER =====
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-
         hamburger.addEventListener('click', () => {
             navMenu.classList.toggle('open');
         });
@@ -696,6 +634,32 @@ function inscrireNewsletter(e) {
                 }
             });
         });
+
+        // ===== NEWSLETTER =====
+        function inscrireNewsletter(e) {
+            e.preventDefault();
+            const email = document.getElementById('newsletterEmail').value;
+            const msg = document.getElementById('newsletterMessage');
+
+            fetch('newsletter-inscrire.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'email=' + encodeURIComponent(email)
+            })
+            .then(r => r.json())
+            .then(data => {
+                msg.textContent = data.message;
+                msg.style.color = data.success ? '#00b894' : '#ff4444';
+                if (data.success) {
+                    document.getElementById('newsletterEmail').value = '';
+                }
+                setTimeout(() => msg.textContent = '', 4000);
+            })
+            .catch(() => {
+                msg.textContent = '⚠️ Une erreur est survenue.';
+                msg.style.color = '#ff4444';
+            });
+        }
     </script>
 
 </body>

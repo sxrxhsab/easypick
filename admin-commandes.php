@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -15,7 +15,7 @@ $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fe
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin Commandes</title>
+    <title>EasyPick – Admin <?= __('commandes') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -96,8 +96,8 @@ $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fe
 
     <section class="admin-hero">
         <div class="container">
-            <h1>Gestion des <span>commandes</span></h1>
-            <p>Suivez et gérez toutes les commandes passées sur votre boutique.</p>
+            <h1>Gestion des <span><?= __('commandes') ?></span></h1>
+            <p>Suivez et gérez toutes les <?= __('commandes') ?> passées sur votre <?= __('boutique') ?>.</p>
         </div>
     </section>
 
@@ -105,10 +105,10 @@ $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fe
         <div class="container">
 
             <div class="admin-menu">
-                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
-                <a href="admin-commandes.php" class="active"><i class="fas fa-shopping-bag"></i> Commandes</a>
-                <a href="#"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
+                <a href="admin-commandes.php" class="active"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
+                <a href="#"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
             </div>
 
             <div class="table-wrap">
@@ -118,7 +118,7 @@ $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fe
                             <th>Référence</th>
                             <th>Client</th>
                             <th>Date</th>
-                            <th>Total</th>
+                            <th><?= __('total') ?></th>
                             <th>Statut</th>
                             <th>Actions</th>
                         </tr>

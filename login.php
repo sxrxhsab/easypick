@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Connexion</title>
+    <title>EasyPick – <?= __('connexion') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -79,21 +79,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST">
             <div class="form-group">
-                <label>Email</label>
+                <label><?= __('email') ?></label>
                 <input type="email" name="email" required placeholder="vous@exemple.com" />
             </div>
             <div class="form-group">
-                <label>Mot de passe</label>
+                <label><?= __('mot_de_passe') ?></label>
                 <input type="password" name="password" required placeholder="••••••••" />
             </div>
-            <button type="submit" class="btn-login">Se connecter</button>
+            <button type="submit" class="btn-login"><?= __('se_connecter') ?></button>
         </form>
 
         <div class="links">
-            Pas encore de compte ? <a href="register.php">Créer un compte</a>
+            <?= __('pas_encore_compte') ?> <a href="register.php"><?= __('creer_un_compte') ?></a>
         </div>
         <div style="text-align:center;">
-            <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+            <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> <?= __('retour_accueil') ?></a>
         </div>
     </div>
 </body>

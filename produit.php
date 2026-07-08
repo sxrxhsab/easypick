@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -27,6 +27,10 @@ $similaires = $stmt->fetchAll();
 
 // Nombre d'articles dans le panier
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
+
+// Variables pour la navbar
+$user_connecte = isset($_SESSION['user_id']);
+$user_role = $_SESSION['user_role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -41,16 +45,11 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
     <style>
-        /* (Reprendre TOUS les styles de la page produit que tu avais précédemment) */
-        /* Pour gagner de la place, je te mets le strict nécessaire, mais tu peux garder ton CSS existant */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
         img { max-width: 100%; display: block; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
-
-        /* Reprends ici tous les styles de produit.php que tu avais (navbar, hero, galerie, etc.) */
-        /* Je te donne juste le corps de la page avec les données dynamiques */
 
         .navbar-simple { width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px; }
         .navbar-simple .nav-container { max-width: 1500px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
@@ -134,6 +133,7 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
         .tab-pane ul li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 12px; }
         .tab-pane ul li strong { color: #fff; min-width: 130px; }
         .tab-pane ul li:last-child { border-bottom: none; }
+
         .review-item { padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
         .review-item:last-child { border-bottom: none; }
         .review-item .review-header { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
@@ -170,20 +170,27 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">Accueil</a></li>
-                <li><a href="boutique.php">Boutique</a></li>
-                <li><a href="#">Nouveautés</a></li>
-                <li><a href="#">Promotions</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="index.php"><?= __('accueil') ?></a></li>
+                <li><a href="boutique.php"><?= __('boutique') ?></a></li>
+                <li><a href="nouveautes.php"><?= __('nouveautes') ?></a></li>
+                <li><a href="promotions.php"><?= __('promotions') ?></a></li>
+                <li><a href="contact.php"><?= __('contact') ?></a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
-                <a href="#" aria-label="Compte"><i class="far fa-user"></i></a>
-                <a href="panier.php" aria-label="Panier" style="position:relative;">
+                <?php if ($user_connecte): ?>
+                    <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
+                <?php else: ?>
+                    <a href="login.php" aria-label='<?= __('connexion') ?>'><i class="fas fa-user"></i></a>
+                <?php endif; ?>
+                <a href="panier.php" aria-label='<?= __('panier') ?>' style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
+                <?php if ($user_connecte && $user_role === 'admin'): ?>
+                    <a href="admin.php" aria-label="Admin"><i class="fas fa-cog"></i></a>
+                <?php endif; ?>
                 <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -196,9 +203,9 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
         <div class="container">
             <h1><span class="orange">FICHE</span> PRODUIT</h1>
             <div class="breadcrumb">
-                <a href="index.php">Accueil</a>
+                <a href="index.php"><?= __('accueil') ?></a>
                 <span class="sep"><i class="fas fa-chevron-right"></i></span>
-                <a href="boutique.php">Boutique</a>
+                <a href="boutique.php"><?= __('boutique') ?></a>
                 <span class="sep"><i class="fas fa-chevron-right"></i></span>
                 <span class="current"><?= htmlspecialchars($produit['nom']) ?></span>
             </div>
@@ -216,9 +223,29 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
                         <img id="mainImage" src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
                     </div>
                     <div class="thumbnails">
-                        <img src="<?= htmlspecialchars($produit['image']) ?>" alt="Vue 1" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image']) ?>')" />
-                        <!-- Si tu veux plusieurs images, tu peux ajouter ici -->
-                    </div>
+    <img src="<?= htmlspecialchars($produit['image']) ?>" alt="Vue principale" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image']) ?>')" />
+    <?php 
+    $images = json_decode($produit['images'], true);
+    if ($images && is_array($images)):
+        foreach ($images as $img): 
+    ?>
+    <?php foreach ($produits as $index => $produit): ?>
+    <?php 
+    // VÉRIFICATION DES FAVORIS (AJOUTE ICI)
+    $est_favori = false;
+    if (isset($_SESSION['user_id'])) {
+        $stmt = $pdo->prepare('SELECT produit_id FROM wishlist WHERE utilisateur_id = ? AND produit_id = ?');
+        $stmt->execute([$_SESSION['user_id'], $produit['id']]);
+        $est_favori = $stmt->fetch();
+    }
+    ?>
+    <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
+        <!-- ... -->
+    </div>
+<?php endforeach; ?>
+        <img src="<?= htmlspecialchars($img) ?>" alt="Vue supplémentaire" onclick="changeImage(this, '<?= htmlspecialchars($img) ?>')" />
+    <?php endforeach; endif; ?>
+</div>
                 </div>
 
                 <!-- Infos -->
@@ -237,7 +264,7 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
                             }
                             ?>
                         </div>
-                        <span class="reviews-count"><?= number_format($produit['note'], 1, ',', ' ') ?>/5 – <a href="#reviews"><?= $produit['nb_avis'] ?> avis</a></span>
+                        <span class="reviews-count"><?= number_format($produit['note'], 1, ',', ' ') ?>/5 – <a href="#reviews"><?= $produit['nb_avis'] ?> <?= __('avis') ?></a></span>
                     </div>
 
                     <div class="product-price">
@@ -258,17 +285,17 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
                             <input type="number" id="qtyInput" value="1" min="1" max="99" />
                             <button onclick="updateQty(1)">+</button>
                         </div>
-                        <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add-cart">
-                            <i class="fas fa-shopping-cart"></i> Ajouter au panier
+                        <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add-cart">
+                            <i class="fas fa-shopping-cart"></i> <?= __('ajouter') ?> au <?= __('panier') ?>
                         </a>
-                        <button class="btn-buy-now" onclick="buyNow()">Acheter maintenant</button>
+                        <button class="btn-buy-now" onclick="buyNow()"><?= __('acheter_maintenant') ?></button>
                     </div>
 
                     <div class="product-extras">
-                        <span class="extra-item"><i class="fas fa-truck"></i> Livraison offerte</span>
+                        <span class="extra-item"><i class="fas fa-truck"></i> <?= __('livraison') ?> offerte</span>
                         <span class="extra-item"><i class="fas fa-undo-alt"></i> Retours sous 30 jours</span>
                         <span class="extra-item"><i class="fas fa-shield-alt"></i> Garantie 2 ans</span>
-                        <span class="extra-item"><i class="fas fa-check-circle in-stock"></i> En stock (<?= $produit['stock'] ?> unités)</span>
+                        <span class="extra-item"><i class="fas fa-check-circle in-stock"></i> <?= __('en_stock') ?> (<?= $produit['stock'] ?> unités)</span>
                     </div>
 
                     <!-- Onglets -->
@@ -276,99 +303,107 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
                         <div class="tabs-nav">
                             <button class="active" data-tab="desc">Description</button>
                             <button data-tab="specs">Caractéristiques</button>
-                            <button data-tab="reviews" id="reviews">Avis clients</button>
+                            <button data-tab="reviews" id="reviews"><?= __('avis') ?> clients</button>
                         </div>
                         <div class="tab-content">
+
                             <div class="tab-pane active" id="tab-desc">
                                 <p><?= nl2br(htmlspecialchars($produit['description'])) ?></p>
                                 <p style="margin-top:15px;">Ce produit est soigneusement sélectionné par EasyPick pour vous garantir qualité et performance.</p>
                             </div>
+
                             <div class="tab-pane" id="tab-specs">
                                 <ul>
                                     <li><strong>Référence</strong> EAS-<?= str_pad($produit['id'], 4, '0', STR_PAD_LEFT) ?></li>
                                     <li><strong>Catégorie</strong> <?= $produit['categorie_id'] ?></li>
                                     <li><strong>Stock</strong> <?= $produit['stock'] ?> unités</li>
                                     <li><strong>Note</strong> <?= number_format($produit['note'], 1, ',', ' ') ?>/5</li>
-                                    <li><strong>Nombre d'avis</strong> <?= $produit['nb_avis'] ?></li>
+                                    <li><strong><?= __('nom') ?>bre d'<?= __('avis') ?></strong> <?= $produit['nb_avis'] ?></li>
                                 </ul>
                             </div>
-                           <div class="tab-pane" id="tab-reviews">
-    <?php
-    // Récupérer les avis du produit
-    $stmt = $pdo->prepare('SELECT * FROM avis WHERE produit_id = ? ORDER BY created_at DESC');
-    $stmt->execute([$id]);
-    $avis = $stmt->fetchAll();
-    ?>
 
-    <?php if (empty($avis)): ?>
-        <p style="color:rgba(255,255,255,0.4);">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
-    <?php else: ?>
-        <?php foreach ($avis as $a): ?>
-        <div class="review-item">
-            <div class="review-header">
-                <div class="review-avatar"><?= strtoupper(substr($a['nom'], 0, 2)) ?></div>
-                <span class="review-name"><?= htmlspecialchars($a['nom']) ?></span>
-                <span class="review-date"><?= date('d/m/Y', strtotime($a['created_at'])) ?></span>
-            </div>
-            <div class="review-stars">
-                <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <?php if ($i <= $a['note']): ?>
-                        <i class="fas fa-star"></i>
-                    <?php else: ?>
-                        <i class="fas fa-star grey"></i>
-                    <?php endif; ?>
-                <?php endfor; ?>
-            </div>
-            <div class="review-text"><?= nl2br(htmlspecialchars($a['commentaire'])) ?></div>
-        </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+                            <!-- ✅ SECTION AVIS CORRIGÉE -->
+                            <div class="tab-pane" id="tab-reviews">
+                                <?php
+                                // Récupérer les avis du produit
+                                $stmt = $pdo->prepare('SELECT * FROM avis WHERE produit_id = ? ORDER BY created_at DESC');
+                                $stmt->execute([$id]);
+                                $avis = $stmt->fetchAll();
+                                ?>
 
-    <!-- Formulaire pour les utilisateurs connectés -->
-    <?php if (isset($_SESSION['user_id'])): ?>
-        <?php if (isset($_SESSION['succes_avis'])): ?>
-            <div style="background:rgba(0,184,148,0.1); border:1px solid rgba(0,184,148,0.2); color:#00b894; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
-                <?= htmlspecialchars($_SESSION['succes_avis']) ?>
-                <?php unset($_SESSION['succes_avis']); ?>
-            </div>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['erreur_avis'])): ?>
-            <div style="background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.2); color:#ff4444; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
-                <?= htmlspecialchars($_SESSION['erreur_avis']) ?>
-                <?php unset($_SESSION['erreur_avis']); ?>
-            </div>
-        <?php endif; ?>
+                                <?php if (empty($avis)): ?>
+                                    <p style="color:rgba(255,255,255,0.4);">Aucun <?= __('avis') ?> pour le moment. Soyez le premier à donner votre <?= __('avis') ?> !</p>
+                                <?php else: ?>
+                                    <?php foreach ($avis as $a): ?>
+                                    <div class="review-item">
+                                        <div class="review-header">
+                                            <div class="review-avatar"><?= strtoupper(substr($a['nom'], 0, 2)) ?></div>
+                                            <span class="review-name"><?= htmlspecialchars($a['nom']) ?></span>
+                                            <span class="review-date"><?= date('d/m/Y', strtotime($a['created_at'])) ?></span>
+                                        </div>
+                                        <div class="review-stars">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <?php if ($i <= $a['note']): ?>
+                                                    <i class="fas fa-star"></i>
+                                                <?php else: ?>
+                                                    <i class="fas fa-star grey"></i>
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <div class="review-text"><?= nl2br(htmlspecialchars($a['commentaire'])) ?></div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
 
-        <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
-            <h4 style="font-size:18px; font-weight:700; margin-bottom:12px;">Donnez votre avis</h4>
-            <form method="POST" action="ajouter-avis.php">
-                <input type="hidden" name="produit_id" value="<?= $produit['id'] ?>" />
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Note :</label>
-                    <div style="display:flex; gap:12px; font-size:24px; color:#ffb800;">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <label style="cursor:pointer;">
-                                <input type="radio" name="note" value="<?= $i ?>" required style="display:none;" />
-                                <i class="fas fa-star" style="transition:color 0.3s; color:#444;"></i>
-                            </label>
-                        <?php endfor; ?>
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Commentaire :</label>
-                    <textarea name="commentaire" required placeholder="Partagez votre expérience avec ce produit..." style="width:100%; padding:12px 16px; background:#0F0F0F; border:1px solid rgba(255,255,255,0.06); border-radius:12px; color:#fff; font-size:14px; font-family:'Poppins', sans-serif; outline:none; min-height:80px; resize:vertical;"></textarea>
-                </div>
-                <button type="submit" style="padding:10px 24px; background:linear-gradient(135deg, #ff6a00, #ff7d1a); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.3s; font-family:'Poppins', sans-serif;">
-                    <i class="fas fa-paper-plane"></i> Publier mon avis
-                </button>
-            </form>
-        </div>
-    <?php else: ?>
-        <div style="margin-top:20px; padding:16px; background:rgba(255,255,255,0.03); border-radius:12px; text-align:center; color:rgba(255,255,255,0.4);">
-            <p><a href="login.php" style="color:#ff6a00;">Connectez-vous</a> pour laisser un avis.</p>
-        </div>
-    <?php endif; ?>
-</div>
+                                <!-- ✅ Messages de succès/erreur -->
+                                <?php if (isset($_SESSION['succes_avis'])): ?>
+                                    <div style="background:rgba(0,184,148,0.1); border:1px solid rgba(0,184,148,0.2); color:#00b894; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
+                                        <?= htmlspecialchars($_SESSION['succes_avis']) ?>
+                                        <?php unset($_SESSION['succes_avis']); ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (isset($_SESSION['erreur_avis'])): ?>
+                                    <div style="background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.2); color:#ff4444; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
+                                        <?= htmlspecialchars($_SESSION['erreur_avis']) ?>
+                                        <?php unset($_SESSION['erreur_avis']); ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- ✅ Formulaire accessible à TOUS (même sans compte) -->
+                                <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
+                                    <h4 style="font-size:18px; font-weight:700; margin-bottom:12px;"><?= __('donner_votre_avis') ?></h4>
+                                    <form method="POST" action="ajouter-avis.php">
+                                        <input type="hidden" name="produit_id" value="<?= $produit['id'] ?>" />
+
+                                        <div class="form-group" style="margin-bottom:12px;">
+                                            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Votre <?= __('nom') ?> *</label>
+                                            <input type="text" name="nom" required placeholder="Votre nom" style="width:100%; padding:12px 16px; background:#0F0F0F; border:1px solid rgba(255,255,255,0.06); border-radius:12px; color:#fff; font-size:14px; font-family:'Poppins', sans-serif; outline:none;" />
+                                        </div>
+
+                                        <div class="form-group" style="margin-bottom:12px;">
+                                            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Note :</label>
+                                            <div style="display:flex; gap:12px; font-size:24px; color:#ffb800;">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="fas fa-star" onclick="setNote(<?= $i ?>)" style="cursor:pointer; color:#444;"></i>
+                                                <?php endfor; ?>
+                                                <input type="hidden" name="note" id="note" value="0" required />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" style="margin-bottom:12px;">
+                                            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Commentaire :</label>
+                                            <textarea name="commentaire" required placeholder="Partagez votre expérience avec ce produit..." style="width:100%; padding:12px 16px; background:#0F0F0F; border:1px solid rgba(255,255,255,0.06); border-radius:12px; color:#fff; font-size:14px; font-family:'Poppins', sans-serif; outline:none; min-height:80px; resize:vertical;"></textarea>
+                                        </div>
+
+                                        <button type="submit" style="padding:10px 24px; background:linear-gradient(135deg, #ff6a00, #ff7d1a); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.3s; font-family:'Poppins', sans-serif;">
+                                            <i class="fas fa-paper-plane"></i> <?= __('publier') ?> mon <?= __('avis') ?>
+                                        </button>
+                                    </form>
+                                </div>
+
+                            </div>
+                            <!-- FIN SECTION AVIS -->
+
                         </div>
                     </div>
                 </div>
@@ -403,7 +438,7 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.</p>
+            <p>&copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.</p>
         </div>
     </footer>
 
@@ -420,7 +455,7 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
             thumb.classList.add('active');
         }
 
-        // Quantité
+        // <?= __('quantite') ?>
         function updateQty(change) {
             const input = document.getElementById('qtyInput');
             let val = parseInt(input.value) + change;
@@ -451,35 +486,16 @@ $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
                 if (panes[target]) panes[target].classList.add('active');
             });
         });
-    </script>
-// Gestion des étoiles du formulaire d'avis
-document.querySelectorAll('input[name="note"]').forEach((radio, index) => {
-    radio.addEventListener('change', function() {
-        const stars = this.closest('div').querySelectorAll('i');
-        const value = parseInt(this.value);
-        stars.forEach((star, i) => {
-            star.style.color = i < value ? '#ffb800' : '#444';
-        });
-    });
-});
 
-// Effet hover sur les étoiles
-document.querySelectorAll('.form-group label').forEach(label => {
-    label.addEventListener('mouseenter', function() {
-        const stars = this.closest('div').querySelectorAll('i');
-        const index = Array.from(this.parentElement.children).indexOf(this);
-        stars.forEach((star, i) => {
-            star.style.color = i <= index ? '#ffb800' : '#444';
-        });
-    });
-    label.addEventListener('mouseleave', function() {
-        const stars = this.closest('div').querySelectorAll('i');
-        const checked = this.closest('div').querySelector('input:checked');
-        const value = checked ? parseInt(checked.value) : 0;
-        stars.forEach((star, i) => {
-            star.style.color = i < value ? '#ffb800' : '#444';
-        });
-    });
-});
+        // ✅ Fonction pour sélectionner la note avec les étoiles
+        function setNote(value) {
+            document.getElementById('note').value = value;
+            const stars = document.querySelectorAll('.tab-pane.active .fa-star');
+            stars.forEach((star, index) => {
+                star.style.color = index < value ? '#ffb800' : '#444';
+            });
+        }
+    </script>
+
 </body>
 </html>

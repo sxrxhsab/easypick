@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -51,7 +51,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Modifier utilisateur</title>
+    <title>EasyPick – <?= __('modifier') ?> utilisateur</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -112,7 +112,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <section class="admin-hero">
         <div class="container">
-            <h1>Modifier l'<span>utilisateur</span></h1>
+            <h1><?= __('modifier') ?> l'<span>utilisateur</span></h1>
             <p>#<?= $user['id'] ?> – <?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></p>
         </div>
     </section>
@@ -120,7 +120,7 @@ $user_role = $_SESSION['user_role'] ?? '';
     <section class="section">
         <div class="container">
             <div class="form-box">
-                <h2>Modifier le rôle</h2>
+                <h2><?= __('modifier') ?> le rôle</h2>
                 <div class="sub">Rôle actuel : <strong><?= $user['role'] ?></strong></div>
 
                 <?php if ($erreur): ?>
@@ -138,7 +138,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Administrateur</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Enregistrer</button>
+                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> <?= __('enregistrer') ?></button>
                 </form>
 
                 <div style="margin-top:16px;">

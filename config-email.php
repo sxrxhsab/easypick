@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // config-email.php - Configuration SMTP pour l'envoi d'emails
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -28,7 +28,7 @@ function envoyerEmail($destinataire, $prenom, $reference, $total, $articles) {
         $mail->isHTML(true);
         $mail->Subject = '✅ Confirmation de votre commande EasyPick';
 
-        // Corps de l'email (HTML)
+        // Corps de l'<?= __('email') ?> (HTML)
         $corps = "
         <html>
         <head>
@@ -43,7 +43,7 @@ function envoyerEmail($destinataire, $prenom, $reference, $total, $articles) {
                 .table { width: 100%; border-collapse: collapse; margin: 15px 0; }
                 .table th { background: #ff6a00; color: #fff; padding: 10px; text-align: left; }
                 .table td { padding: 10px; border-bottom: 1px solid #ddd; }
-                .total { font-size: 20px; font-weight: 700; text-align: right; color: #ff6a00; padding-top: 10px; border-top: 2px solid #ddd; }
+                .<?= __('total') ?> { font-size: 20px; font-weight: 700; text-align: right; color: #ff6a00; padding-top: 10px; border-top: 2px solid #ddd; }
                 .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
                 .btn { display: inline-block; padding: 12px 30px; background: #ff6a00; color: #fff; border-radius: 50px; text-decoration: none; font-weight: 700; }
             </style>
@@ -55,7 +55,7 @@ function envoyerEmail($destinataire, $prenom, $reference, $total, $articles) {
                     <p style='color:#666;'>Merci pour votre commande !</p>
                 </div>
 
-                <p>Bonjour <strong>" . htmlspecialchars($prenom) . "</strong>,</p>
+                <p>Bonjour <strong>" . htmlspecialchars($pre<?= __('nom') ?>) . "</strong>,</p>
                 <p>Nous vous remercions pour votre commande. Voici le récapitulatif :</p>
 
                 <div class='order-details'>
@@ -67,7 +67,7 @@ function envoyerEmail($destinataire, $prenom, $reference, $total, $articles) {
                     <thead>
                         <tr>
                             <th>Produit</th>
-                            <th style='text-align:center;'>Quantité</th>
+                            <th style='text-align:center;'><?= __('quantite') ?></th>
                             <th style='text-align:right;'>Prix</th>
                         </tr>
                     </thead>
@@ -76,7 +76,7 @@ function envoyerEmail($destinataire, $prenom, $reference, $total, $articles) {
         foreach ($articles as $article) {
             $corps .= "
                         <tr>
-                            <td>" . htmlspecialchars($article['nom']) . "</td>
+                            <td>" . htmlspecialchars($article['<?= __('nom') ?>']) . "</td>
                             <td style='text-align:center;'>" . $article['quantite'] . "</td>
                             <td style='text-align:right;'>" . number_format($article['prix'] * $article['quantite'], 2, ',', ' ') . " €</td>
                         </tr>";
@@ -87,7 +87,7 @@ function envoyerEmail($destinataire, $prenom, $reference, $total, $articles) {
                 </table>
 
                 <div class='total'>
-                    Total : " . number_format($total, 2, ',', ' ') . " €
+                    <?= __('total') ?> : " . number_format($<?= __('total') ?>, 2, ',', ' ') . " €
                 </div>
 
                 <p style='margin: 25px 0; text-align:center;'>
@@ -96,7 +96,7 @@ function envoyerEmail($destinataire, $prenom, $reference, $total, $articles) {
 
                 <div class='footer'>
                     <p>EasyPick – Votre guide tech depuis 2025</p>
-                    <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+                    <p>Cet <?= __('email') ?> a été envoyé automatiquement, merci de ne pas y répondre.</p>
                 </div>
             </div>
         </body>

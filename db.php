@@ -1,4 +1,18 @@
 <?php
+
+// ===== MULTILANGUE =====
+$lang = $_GET['lang'] ?? $_SESSION['lang'] ?? 'fr';
+$_SESSION['lang'] = $lang;
+$translations = [];
+if (file_exists(__DIR__ . '/lang/' . $lang . '.php')) {
+    $translations = require_once __DIR__ . '/lang/' . $lang . '.php';
+}
+function __($key) {
+    global $translations;
+    return $translations[$key] ?? $key;
+}
+
+?><?php
 // db.php - Connexion à la base de données
 
 $host = getenv('DB_HOST') ?: 'localhost';

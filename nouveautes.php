@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -15,13 +15,13 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Nouveautés</title>
+    <title>EasyPick – <?= __('nouveautes') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* (reprendre les styles de boutique.php) */
+        /* (reprendre les styles de <?= __('boutique') ?>.php) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; }
         a { text-decoration: none; color: inherit; }
@@ -105,8 +105,8 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <section class="page-hero">
         <div class="container">
-            <h1><span>Nouveautés</span></h1>
-            <p>Découvrez les derniers produits ajoutés à notre catalogue.</p>
+            <h1><span><?= __('nouveautes') ?></span></h1>
+            <p>Découvrez les derniers <?= __('produits') ?> ajoutés à notre catalogue.</p>
         </div>
     </section>
 
@@ -143,7 +143,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 }
                                 ?>
                             </span>
-                            <span class="count">(<?= $produit['nb_avis'] ?> avis)</span>
+                            <span class="count">(<?= $produit['nb_avis'] ?> <?= __('avis') ?>)</span>
                         </div>
                         <div class="product-price">
                             <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
@@ -152,7 +152,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <?php endif; ?>
                         </div>
                         <div class="card-actions">
-                            <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add">Ajouter au panier</a>
+                            <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -163,7 +163,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <footer class="footer">
         <div class="container">
-            &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.
+            &copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.
         </div>
     </footer>
 

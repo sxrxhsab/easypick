@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 require_once 'config-email.php';
@@ -54,7 +54,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Contact</title>
+    <title>EasyPick – <?= __('contact') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -90,17 +90,17 @@ $user_role = $_SESSION['user_role'] ?? '';
         .page-hero h1 span { color: #ff6a00; }
         .page-hero p { color: rgba(255,255,255,0.4); font-size: 15px; margin-top: 4px; }
 
-        .contact-section { padding: 40px 0 80px; }
-        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
-        .contact-info { background: #1A1A1A; border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); }
-        .contact-info h3 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
-        .contact-info p { color: rgba(255,255,255,0.6); line-height: 1.8; margin-bottom: 20px; }
-        .contact-info .item { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-        .contact-info .item i { color: #ff6a00; font-size: 20px; width: 30px; text-align: center; }
-        .contact-info .item span { color: rgba(255,255,255,0.7); }
+        .<?= __('contact') ?>-section { padding: 40px 0 80px; }
+        .<?= __('contact') ?>-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+        .<?= __('contact') ?>-info { background: #1A1A1A; border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); }
+        .<?= __('contact') ?>-info h3 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+        .<?= __('contact') ?>-info p { color: rgba(255,255,255,0.6); line-height: 1.8; margin-bottom: 20px; }
+        .<?= __('contact') ?>-info .item { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .<?= __('contact') ?>-info .item i { color: #ff6a00; font-size: 20px; width: 30px; text-align: center; }
+        .<?= __('contact') ?>-info .item span { color: rgba(255,255,255,0.7); }
 
-        .contact-form { background: #1A1A1A; border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); }
-        .contact-form h3 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+        .<?= __('contact') ?>-form { background: #1A1A1A; border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); }
+        .<?= __('contact') ?>-form h3 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; color: rgba(255,255,255,0.7); }
         .form-group input, .form-group textarea { width: 100%; padding: 12px 16px; background: #0F0F0F; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; color: #fff; font-size: 14px; font-family: 'Poppins', sans-serif; outline: none; transition: border-color 0.3s; }
@@ -114,7 +114,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .footer { background: #0F0F0F; padding: 40px 0 20px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; color: rgba(255,255,255,0.12); font-size: 13px; }
         .footer a { color: #ff6a00; }
 
-        @media (max-width: 992px) { .contact-grid { grid-template-columns: 1fr; gap: 30px; } }
+        @media (max-width: 992px) { .<?= __('contact') ?>-grid { grid-template-columns: 1fr; gap: 30px; } }
         @media (max-width: 768px) {
             .navbar-simple { height: 60px; padding: 0 16px; }
             .navbar-simple .logo-text { font-size: 18px; }
@@ -125,7 +125,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             .navbar-simple .nav-icons { gap: 14px; }
             .navbar-simple .nav-icons a { font-size: 16px; }
             .page-hero h1 { font-size: 28px; }
-            .contact-section { padding: 30px 0 60px; }
+            .<?= __('contact') ?>-section { padding: 30px 0 60px; }
         }
     </style>
 </head>
@@ -135,7 +135,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <section class="page-hero">
         <div class="container">
-            <h1>Nous <span>contacter</span></h1>
+            <h1>Nous <span><?= __('contact') ?>er</span></h1>
             <p>Une question ? Un projet ? Écrivez-nous, nous vous répondrons rapidement.</p>
         </div>
     </section>
@@ -147,7 +147,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <!-- Infos -->
                 <div class="contact-info">
                     <h3>📬 Coordonnées</h3>
-                    <p>Vous pouvez nous joindre par email ou via ce formulaire. Nous sommes disponibles du lundi au vendredi de 9h à 18h.</p>
+                    <p>Vous pouvez nous joindre par <?= __('email') ?> ou via ce formulaire. Nous sommes disponibles du lundi au vendredi de 9h à 18h.</p>
                     <div class="item"><i class="fas fa-envelope"></i><span>sabeursarah66@gmail.com</span></div>
                     <div class="item"><i class="fas fa-phone"></i><span>+33 6 12 34 56 78</span></div>
                     <div class="item"><i class="fas fa-map-marker-alt"></i><span>Paris, France</span></div>
@@ -165,11 +165,11 @@ $user_role = $_SESSION['user_role'] ?? '';
                     <?php endif; ?>
                     <form method="POST">
                         <div class="form-group">
-                            <label>Nom *</label>
+                            <label><?= __('nom') ?> *</label>
                             <input type="text" name="nom" required placeholder="Votre nom" />
                         </div>
                         <div class="form-group">
-                            <label>Email *</label>
+                            <label><?= __('email') ?> *</label>
                             <input type="email" name="email" required placeholder="votre@email.com" />
                         </div>
                         <div class="form-group">
@@ -190,7 +190,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <footer class="footer">
         <div class="container">
-            &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.
+            &copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.
         </div>
     </footer>
 

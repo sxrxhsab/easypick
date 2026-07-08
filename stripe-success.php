@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 require_once 'config-stripe.php';
@@ -43,13 +43,22 @@ try {
             ]);
 
             $commande_id = $pdo->lastInsertId();
+            // Après avoir enregistré la commande, décrémenter le stock
+foreach ($data['articles'] as $article) {
+    $stmt = $pdo->prepare('UPDATE produits SET stock = stock - ? WHERE id = ? AND stock >= ?');
+    $stmt->execute([$article['quantite'], $article['id'], $article['quantite']]);
+}
 
             // Insérer les lignes de commande
             foreach ($data['articles'] as $article) {
                 $stmt = $pdo->prepare('INSERT INTO lignes_commandes (commande_id, produit_id, quantite, prix_unitaire) VALUES (?, ?, ?, ?)');
                 $stmt->execute([$commande_id, $article['id'], $article['quantite'], $article['prix']]);
             }
-
+// Après avoir inséré les lignes de commande, décrémenter le stock
+foreach ($data['articles'] as $article) {
+    $stmt = $pdo->prepare('UPDATE produits SET stock = stock - ? WHERE id = ? AND stock >= ?');
+    $stmt->execute([$article['quantite'], $article['id'], $article['quantite']]);
+}
             // 👇 ENVOI DE L'EMAIL DE CONFIRMATION (AJOUT ICI)
             $envoi = envoyerEmail(
                 $data['email'],
@@ -154,13 +163,13 @@ try {
                     <?php if (isset($email)): ?><br><strong><?= htmlspecialchars($email) ?></strong><?php endif; ?>
                 </p>
 
-                <a href="index.php" class="btn-continue"><i class="fas fa-home"></i> Retour à l'accueil</a>
+                <a href="index.php" class="btn-continue"><i class="fas fa-home"></i> <?= __('retour_accueil') ?></a>
             </div>
         </div>
     </section>
 
     <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.08); font-size:13px;">
-        <div class="container">&copy; 2026 EasyPick – Tous droits réservés.</div>
+        <div class="container">&copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>.</div>
     </footer>
 
 </body>

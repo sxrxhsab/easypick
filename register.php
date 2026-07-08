@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -6,14 +6,14 @@ $erreur = '';
 $succes = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $prenom = trim($_POST['prenom']);
-    $nom = trim($_POST['nom']);
-    $email = trim($_POST['email']);
+    $pre<?= __('nom') ?> = trim($_POST['pre<?= __('nom') ?>']);
+    $<?= __('nom') ?> = trim($_POST['<?= __('nom') ?>']);
+    $<?= __('email') ?> = trim($_POST['<?= __('email') ?>']);
     $password = $_POST['password'];
     $password_confirm = $_POST['password_confirm'];
 
     // 1. Validations
-    if (empty($prenom) || empty($nom) || empty($email) || empty($password)) {
+    if (empty($pre<?= __('nom') ?>) || empty($<?= __('nom') ?>) || empty($<?= __('email') ?>) || empty($password)) {
         $erreur = 'Tous les champs sont obligatoires.';
     } elseif ($password !== $password_confirm) {
         $erreur = 'Les mots de passe ne correspondent pas.';
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Inscription</title>
+    <title>EasyPick – <?= __('inscription') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -85,34 +85,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!$succes): ?>
         <form method="POST">
             <div class="form-group">
-                <label>Prénom</label>
+                <label>Pré<?= __('nom') ?></label>
                 <input type="text" name="prenom" required placeholder="Jean" />
             </div>
             <div class="form-group">
-                <label>Nom</label>
+                <label><?= __('nom') ?></label>
                 <input type="text" name="nom" required placeholder="Dupont" />
             </div>
             <div class="form-group">
-                <label>Email</label>
+                <label><?= __('email') ?></label>
                 <input type="email" name="email" required placeholder="vous@exemple.com" />
             </div>
             <div class="form-group">
-                <label>Mot de passe</label>
+                <label><?= __('mot_de_passe') ?></label>
                 <input type="password" name="password" required placeholder="Min. 6 caractères" />
             </div>
             <div class="form-group">
-                <label>Confirmer le mot de passe</label>
+                <label><?= __('confirmer_mot_de_passe') ?></label>
                 <input type="password" name="password_confirm" required placeholder="••••••••" />
             </div>
-            <button type="submit" class="btn-register">Créer mon compte</button>
+            <button type="submit" class="btn-register">Créer <?= __('mon_compte') ?></button>
         </form>
         <?php endif; ?>
 
         <div class="links">
-            Déjà un compte ? <a href="login.php">Se connecter</a>
+            <?= __('deja_compte') ?> <a href="login.php"><?= __('se_connecter') ?></a>
         </div>
         <div style="text-align:center;">
-            <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
+            <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> <?= __('retour_accueil') ?></a>
         </div>
     </div>
 </body>

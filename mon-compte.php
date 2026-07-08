@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -19,7 +19,7 @@ $commandes = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Mon compte</title>
+    <title>EasyPick – <?= __('mon_compte') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -58,10 +58,10 @@ $commandes = $stmt->fetchAll();
         .welcome .btn-logout { padding: 10px 24px; background: rgba(255,68,68,0.1); color: #ff4444; border: 1px solid rgba(255,68,68,0.2); border-radius: 12px; font-weight: 600; transition: all 0.3s; }
         .welcome .btn-logout:hover { background: rgba(255,68,68,0.2); }
 
-        .commandes-table { width: 100%; border-collapse: collapse; background: #1A1A1A; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
-        .commandes-table th { text-align: left; padding: 14px 18px; color: rgba(255,255,255,0.3); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .commandes-table td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
-        .commandes-table tr:last-child td { border-bottom: none; }
+        .<?= __('commandes') ?>-table { width: 100%; border-collapse: collapse; background: #1A1A1A; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+        .<?= __('commandes') ?>-table th { text-align: left; padding: 14px 18px; color: rgba(255,255,255,0.3); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .<?= __('commandes') ?>-table td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+        .<?= __('commandes') ?>-table tr:last-child td { border-bottom: none; }
         .statut { padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; }
         .statut.en_attente { background: rgba(255,193,7,0.15); color: #ffc107; }
         .statut.payee { background: rgba(0,184,148,0.15); color: #00b894; }
@@ -79,8 +79,8 @@ $commandes = $stmt->fetchAll();
             .navbar-simple .hamburger { display: flex; }
             .navbar-simple .nav-icons { gap: 14px; }
             .navbar-simple .nav-icons a { font-size: 16px; }
-            .commandes-table { font-size: 13px; display: block; overflow-x: auto; }
-            .commandes-table th, .commandes-table td { padding: 10px 12px; }
+            .<?= __('commandes') ?>-table { font-size: 13px; display: block; overflow-x: auto; }
+            .<?= __('commandes') ?>-table th, .<?= __('commandes') ?>-table td { padding: 10px 12px; }
             .welcome { flex-direction: column; align-items: stretch; text-align: center; }
         }
     </style>
@@ -92,17 +92,17 @@ $commandes = $stmt->fetchAll();
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">Accueil</a></li>
-                <li><a href="boutique.php">Boutique</a></li>
-                <li><a href="#">Nouveautés</a></li>
-                <li><a href="#">Promotions</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="index.php"><?= __('accueil') ?></a></li>
+                <li><a href="boutique.php"><?= __('boutique') ?></a></li>
+                <li><a href="#"><?= __('nouveautes') ?></a></li>
+                <li><a href="#"><?= __('promotions') ?></a></li>
+                <li><a href="#"><?= __('contact') ?></a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
-                <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
-                <a href="panier.php" aria-label="Panier" style="position:relative;">
+                <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
+                <a href="panier.php" aria-label='<?= __('panier') ?>' style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                 </a>
                 <button class="hamburger" id="hamburger" aria-label="Menu">
@@ -116,7 +116,7 @@ $commandes = $stmt->fetchAll();
     <section class="page-hero">
         <div class="container">
             <h1>Mon <span>compte</span></h1>
-            <p>Gérez vos informations et suivez vos commandes.</p>
+            <p>Gérez vos informations et suivez vos <?= __('commandes') ?>.</p>
         </div>
     </section>
 
@@ -124,25 +124,29 @@ $commandes = $stmt->fetchAll();
     <section class="section">
         <div class="container">
 
-            <div class="welcome">
-                <div>
-                    <h2>Bonjour <span><?= htmlspecialchars($_SESSION['user_prenom']) ?></span> !</h2>
-                    <p style="color:rgba(255,255,255,0.4); font-size:14px;"><?= htmlspecialchars($_SESSION['user_email']) ?></p>
-                </div>
-                <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <a href="logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
-                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
-                        <a href="admin.php" style="padding:10px 24px; background:rgba(255,106,0,0.1); color:#ff6a00; border:1px solid rgba(255,106,0,0.2); border-radius:12px; font-weight:600; transition:all 0.3s;"><i class="fas fa-cog"></i> Admin</a>
-                    <?php endif; ?>
-                </div>
-            </div>
+           <div class="welcome">
+    <div>
+        <h2>Bonjour <span><?= htmlspecialchars($_SESSION['user_prenom']) ?></span> !</h2>
+        <p style="color:rgba(255,255,255,0.4); font-size:14px;"><?= htmlspecialchars($_SESSION['user_email']) ?></p>
+    </div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <!-- ✅ AJOUTE LE LIEN VERS LES FAVORIS ICI -->
+        <a href="wishlist.php" style="padding:10px 24px; background:rgba(255,106,0,0.1); color:#ff6a00; border:1px solid rgba(255,106,0,0.2); border-radius:12px; font-weight:600; transition:all 0.3s;">
+            <i class="fas fa-heart"></i> Mes favoris
+        </a>
+        <a href="logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i> <?= __('deconnexion') ?></a>
+        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+            <a href="admin.php" style="padding:10px 24px; background:rgba(255,106,0,0.1); color:#ff6a00; border:1px solid rgba(255,106,0,0.2); border-radius:12px; font-weight:600; transition:all 0.3s;"><i class="fas fa-cog"></i> Admin</a>
+        <?php endif; ?>
+    </div>
+</div>
 
-            <h3 style="font-size:20px; font-weight:700; margin-bottom:16px;">📦 Mes commandes</h3>
+            <h3 style="font-size:20px; font-weight:700; margin-bottom:16px;">📦 Mes <?= __('commandes') ?></h3>
 
             <?php if (empty($commandes)): ?>
                 <div class="empty">
                     <p>Vous n'avez pas encore passé de commande.</p>
-                    <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Découvrir nos produits</a>
+                    <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Découvrir nos <?= __('produits') ?></a>
                 </div>
             <?php else: ?>
                 <table class="commandes-table">
@@ -150,7 +154,7 @@ $commandes = $stmt->fetchAll();
                         <tr>
                             <th>Référence</th>
                             <th>Date</th>
-                            <th>Total</th>
+                            <th><?= __('total') ?></th>
                             <th>Statut</th>
                         </tr>
                     </thead>
@@ -172,7 +176,7 @@ $commandes = $stmt->fetchAll();
 
     <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.12); font-size:13px;">
         <div class="container">
-            &copy; 2026 EasyPick – Tous droits réservés.
+            &copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>.
         </div>
     </footer>
 

@@ -2,8 +2,21 @@
 session_start();
 require_once 'db.php';
 
-// Récupérer les produits avec est_promo = 1 ET prix_old non vide
-$stmt = $pdo->query('SELECT * FROM produits WHERE est_promo = 1 AND prix_old IS NOT NULL ORDER BY RAND()');
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Récupérer les produits favoris
+$stmt = $pdo->prepare('
+    SELECT p.* FROM wishlist w 
+    JOIN produits p ON w.produit_id = p.id 
+    WHERE w.utilisateur_id = ? 
+    ORDER BY w.created_at DESC
+');
+$stmt->execute([$user_id]);
 $produits = $stmt->fetchAll();
 
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
@@ -15,22 +28,19 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – <?= __('promotions') ?></title>
+    <title>EasyPick – Mes favoris</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* (reprendre les styles de nouveautes.php – identiques) */
-        /* Pour gagner de la place, je te donne la version complète de <?= __('promotions') ?>.php avec les mêmes styles */
+        /* (reprendre les styles de <?= __('boutique') ?>.php pour la grille) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; }
         a { text-decoration: none; color: inherit; }
         .container { max-width: 1500px; margin: 0 auto; padding: 0 30px; }
-        .navbar-simple {
-            width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px;
-        }
+
+        .navbar-simple { width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px; }
         .navbar-simple .nav-container { max-width: 1500px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
         .navbar-simple .logo-text { font-weight: 900; font-size: 22px; letter-spacing: 1px; }
         .navbar-simple .logo-text .easy { color: #ff6a00; }
@@ -43,6 +53,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .navbar-simple .nav-icons { display: flex; gap: 20px; }
         .navbar-simple .nav-icons a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.3s; position: relative; }
         .navbar-simple .nav-icons a:hover { color: #ff6a00; }
+        .navbar-simple .nav-icons .cart-badge { position: absolute; top: -6px; right: -8px; background: #ff6a00; color: #fff; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(255,106,0,0.4); }
         .navbar-simple .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
         .navbar-simple .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 10px; transition: 0.3s; }
 
@@ -51,9 +62,9 @@ $user_role = $_SESSION['user_role'] ?? '';
         .page-hero h1 span { color: #ff6a00; }
         .page-hero p { color: rgba(255,255,255,0.4); font-size: 15px; }
 
-        .products-section { padding: 40px 0 80px; background: #151515; }
+        .wishlist-section { padding: 40px 0 80px; background: #151515; }
         .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 35px; }
-        .product-card { background: #202020; border-radius: 20px; overflow: hidden; padding: 24px 24px 28px; border: 1px solid rgba(255,255,255,0.06); transition: transform 0.4s, box-shadow 0.4s; position: relative; }
+        .product-card { background: #202020; border-radius: 20px; overflow: hidden; padding: 24px 24px 28px; border: 1px solid rgba(255,255,255,0.06); transition: transform 0.4s, box-shadow 0.4s; position: relative; display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-12px); box-shadow: 0 30px 70px rgba(255,106,0,0.12); border-color: rgba(255,106,0,0.12); }
         .product-card .product-image-wrap { position: relative; overflow: hidden; border-radius: 16px; background: #151515; margin-bottom: 16px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; }
         .product-card .product-image-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 20px; transition: transform 0.5s; }
@@ -61,6 +72,8 @@ $user_role = $_SESSION['user_role'] ?? '';
         .product-card .badges { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
         .product-card .badges .badge { padding: 4px 14px; border-radius: 30px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .product-card .badges .badge.promo { background: #ff6a00; color: #fff; }
+        .product-card .badges .badge.new { background: #00b894; color: #fff; }
+        .product-card .badges .badge.top { background: #fdcb6e; color: #151515; }
         .product-card .action-buttons { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 8px; z-index: 2; opacity: 0; transform: translateX(12px); transition: all 0.4s; }
         .product-card:hover .action-buttons { opacity: 1; transform: translateX(0); }
         .product-card .action-buttons button { width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(21,21,21,0.85); backdrop-filter: blur(8px); color: #fff; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.06); z-index: 3; }
@@ -73,7 +86,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .product-card .product-price { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
         .product-card .product-price .current { font-size: 32px; font-weight: 900; color: #ff6a00; letter-spacing: -0.5px; }
         .product-card .product-price .old { font-size: 16px; color: rgba(255,255,255,0.2); text-decoration: line-through; font-weight: 400; }
-        .product-card .card-actions { display: flex; gap: 10px; margin-top: auto; z-index: 2; position: relative; }
+        .product-card .card-actions { display: flex; gap: 10px; margin-top: auto; position: relative; z-index: 2; }
         .product-card .card-actions .btn-add { width: 100%; padding: 14px 0; background: linear-gradient(135deg, #ff6a00, #ff7d1a); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.4s; font-family: 'Poppins', sans-serif; box-shadow: 0 6px 25px rgba(255,106,0,0.12); text-align: center; display: inline-block; }
         .product-card .card-actions .btn-add:hover { transform: scale(1.03); box-shadow: 0 10px 35px rgba(255,106,0,0.25); background: linear-gradient(135deg, #ff7d1a, #ff8c33); }
 
@@ -106,29 +119,41 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <section class="page-hero">
         <div class="container">
-            <h1><span><?= __('promotions') ?></span> 🔥</h1>
-            <p>Profitez de nos offres exclusives sur une sélection de <?= __('produits') ?>.</p>
+            <h1>Mes <span>favoris</span></h1>
+            <p>Retrouvez ici tous les <?= __('produits') ?> que vous avez aimés.</p>
         </div>
     </section>
 
-    <section class="products-section">
+    <section class="wishlist-section">
         <div class="container">
             <?php if (empty($produits)): ?>
                 <div class="empty">
-                    <i class="fas fa-tags"></i>
-                    <p>Aucune promotion en cours. Revenez bientôt !</p>
+                    <i class="fas fa-heart" style="color:#ff6a00;"></i>
+                    <p>Vous n'avez pas encore de favoris.</p>
+                    <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Découvrir nos <?= __('produits') ?></a>
                 </div>
             <?php else: ?>
                 <div class="products-grid">
                     <?php foreach ($produits as $produit): ?>
                     <div class="product-card">
+                        <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay"></a>
                         <div class="product-image-wrap">
                             <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
                             <div class="badges">
-                                <span class="badge promo">Promo</span>
+                                <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
+                                    <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
+                                <?php endif; ?>
+                                <?php if ($produit['est_nouveau']): ?>
+                                    <span class="badge new">Nouveau</span>
+                                <?php endif; ?>
+                                <?php if ($produit['est_top']): ?>
+                                    <span class="badge top">Top vente</span>
+                                <?php endif; ?>
                             </div>
                             <div class="action-buttons">
-                                <button class="fav-btn" onclick="event.stopPropagation(); toggleFav(this)"><i class="far fa-heart"></i></button>
+                                <button class="fav-btn" onclick="event.stopPropagation(); window.location.href='wishlist-<?= __('supprimer') ?>.php?id=<?= $produit['id'] ?>'">
+                                    <i class="fas fa-heart" style="color:#ff6a00;"></i>
+                                </button>
                                 <button onclick="event.stopPropagation(); quickView(this)"><i class="fas fa-eye"></i></button>
                             </div>
                         </div>
@@ -173,18 +198,12 @@ $user_role = $_SESSION['user_role'] ?? '';
         const navMenu = document.getElementById('navMenu');
         hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
 
-        function toggleFav(btn) {
-            const icon = btn.querySelector('i');
-            icon.classList.toggle('far');
-            icon.classList.toggle('fas');
-            btn.classList.toggle('fav-active');
-        }
-
         function quickView(btn) {
             const card = btn.closest('.product-card');
             const name = card.querySelector('.product-name').textContent;
             alert('🖥️ Aperçu rapide : ' + name);
         }
     </script>
+
 </body>
 </html>

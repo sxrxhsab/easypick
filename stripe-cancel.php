@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ?>
 <!DOCTYPE html>
@@ -31,7 +31,7 @@ session_start();
         <h1>Paiement <span>annulé</span></h1>
         <p>Vous avez annulé le processus de paiement.</p>
         <p style="font-size:14px; color:rgba(255,255,255,0.3); margin-top:6px;">Aucun montant n'a été prélevé.</p>
-        <a href="panier.php" class="btn-retry"><i class="fas fa-arrow-left"></i> Retour au panier</a>
+        <a href="panier.php" class="btn-retry"><i class="fas fa-arrow-left"></i> Retour au <?= __('panier') ?></a>
     </div>
 </body>
 </html>

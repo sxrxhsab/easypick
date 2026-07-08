@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'db.php';
 
@@ -23,8 +23,8 @@ $commande = $stmt->fetch();
     </div>
 
     <p style="font-size:14px; color:rgba(255,255,255,0.3);">
-        Un email de confirmation a été envoyé à <strong><?= htmlspecialchars($commande['email']) ?></strong>
+        Un <?= __('email') ?> de confirmation a été envoyé à <strong><?= htmlspecialchars($commande['email']) ?></strong>
     </p>
 
-    <a href="index.php" class="btn-continue"><i class="fas fa-home"></i> Retour à l'accueil</a>
+    <a href="index.php" class="btn-continue"><i class="fas fa-home"></i> <?= __('retour_accueil') ?></a>
 </div>
