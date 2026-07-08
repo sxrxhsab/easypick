@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // panier-supprimer.php - Supprime un produit du panier
 session_start();
 

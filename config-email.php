@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // config-email.php - Configuration SMTP pour l'envoi d'emails
 
 use PHPMailer\PHPMailer\PHPMailer;

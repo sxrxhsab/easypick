@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once 'config-email.php';
 
 // Tester l'envoi d'un email

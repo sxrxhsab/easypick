@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // newsletter-notification.php - Envoyer une notification aux inscrits
 
 function envoyerNotificationNouveauxProduits($nb_produits_ajoutes) {

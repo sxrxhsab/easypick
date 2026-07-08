@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 // ===== MULTILANGUE =====
 $lang = $_GET['lang'] ?? $_SESSION['lang'] ?? 'fr';

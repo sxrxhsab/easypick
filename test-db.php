@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once 'db.php';
 $query = $pdo->query('SELECT * FROM produits LIMIT 5');
 $produits = $query->fetchAll();

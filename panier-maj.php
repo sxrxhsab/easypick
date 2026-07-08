@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // panier-maj.php - Met à jour les quantités dans le panier
 session_start();
 

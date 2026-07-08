@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 return [
     'accueil' => 'Accueil',
     'boutique' => 'Boutique',

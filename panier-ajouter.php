@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // <?= __('panier') ?>-<?= __('ajouter') ?>.php - Ajoute un produit au <?= __('panier') ?>
 session_start();
 
