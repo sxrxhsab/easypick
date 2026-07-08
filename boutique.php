@@ -1,6 +1,5 @@
 ﻿<?php
 ob_start();
-session_start();
 require_once 'db.php';
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $categorie = isset($_GET['categorie']) ? (int)$_GET['categorie'] : null;
