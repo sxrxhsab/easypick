@@ -1,6 +1,14 @@
 <?php
+ob_start();
 session_start();
 require_once 'db.php';
+
+// Fonction de traduction
+if (!function_exists('__')) {
+    function __($text) {
+        return $text;
+    }
+}
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: login.php');
@@ -20,7 +28,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin <?= __('utilisateurs') ?></title>
+    <title>EasyPick – Admin Utilisateurs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -91,23 +99,43 @@ $user_role = $_SESSION['user_role'] ?? '';
 </head>
 <body>
 
-    <?php include 'header.php'; ?>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar-simple">
+        <div class="nav-container">
+            <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="admin.php">Dashboard</a></li>
+                <li><a href="admin-produits.php">Produits</a></li>
+                <li><a href="admin-commandes.php">Commandes</a></li>
+                <li><a href="admin-utilisateurs.php" class="active">Utilisateurs</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="index.php"><i class="fas fa-home"></i></a>
+                <a href="logout.php"><i class="fas fa-sign-out-alt"></i></a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
+    <!-- ===== HERO ===== -->
     <section class="admin-hero">
         <div class="container">
-            <h1>Gestion des <span><?= __('utilisateurs') ?></span></h1>
+            <h1>Gestion des <span>Utilisateurs</span></h1>
             <p>Consultez et gérez les comptes des clients inscrits.</p>
         </div>
     </section>
 
+    <!-- ===== CONTENU ===== -->
     <section class="section">
         <div class="container">
 
             <div class="admin-menu">
-                <a href="admin.php"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
-                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
-                <a href="admin-utilisateurs.php" class="active"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
+                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
+                <a href="admin-utilisateurs.php" class="active"><i class="fas fa-users"></i> Utilisateurs</a>
             </div>
 
             <div class="table-wrap">
@@ -118,8 +146,8 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th><?= __('nom') ?></th>
-                                <th><?= __('email') ?></th>
+                                <th>Nom</th>
+                                <th>Email</th>
                                 <th>Rôle</th>
                                 <th>Inscrit le</th>
                                 <th>Actions</th>
@@ -132,11 +160,11 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 <td><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></td>
                                 <td><?= htmlspecialchars($user['email']) ?></td>
                                 <td><span class="role <?= $user['role'] ?>"><?= $user['role'] ?></span></td>
-                                <td><?= date('d/m/Y', strtotime($user['created_at'])) ?></td>
+                                <td><?= isset($user['created_at']) ? date('d/m/Y', strtotime($user['created_at'])) : 'N/A' ?></td>
                                 <td>
                                     <div class="btn-actions">
-                                        <a href="admin-utilisateur-<?= __('modifier') ?>.php?id=<?= $user['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> <?= __('modifier') ?></a>
-                                        <a href="admin-utilisateur-<?= __('supprimer') ?>.php?id=<?= $user['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="fas fa-trash"></i> <?= __('supprimer') ?></a>
+                                        <a href="admin-utilisateur-modifier.php?id=<?= $user['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Modifier</a>
+                                        <a href="admin-utilisateur-supprimer.php?id=<?= $user['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="fas fa-trash"></i> Supprimer</a>
                                     </div>
                                 </td>
                             </tr>
@@ -150,13 +178,15 @@ $user_role = $_SESSION['user_role'] ?? '';
     </section>
 
     <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.12); font-size:13px;">
-        <div class="container">&copy; 2026 EasyPick – Admin</div>
+        <div class="container">&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#" style="color:#ff6a00;">Samy Sabeur</a>.</div>
     </footer>
 
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
     </script>
 </body>
 </html>

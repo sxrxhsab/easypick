@@ -1,6 +1,14 @@
 <?php
+ob_start();
 session_start();
 require_once 'db.php';
+
+// Fonction de traduction
+if (!function_exists('__')) {
+    function __($text) {
+        return $text;
+    }
+}
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: login.php');
@@ -9,23 +17,27 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 
 // Récupérer toutes les commandes avec les infos client
 $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fetchAll();
+
+$nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
+$user_connecte = isset($_SESSION['user_id']);
+$user_role = $_SESSION['user_role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin <?= __('commandes') ?></title>
+    <title>EasyPick – Admin Commandes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* (reprendre les styles de admin.php) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; }
         a { text-decoration: none; color: inherit; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
         .navbar-simple { width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px; }
         .navbar-simple .nav-container { max-width: 1500px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
         .navbar-simple .logo-text { font-weight: 900; font-size: 22px; letter-spacing: 1px; }
@@ -70,6 +82,8 @@ $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fe
         .btn-view { background: rgba(13,202,240,0.1); color: #0dcaf0; border: 1px solid rgba(13,202,240,0.2); }
         .btn-view:hover { background: rgba(13,202,240,0.2); }
 
+        .empty { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.3); }
+
         @media (max-width: 768px) {
             .navbar-simple { height: 60px; padding: 0 16px; }
             .navbar-simple .logo-text { font-size: 18px; }
@@ -86,39 +100,56 @@ $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fe
 </head>
 <body>
 
-    <?php
-    // Variables pour la navbar
-    $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
-    $user_connecte = isset($_SESSION['user_id']);
-    $user_role = $_SESSION['user_role'] ?? '';
-    include 'header.php';
-    ?>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar-simple">
+        <div class="nav-container">
+            <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="admin.php">Dashboard</a></li>
+                <li><a href="admin-produits.php">Produits</a></li>
+                <li><a href="admin-commandes.php" class="active">Commandes</a></li>
+                <li><a href="admin-utilisateurs.php">Utilisateurs</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="index.php"><i class="fas fa-home"></i></a>
+                <a href="logout.php"><i class="fas fa-sign-out-alt"></i></a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
+    <!-- ===== HERO ===== -->
     <section class="admin-hero">
         <div class="container">
-            <h1>Gestion des <span><?= __('commandes') ?></span></h1>
-            <p>Suivez et gérez toutes les <?= __('commandes') ?> passées sur votre <?= __('boutique') ?>.</p>
+            <h1>Gestion des <span>Commandes</span></h1>
+            <p>Suivez et gérez toutes les commandes passées sur votre boutique.</p>
         </div>
     </section>
 
+    <!-- ===== CONTENU ===== -->
     <section class="section">
         <div class="container">
 
             <div class="admin-menu">
-                <a href="admin.php"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
-                <a href="admin-commandes.php" class="active"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
-                <a href="#"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
+                <a href="admin-commandes.php" class="active"><i class="fas fa-shopping-bag"></i> Commandes</a>
+                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> Utilisateurs</a>
             </div>
 
             <div class="table-wrap">
+                <?php if (empty($commandes)): ?>
+                    <div class="empty">Aucune commande pour le moment.</div>
+                <?php else: ?>
                 <table>
                     <thead>
                         <tr>
                             <th>Référence</th>
                             <th>Client</th>
                             <th>Date</th>
-                            <th><?= __('total') ?></th>
+                            <th>Total</th>
                             <th>Statut</th>
                             <th>Actions</th>
                         </tr>
@@ -142,16 +173,22 @@ $commandes = $pdo->query('SELECT * FROM commandes ORDER BY created_at DESC')->fe
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                <?php endif; ?>
             </div>
 
         </div>
     </section>
 
+    <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.12); font-size:13px;">
+        <div class="container">&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#" style="color:#ff6a00;">Samy Sabeur</a>.</div>
+    </footer>
+
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
     </script>
-
 </body>
 </html>
