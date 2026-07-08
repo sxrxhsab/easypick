@@ -319,7 +319,26 @@ $total_produits = count($produits);
             <form method="GET" action="" class="search-toolbar">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
                 <input type="text" name="search" placeholder="Rechercher un produit..." value="<?= htmlspecialchars($search) ?>" />
-                <div class="search-divider"></div>
+                <div class="search-toolbar">
+    <span class="search-icon"><i class="fas fa-search"></i></span>
+    <input type="text" id="searchInput" placeholder="Rechercher un produit..." autocomplete="off" />
+    <div class="search-divider"></div>
+    <div class="sort-wrap">
+        <label for="sortSelect">Trier par</label>
+        <select id="sortSelect" onchange="applyFilters()">
+            <option value="relevance">Pertinence</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+            <option value="rating">Meilleures notes</option>
+            <option value="newest">Nouveautés</option>
+        </select>
+    </div>
+</div>
+<div id="productGrid" class="products-grid">
+    <?php foreach ($produits as $index => $produit): ?>
+        <!-- les cartes existantes -->
+    <?php endforeach; ?>
+</div>
                 <div class="sort-wrap">
                     <label for="sortSelect">Trier par</label>
                     <select name="sort" id="sortSelect" onchange="this.form.submit()">
@@ -422,6 +441,43 @@ $total_produits = count($produits);
                     <?php else: ?>
                         <div class="products-grid">
                             <?php foreach ($produits as $index => $produit): ?>
+                                <?php foreach ($produits as $index => $produit): ?>
+    <?php 
+    // VÉRIFICATION DES FAVORIS (AJOUTE ICI)
+    $est_favori = false;
+    if (isset($_SESSION['user_id'])) {
+        $stmt = $pdo->prepare('SELECT produit_id FROM wishlist WHERE utilisateur_id = ? AND produit_id = ?');
+        $stmt->execute([$_SESSION['user_id'], $produit['id']]);
+        $est_favori = $stmt->fetch();
+    }
+    ?>
+    <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
+    <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay"></a>
+    <div class="product-image-wrap">
+        <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
+        <div class="badges">
+            <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
+                <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
+            <?php endif; ?>
+            <?php if ($produit['est_nouveau']): ?>
+                <span class="badge new">Nouveau</span>
+            <?php endif; ?>
+            <?php if ($produit['est_top']): ?>
+                <span class="badge top">Top vente</span>
+            <?php endif; ?>
+        </div>
+        <div class="action-buttons">
+            <!-- ✅ BOUTON FAVORIS AJOUTÉ ICI -->
+            <button class="fav-btn" onclick="toggleFav(<?= $produit['id'] ?>, this)">
+                <i class="<?= $est_favori ? 'fas' : 'far' ?> fa-heart"></i>
+            </button>
+            <button onclick="quickView(this)"><i class="fas fa-eye"></i></button>
+        </div>
+    </div>
+    <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
+    <!-- ... -->
+</div>
+<?php endforeach; ?>
                             <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
                                 <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay" aria-label="Voir le produit"></a>
                                 <div class="product-image-wrap">
@@ -438,9 +494,13 @@ $total_produits = count($produits);
                                         <?php endif; ?>
                                     </div>
                                     <div class="action-buttons">
-                                        <button class="fav-btn" onclick="event.stopPropagation(); toggleFav(this)"><i class="far fa-heart"></i></button>
-                                        <button onclick="event.stopPropagation(); quickView(this)"><i class="fas fa-eye"></i></button>
-                                    </div>
+    <!-- AJOUTE CE BOUTON POUR LES FAVORIS -->
+    <button class="fav-btn" onclick="toggleFav(<?= $produit['id'] ?>, this)">
+        <i class="<?= $est_favori ? 'fas' : 'far' ?> fa-heart"></i>
+    </button>
+    <!-- Conserve l'ancien bouton favoris si tu veux, ou remplace-le -->
+    <button onclick="quickView(this)"><i class="fas fa-eye"></i></button>
+</div>
                                 </div>
                                 <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
                                 <div class="product-rating">
@@ -575,7 +635,52 @@ $total_produits = count($produits);
             });
         }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
         fadeElements.forEach(el => observer.observe(el));
-    </script>
+        function toggleFav(productId, btn) {
+        const icon = btn.querySelector('i');
+        if (icon.classList.contains('fas')) {
+            // Si déjà en favori → supprimer
+            window.location.href = 'wishlist-supprimer.php?id=' + productId;
+        } else {
+            // Sinon → ajouter
+            window.location.href = 'wishlist-ajouter.php?id=' + productId;
+        }
+    }
 
+    </script>
+<script>
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    const productGrid = document.getElementById('productGrid');
+
+    function loadProducts(q = '', sort = 'relevance') {
+        const url = `recherche-ajax.php?q=${encodeURIComponent(q)}&sort=${sort}`;
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                productGrid.innerHTML = html;
+                // Réappliquer les animations fade-up
+                document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+            })
+            .catch(err => console.error('Erreur:', err));
+    }
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const q = this.value.trim();
+        searchTimeout = setTimeout(() => {
+            const sort = document.getElementById('sortSelect').value;
+            loadProducts(q, sort);
+        }, 300); // délai pour éviter trop de requêtes
+    });
+
+    function applyFilters() {
+        const q = searchInput.value.trim();
+        const sort = document.getElementById('sortSelect').value;
+        loadProducts(q, sort);
+    }
+
+    // Initialisation : charger les produits par défaut (déjà chargés via PHP, mais on peut garder)
+    // Pour le tri, on peut aussi recharger avec ajax
+</script>
 </body>
 </html>

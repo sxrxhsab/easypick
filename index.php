@@ -573,7 +573,7 @@ $user_role = $_SESSION['user_role'] ?? '';
     <input type="email" id="newsletterEmail" placeholder="Votre adresse email" required />
     <button type="submit">S'abonner</button>
 </form>
-<div id="newsletterMessage" style="margin-top:10px; text-align:center;"></div>
+<div id="newsletterMessage"></div>
 
 <script>
 function inscrireNewsletter(e) {
