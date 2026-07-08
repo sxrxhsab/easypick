@@ -1,27 +1,12 @@
 ﻿<?php
 require_once __DIR__ . '/lang.php';
 require_once __DIR__ . '/db.php';
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
-
-$lang = $_GET['lang'] ?? $_SESSION['lang'] ?? 'fr';
-$_SESSION['lang'] = $lang;
-$translations = [];
-if (file_exists(__DIR__ . '/lang/' . $lang . '.php')) {
-    $translations = require_once __DIR__ . '/lang/' . $lang . '.php';
-}
-function __($key) {
-    global $translations;
-    return $translations[$key] ?? $key;
-}
 ?>
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
@@ -80,7 +65,7 @@ function __($key) {
         .top-text strong { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: 0.3px; }
         .top-text span { font-weight: 300; font-size: 11px; color: #aaa; }
 
-        /* NAVBAR FLOTTANTE (version <?= __('accueil') ?>) */
+        /* NAVBAR FLOTTANTE (version accueil) */
         .navbar-wrapper {
             display: flex;
             justify-content: center;
@@ -175,7 +160,7 @@ function __($key) {
         .founder-card .quote { font-style: italic; color: rgba(255,255,255,0.75); font-size: 15px; line-height: 1.6; }
         .founder-card .quote i { color: #ff6a00; opacity: 0.6; }
 
-        /* <?= __('categories') ?> */
+        /* CATEGORIES */
         .categories { padding: 80px 0 60px; background: #0d0d0d; }
         .section-title { font-size: 36px; font-weight: 700; text-align: center; margin-bottom: 12px; }
         .section-title span { color: #ff6a00; }
@@ -190,7 +175,7 @@ function __($key) {
         .category-card .cat-content .btn-cat { display: inline-block; margin-top: 15px; padding: 10px 25px; border-radius: 50px; background: #ff6a00; color: #fff; font-weight: 600; font-size: 14px; opacity: 0; transform: translateY(10px); transition: all 0.3s; }
         .category-card:hover .btn-cat { opacity: 1; transform: translateY(0); }
 
-        /* <?= __('produits') ?> VEDETTES */
+        /* PRODUITS VEDETTES */
         .products { padding: 60px 0 80px; background: #111; }
         .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; }
         .product-card { background: #1a1a1a; border-radius: 16px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 8px 25px rgba(0,0,0,0.3); padding: 20px 20px 25px; text-align: center; }
@@ -212,7 +197,7 @@ function __($key) {
         .promo-content .btn-promo { background: #ff6a00; color: #fff; padding: 16px 50px; border-radius: 60px; font-weight: 700; font-size: 20px; transition: all 0.3s; box-shadow: 0 8px 30px rgba(255,106,0,0.3); text-transform: uppercase; letter-spacing: 1px; }
         .promo-content .btn-promo:hover { background: #ff8833; transform: scale(1.05); box-shadow: 0 12px 40px rgba(255,106,0,0.5); }
 
-        /* <?= __('avis') ?> */
+        /* AVIS */
         .testimonials { padding: 80px 0; background: #0d0d0d; }
         .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; }
         .testimonial-card { background: #1a1a1a; border-radius: 20px; padding: 30px 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: transform 0.3s; }
@@ -352,10 +337,9 @@ function __($key) {
         </div>
     </div>
 
-    <!-- ===== NAVBAR FLOTTANTE (CORRIGÉE) ===== -->
+    <!-- ===== NAVBAR FLOTTANTE ===== -->
     <div class="navbar-wrapper">
         <nav class="navbar">
-            <!-- Logo avec image -->
             <div class="logo">
                 <img src="logoeasy.png" alt="EasyPick Logo" />
                 <div class="logo-text">
@@ -363,8 +347,6 @@ function __($key) {
                     <span class="sub">By Sarah Sabeur</span>
                 </div>
             </div>
-
-            <!-- Menu -->
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.php" class="active"><?= __('accueil') ?></a></li>
                 <li><a href="boutique.php"><?= __('boutique') ?></a></li>
@@ -372,8 +354,6 @@ function __($key) {
                 <li><a href="promotions.php"><?= __('promotions') ?></a></li>
                 <li><a href="contact.php"><?= __('contact') ?></a></li>
             </ul>
-
-            <!-- Icônes -->
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>

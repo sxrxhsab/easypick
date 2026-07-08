@@ -1,6 +1,6 @@
-<?php
-session_start();
-require_once 'db.php';
+﻿<?php
+require_once __DIR__ . '/lang.php';
+require_once __DIR__ . '/db.php';
 
 // Variables navbar
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
@@ -65,7 +65,6 @@ $produits = $stmt->fetchAll();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* ---------- TOUS LES STYLES EXISTANTS ---------- */
-        /* On garde exactement les mêmes styles que précédemment pour ne rien casser */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
@@ -431,7 +430,7 @@ $produits = $stmt->fetchAll();
                                     <?php endif; ?>
                                 </div>
                                 <div class="card-actions">
-                                    <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
+                                    <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
                                 </div>
                             </div>
                             <?php endforeach; ?>

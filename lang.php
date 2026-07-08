@@ -1,5 +1,4 @@
 <?php
-// lang.php - Gestion du multilangue (centralisé)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

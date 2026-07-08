@@ -1,6 +1,6 @@
 <?php
-session_start();
-require_once 'db.php';
+require_once __DIR__ . '/lang.php';
+require_once __DIR__ . '/db.php';
 
 // Récupérer l'ID du produit depuis l'URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -223,29 +223,15 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <img id="mainImage" src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
                     </div>
                     <div class="thumbnails">
-    <img src="<?= htmlspecialchars($produit['image']) ?>" alt="Vue principale" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image']) ?>')" />
-    <?php 
-    $images = json_decode($produit['images'], true);
-    if ($images && is_array($images)):
-        foreach ($images as $img): 
-    ?>
-    <?php foreach ($produits as $index => $produit): ?>
-    <?php 
-    // VÉRIFICATION DES FAVORIS (AJOUTE ICI)
-    $est_favori = false;
-    if (isset($_SESSION['user_id'])) {
-        $stmt = $pdo->prepare('SELECT produit_id FROM wishlist WHERE utilisateur_id = ? AND produit_id = ?');
-        $stmt->execute([$_SESSION['user_id'], $produit['id']]);
-        $est_favori = $stmt->fetch();
-    }
-    ?>
-    <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
-        <!-- ... -->
-    </div>
-<?php endforeach; ?>
-        <img src="<?= htmlspecialchars($img) ?>" alt="Vue supplémentaire" onclick="changeImage(this, '<?= htmlspecialchars($img) ?>')" />
-    <?php endforeach; endif; ?>
-</div>
+                        <img src="<?= htmlspecialchars($produit['image']) ?>" alt="Vue principale" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image']) ?>')" />
+                        <?php 
+                        $images = json_decode($produit['images'], true);
+                        if ($images && is_array($images)):
+                            foreach ($images as $img): 
+                        ?>
+                            <img src="<?= htmlspecialchars($img) ?>" alt="Vue supplémentaire" onclick="changeImage(this, '<?= htmlspecialchars($img) ?>')" />
+                        <?php endforeach; endif; ?>
+                    </div>
                 </div>
 
                 <!-- Infos -->
@@ -285,7 +271,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <input type="number" id="qtyInput" value="1" min="1" max="99" />
                             <button onclick="updateQty(1)">+</button>
                         </div>
-                        <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add-cart">
+                        <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add-cart">
                             <i class="fas fa-shopping-cart"></i> <?= __('ajouter') ?> au <?= __('panier') ?>
                         </a>
                         <button class="btn-buy-now" onclick="buyNow()"><?= __('acheter_maintenant') ?></button>
@@ -318,7 +304,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                                     <li><strong>Catégorie</strong> <?= $produit['categorie_id'] ?></li>
                                     <li><strong>Stock</strong> <?= $produit['stock'] ?> unités</li>
                                     <li><strong>Note</strong> <?= number_format($produit['note'], 1, ',', ' ') ?>/5</li>
-                                    <li><strong><?= __('nom') ?>bre d'<?= __('avis') ?></strong> <?= $produit['nb_avis'] ?></li>
+                                    <li><strong>Nombre d'<?= __('avis') ?></strong> <?= $produit['nb_avis'] ?></li>
                                 </ul>
                             </div>
 
@@ -455,7 +441,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             thumb.classList.add('active');
         }
 
-        // <?= __('quantite') ?>
+        // Quantité
         function updateQty(change) {
             const input = document.getElementById('qtyInput');
             let val = parseInt(input.value) + change;
@@ -487,7 +473,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             });
         });
 
-        // ✅ Fonction pour sélectionner la note avec les étoiles
+        // Fonction pour sélectionner la note avec les étoiles
         function setNote(value) {
             document.getElementById('note').value = value;
             const stars = document.querySelectorAll('.tab-pane.active .fa-star');
