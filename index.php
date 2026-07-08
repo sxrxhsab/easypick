@@ -569,10 +569,36 @@ $user_role = $_SESSION['user_role'] ?? '';
             <div class="newsletter-content">
                 <h2>Ne ratez aucune <span style="color:#ff6a00;">offre</span></h2>
                 <p>Inscrivez-vous à notre newsletter et recevez en avant-première nos promotions exclusives.</p>
-                <form class="newsletter-form" action="#">
-                    <input type="email" placeholder="Votre adresse email" required />
-                    <button type="submit">S'abonner</button>
-                </form>
+                <form class="newsletter-form" onsubmit="return inscrireNewsletter(event)">
+    <input type="email" id="newsletterEmail" placeholder="Votre adresse email" required />
+    <button type="submit">S'abonner</button>
+</form>
+<div id="newsletterMessage" style="margin-top:10px; text-align:center;"></div>
+
+<script>
+function inscrireNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value;
+    const msg = document.getElementById('newsletterMessage');
+    
+    fetch('newsletter-inscrire.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'email=' + encodeURIComponent(email)
+    })
+    .then(r => r.json())
+    .then(data => {
+        msg.textContent = data.message;
+        msg.style.color = data.success ? '#00b894' : '#ff4444';
+        if (data.success) document.getElementById('newsletterEmail').value = '';
+        setTimeout(() => msg.textContent = '', 4000);
+    })
+    .catch(() => {
+        msg.textContent = '⚠️ Une erreur est survenue.';
+        msg.style.color = '#ff4444';
+    });
+}
+</script>
             </div>
         </div>
     </section>
