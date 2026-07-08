@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erreur = 'Le mot de passe doit faire au moins 6 caractères.';
     } else {
         // Vérifier si l'email existe déjà
-        $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
+        $stmt = $pdo->prepare('INSERT INTO utilisateurs (prenom, nom, email, password, role) VALUES (?, ?, ?, ?, "user")');
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
             $erreur = 'Cet email est déjà utilisé.';
