@@ -2,6 +2,14 @@
 ob_start();
 session_start();
 require_once 'db.php';
+
+// ✅ AJOUT DE LA FONCTION DE TRADUCTION
+if (!function_exists('__')) {
+    function __($text) {
+        return $text; // Retourne le texte sans le traduire
+    }
+}
+
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: login.php');
     exit;
@@ -13,7 +21,6 @@ $nb_commandes = $pdo->query('SELECT COUNT(*) FROM commandes')->fetchColumn();
 $nb_utilisateurs = $pdo->query('SELECT COUNT(*) FROM utilisateurs')->fetchColumn();
 
 // ✅ Correction : utiliser la colonne "statut" avec la valeur "payée" (ou "payee" selon ta base)
-// Si tu as des commandes avec statut "payée" (avec accent), utilise "payée". Sinon, remplace par "payee".
 $chiffre_affaires = $pdo->query("SELECT SUM(total) FROM commandes WHERE statut = 'payee'")->fetchColumn();
 $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',', ' ') : '0,00';
 ?>
@@ -86,15 +93,15 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php"><?= __('accueil') ?></a></li>
-                <li><a href="boutique.php"><?= __('boutique') ?></a></li>
-                <li><a href="#"><?= __('nouveautes') ?></a></li>
-                <li><a href="#"><?= __('promotions') ?></a></li>
-                <li><a href="#"><?= __('contact') ?></a></li>
+                <li><a href="index.php">Accueil</a></li>
+                <li><a href="boutique.php">Boutique</a></li>
+                <li><a href="nouveautes.php">Nouveautés</a></li>
+                <li><a href="promotions.php">Promotions</a></li>
+                <li><a href="contact.php">Contact</a></li>
             </ul>
             <div class="nav-icons">
-                <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
-                <a href="logout.php" aria-label='<?= __('deconnexion') ?>'><i class="fas fa-sign-out-alt"></i></a>
+                <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
+                <a href="logout.php" aria-label="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
                 <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -105,8 +112,8 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
     <!-- ===== HERO ===== -->
     <section class="admin-hero">
         <div class="container">
-            <h1><?= __('tableau_de_bord') ?> <span>Admin</span></h1>
-            <p>Gérez vos <?= __('produits') ?>, <?= __('commandes') ?> et <?= __('utilisateurs') ?>.</p>
+            <h1>Tableau de bord <span>Admin</span></h1>
+            <p>Gérez vos produits, commandes et utilisateurs.</p>
         </div>
     </section>
 
@@ -114,27 +121,27 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
     <section class="section">
         <div class="container">
 
-            <!-- Menu admin (une seule fois) -->
+            <!-- Menu admin -->
             <div class="admin-menu">
-                <a href="admin.php" class="active"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
-                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
-                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
+                <a href="admin.php" class="active"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
+                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
+                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> Utilisateurs</a>
             </div>
 
             <!-- Statistiques -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="number"><?= $nb_produits ?></div>
-                    <div class="label"><?= __('produits') ?></div>
+                    <div class="label">Produits</div>
                 </div>
                 <div class="stat-card">
                     <div class="number"><?= $nb_commandes ?></div>
-                    <div class="label"><?= __('commandes') ?></div>
+                    <div class="label">Commandes</div>
                 </div>
                 <div class="stat-card">
                     <div class="number"><?= $nb_utilisateurs ?></div>
-                    <div class="label"><?= __('utilisateurs') ?></div>
+                    <div class="label">Utilisateurs</div>
                 </div>
                 <div class="stat-card">
                     <div class="number"><?= $chiffre_affaires ?> €</div>
@@ -143,7 +150,7 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
             </div>
 
             <div style="background:#1A1A1A; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.06);">
-                <p style="color:rgba(255,255,255,0.4); font-size:14px;">Bienvenue dans votre espace d'administration. Utilisez le menu ci-dessus pour gérer votre <?= __('boutique') ?>.</p>
+                <p style="color:rgba(255,255,255,0.4); font-size:14px;">Bienvenue dans votre espace d'administration. Utilisez le menu ci-dessus pour gérer votre boutique.</p>
             </div>
 
         </div>
@@ -151,14 +158,16 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
 
     <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.12); font-size:13px;">
         <div class="container">
-            &copy; 2026 EasyPick – Admin
+            &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#" style="color:#ff6a00;">Samy Sabeur</a>.
         </div>
     </footer>
 
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
     </script>
 </body>
 </html>
