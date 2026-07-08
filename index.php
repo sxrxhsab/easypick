@@ -91,7 +91,14 @@ $user_role = $_SESSION['user_role'] ?? '';
         .logo img { height: 60px; width: auto; filter: drop-shadow(0 0 12px rgba(255,106,0,0.35)); transition: transform 0.3s; object-fit: contain; }
         .logo img:hover { transform: scale(1.05); }
         .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
-        .logo-text .brand { font-weight: 900; font-size: 22px; letter-spacing: 1.5px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .logo-text .brand { 
+            font-weight: 900; 
+            font-size: 22px; 
+            letter-spacing: 1.5px; 
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .logo-text .brand .easy { color: #ff6a00; }
+        .logo-text .brand .pick { color: #ffffff; }
         .logo-text .sub { font-weight: 300; font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; margin-top: -2px; }
 
         .nav-menu { display: flex; align-items: center; gap: 28px; list-style: none; }
@@ -358,8 +365,8 @@ $user_role = $_SESSION['user_role'] ?? '';
             <div class="logo">
                 <img src="logoeasy.png" alt="EasyPick Logo" />
                 <div class="logo-text">
-                    <span class="brand">EASYPICK</span>
-                    <span class="sub">By Sarah Sabeur</span>
+                    <span class="brand"><span class="easy">EASY</span><span class="pick">PICK</span></span>
+                    <span class="sub">By Samy Sabeur</span>
                 </div>
             </div>
             <ul class="nav-menu" id="navMenu">
@@ -421,8 +428,8 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <div class="story-text">
                     <span class="badge">Notre histoire</span>
                     <h2>Une passion pour la tech, <br />une mission : <span>simplifier vos choix</span>.</h2>
-                    <p>Fondée en <strong>2025</strong> par <strong>Sabeur Samy</strong>, EasyPick est bien plus qu'une simple boutique en ligne. C'est un véritable guide pour vous aider à <strong>"picker" (choisir)</strong> les meilleurs accessoires tech, sans prise de tête.</p>
-                    <p>Fatigué de passer des heures à comparer des fiches techniques ? Sabeur et son équipe sélectionnent avec soin chaque produit pour vous garantir le meilleur rapport qualité-prix, en testant et en vérifiant rigoureusement chaque référence.</p>
+                    <p>Fondée en <strong>2025</strong> par <strong>Samy Sabeur</strong>, EasyPick est bien plus qu'une simple boutique en ligne. C'est un véritable guide pour vous aider à <strong>"picker" (choisir)</strong> les meilleurs accessoires tech, sans prise de tête.</p>
+                    <p>Fatigué de passer des heures à comparer des fiches techniques ? Samy et son équipe sélectionnent avec soin chaque produit pour vous garantir le meilleur rapport qualité-prix, en testant et en vérifiant rigoureusement chaque référence.</p>
                     <p>Notre promesse : vous offrir une expérience d'achat fluide, des produits premium et un accompagnement sur mesure, pour que vous puissiez équiper votre quotidien en toute confiance.</p>
                     <div class="signature">— <span>EasyPick</span>, votre guide tech depuis 2025.</div>
                 </div>
@@ -430,7 +437,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                     <div class="year-badge">2025</div>
                     <div class="founder-card">
                         <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
-                        <h4>Sabeur Samy</h4>
+                        <h4>Samy Sabeur</h4>
                         <div class="title">Fondateur & CEO</div>
                         <div class="divider"></div>
                         <div class="quote"><i class="fas fa-quote-left"></i> Rendre la tech accessible et désirable, c'est notre ADN. <i class="fas fa-quote-right"></i></div>
@@ -621,7 +628,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                 </div>
             </div>
             <div class="footer-bottom">
-                &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.
+                &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.
             </div>
         </div>
     </footer>
