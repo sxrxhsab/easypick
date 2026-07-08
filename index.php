@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/lang.php';
 require_once __DIR__ . '/db.php';
 
@@ -656,6 +656,6 @@ $user_role = $_SESSION['user_role'] ?? '';
             });
         }
     </script>
-
+<?php include __DIR__ . '/footer.php'; ?>
 </body>
 </html>

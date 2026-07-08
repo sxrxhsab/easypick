@@ -5,14 +5,13 @@ require_once __DIR__ . '/lang.php'; // ← Inclusion centralisée
 ?>
 <nav class="navbar-simple">
     <div class="nav-container">
-        <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
         <ul class="nav-menu" id="navMenu">
-            <li><a href="index.php"><?= __('accueil') ?></a></li>
-            <li><a href="boutique.php"><?= __('boutique') ?></a></li>
-            <li><a href="nouveautes.php"><?= __('nouveautes') ?></a></li>
-            <li><a href="promotions.php"><?= __('promotions') ?></a></li>
-            <li><a href="contact.php"><?= __('contact') ?></a></li>
-        </ul>
+    <li><a href="index.php?lang=<?= $lang ?>"><?= __('accueil') ?></a></li>
+    <li><a href="boutique.php?lang=<?= $lang ?>"><?= __('boutique') ?></a></li>
+    <li><a href="nouveautes.php?lang=<?= $lang ?>"><?= __('nouveautes') ?></a></li>
+    <li><a href="promotions.php?lang=<?= $lang ?>"><?= __('promotions') ?></a></li>
+    <li><a href="contact.php?lang=<?= $lang ?>"><?= __('contact') ?></a></li>
+</ul>
         <div class="nav-icons">
             <!-- Sélecteur de langue -->
             <a href="?lang=fr" style="color:#ff6a00; font-weight:700; font-size:14px;">FR</a>

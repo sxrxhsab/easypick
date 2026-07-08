@@ -19,6 +19,8 @@ return [
     'avis' => 'Avis',
     'donner_votre_avis' => 'Donnez votre avis',
     'publier' => 'Publier',
+    'aide' => 'Aide',
+'legal' => 'Légal',
     'total' => 'Total',
     'sous_total' => 'Sous-total',
     'livraison' => 'Livraison',

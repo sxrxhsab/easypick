@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/lang.php';
 require_once __DIR__ . '/db.php';
 
@@ -554,5 +554,6 @@ $produits = $stmt->fetchAll();
         }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
         fadeElements.forEach(el => observer.observe(el));
     </script>
+    <?php include __DIR__ . '/footer.php'; ?>
 </body>
 </html>

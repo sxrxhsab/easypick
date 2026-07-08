@@ -58,6 +58,8 @@ return [
     'modifier' => 'Edit',
     'supprimer' => 'Delete',
     'enregistrer' => 'Save',
+    'aide' => 'Help',
+'legal' => 'Legal',
     'annuler' => 'Cancel',
     
     // Footer
