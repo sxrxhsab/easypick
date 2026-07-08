@@ -1,5 +1,5 @@
 <?php
-// db.php - Neon PostgreSQL
+// db.php - Neon PostgreSQL (VERSION FINALE)
 
 $host = 'ep-lingering-glade-atuudk2x.c-9.us-east-1.aws.neon.tech';
 $port = 5432;
@@ -19,6 +19,7 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die('Erreur de connexion PostgreSQL : ' . $e->getMessage());
+    // Affiche l'erreur mais continue
+    echo '⚠️ Erreur de connexion : ' . $e->getMessage();
 }
 ?>

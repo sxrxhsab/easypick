@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-ob_start(); // ← Anti-erreur session_start()
+ob_start();
 session_start();
 require_once 'db.php';
 
@@ -16,23 +16,18 @@ $user_role = $_SESSION['user_role'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EasyPick – Accueil</title>
 
-    <!-- Google Fonts : Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
-
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
     <style>
-        /* ---- TOUS TES STYLES (que tu avais déjà) ---- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #0d0d0d; color: #fff; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
         img { max-width: 100%; display: block; }
         .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
 
-        /* TOP BAR */
         .top-bar {
             background: #0a0a0a;
             height: 62px;
@@ -68,7 +63,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .top-text strong { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: 0.3px; }
         .top-text span { font-weight: 300; font-size: 11px; color: #aaa; }
 
-        /* NAVBAR FLOTTANTE */
         .navbar-wrapper {
             display: flex;
             justify-content: center;
@@ -94,12 +88,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .logo img { height: 60px; width: auto; filter: drop-shadow(0 0 12px rgba(255,106,0,0.35)); transition: transform 0.3s; object-fit: contain; }
         .logo img:hover { transform: scale(1.05); }
         .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
-        .logo-text .brand { 
-            font-weight: 900; 
-            font-size: 22px; 
-            letter-spacing: 1.5px; 
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
+        .logo-text .brand { font-weight: 900; font-size: 22px; letter-spacing: 1.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .logo-text .brand .easy { color: #ff6a00; }
         .logo-text .brand .pick { color: #ffffff; }
         .logo-text .sub { font-weight: 300; font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; margin-top: -2px; }
@@ -120,7 +109,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
         .hamburger span { display: block; width: 26px; height: 2.5px; background: #fff; border-radius: 10px; transition: 0.3s ease; }
 
-        /* HERO */
         .hero {
             position: relative;
             min-height: 620px;
@@ -151,7 +139,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .hero-visual .glow-circle { width: 320px; height: 320px; background: radial-gradient(circle, rgba(255,106,0,0.15) 0%, transparent 70%); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); filter: blur(40px); animation: pulse 4s infinite alternate; }
         @keyframes pulse { 0% { transform: translate(-50%,-50%) scale(0.9); opacity: 0.6; } 100% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; } }
 
-        /* NOTRE HISTOIRE */
         .brand-story { padding: 90px 0; background: linear-gradient(135deg, #0d0d0d 0%, #1a0a00 100%); border-bottom: 1px solid rgba(255,106,0,0.1); border-top: 1px solid rgba(255,106,0,0.05); }
         .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
         .story-text .badge { color: #ff6a00; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 14px; margin-bottom: 10px; display: inline-block; border-left: 3px solid #ff6a00; padding-left: 15px; }
@@ -170,7 +157,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .founder-card .quote { font-style: italic; color: rgba(255,255,255,0.75); font-size: 15px; line-height: 1.6; }
         .founder-card .quote i { color: #ff6a00; opacity: 0.6; }
 
-        /* CATEGORIES */
         .categories { padding: 80px 0 60px; background: #0d0d0d; }
         .section-title { font-size: 36px; font-weight: 700; text-align: center; margin-bottom: 12px; }
         .section-title span { color: #ff6a00; }
@@ -185,7 +171,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .category-card .cat-content .btn-cat { display: inline-block; margin-top: 15px; padding: 10px 25px; border-radius: 50px; background: #ff6a00; color: #fff; font-weight: 600; font-size: 14px; opacity: 0; transform: translateY(10px); transition: all 0.3s; }
         .category-card:hover .btn-cat { opacity: 1; transform: translateY(0); }
 
-        /* PRODUITS VEDETTES */
         .products { padding: 60px 0 80px; background: #111; }
         .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; }
         .product-card { background: #1a1a1a; border-radius: 16px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 8px 25px rgba(0,0,0,0.3); padding: 20px 20px 25px; text-align: center; }
@@ -198,7 +183,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .product-card .btn-add { background: transparent; border: 2px solid #ff6a00; color: #ff6a00; padding: 8px 20px; border-radius: 50px; font-weight: 600; transition: all 0.3s; cursor: pointer; font-size: 14px; }
         .product-card .btn-add:hover { background: #ff6a00; color: #fff; box-shadow: 0 8px 20px rgba(255,106,0,0.3); }
 
-        /* PROMO */
         .promo-banner { padding: 80px 0; background: linear-gradient(135deg, #1a0a00, #2d0a00, #0d0d0d); border-top: 1px solid rgba(255,106,0,0.2); border-bottom: 1px solid rgba(255,106,0,0.2); }
         .promo-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
         .promo-content h2 { font-size: 44px; font-weight: 900; text-transform: uppercase; }
@@ -206,60 +190,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .promo-content p { font-size: 20px; color: rgba(255,255,255,0.7); max-width: 600px; }
         .promo-content .btn-promo { background: #ff6a00; color: #fff; padding: 16px 50px; border-radius: 60px; font-weight: 700; font-size: 20px; transition: all 0.3s; box-shadow: 0 8px 30px rgba(255,106,0,0.3); text-transform: uppercase; letter-spacing: 1px; }
         .promo-content .btn-promo:hover { background: #ff8833; transform: scale(1.05); box-shadow: 0 12px 40px rgba(255,106,0,0.5); }
-<!-- ===== AVIS DYNAMIQUES ===== -->
-<section class="testimonials">
-    <div class="container">
-        <h2 class="section-title">Ils nous <span>font confiance</span></h2>
-        <p class="section-sub">Ce que nos clients pensent de nous</p>
-        <div class="testimonials-grid">
-            <?php
-            // Récupérer les 3 derniers avis 5 étoiles
-            $stmt = $pdo->prepare("SELECT a.*, u.nom as utilisateur_nom, u.prenom as utilisateur_prenom 
-                                   FROM avis a 
-                                   JOIN utilisateurs u ON a.utilisateur_id = u.id 
-                                   WHERE a.note >= 4 
-                                   ORDER BY a.created_at DESC 
-                                   LIMIT 3");
-            $stmt->execute();
-            $avis = $stmt->fetchAll();
 
-            if (!empty($avis)):
-                foreach ($avis as $avis_item):
-            ?>
-            <div class="testimonial-card">
-                <div class="avatar">
-                    <?php 
-                    $initials = strtoupper(substr($avis_item['utilisateur_prenom'] ?? 'U', 0, 1) . substr($avis_item['utilisateur_nom'] ?? 'N', 0, 1));
-                    ?>
-                    <span style="display:flex; align-items:center; justify-content:center; width:60px; height:60px; border-radius:50%; background:#ff6a00; color:#fff; font-weight:700; font-size:20px;">
-                        <?= $initials ?>
-                    </span>
-                </div>
-                <div class="name"><?= htmlspecialchars($avis_item['utilisateur_prenom'] . ' ' . $avis_item['utilisateur_nom']) ?></div>
-                <div class="role">Client EasyPick</div>
-                <div class="stars">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <?php if ($i <= $avis_item['note']): ?>
-                            <i class="fas fa-star"></i>
-                        <?php else: ?>
-                            <i class="fas fa-star grey"></i>
-                        <?php endif; ?>
-                    <?php endfor; ?>
-                </div>
-                <div class="comment">"<?= htmlspecialchars($avis_item['commentaire']) ?>"</div>
-            </div>
-            <?php 
-                endforeach;
-            else:
-            ?>
-            <div class="testimonial-card" style="grid-column:1/-1; text-align:center; color:rgba(255,255,255,0.4); padding:40px;">
-                <p>Pas encore d'avis. Soyez le premier à donner votre avis !</p>
-            </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
-        /* AVIS */
         .testimonials { padding: 80px 0; background: #0d0d0d; }
         .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; }
         .testimonial-card { background: #1a1a1a; border-radius: 20px; padding: 30px 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: transform 0.3s; }
@@ -270,7 +201,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .testimonial-card .stars { color: #ffb800; margin-bottom: 12px; }
         .testimonial-card .comment { color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.6; font-style: italic; }
 
-        /* NEWSLETTER */
         .newsletter { padding: 80px 0; background: #111; border-top: 1px solid rgba(255,255,255,0.05); }
         .newsletter-content { max-width: 600px; margin: 0 auto; text-align: center; }
         .newsletter-content h2 { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
@@ -281,7 +211,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .newsletter-form button { background: #ff6a00; color: #fff; border: none; padding: 16px 40px; border-radius: 60px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.3s; }
         .newsletter-form button:hover { background: #ff8833; transform: scale(1.04); box-shadow: 0 8px 25px rgba(255,106,0,0.4); }
 
-        /* FOOTER */
         .footer { background: #0a0a0a; padding: 50px 0 30px; border-top: 1px solid rgba(255,255,255,0.05); }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 40px; margin-bottom: 40px; }
         .footer-col h4 { font-size: 18px; font-weight: 700; margin-bottom: 18px; color: #fff; }
@@ -298,7 +227,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .footer-bottom { text-align: center; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); font-size: 14px; }
         .footer-bottom a { color: #ff6a00; }
 
-        /* RESPONSIVE */
         @media (max-width:1024px) {
             .navbar { padding: 0 18px; height: 68px; }
             .nav-menu { gap: 18px; }
@@ -319,12 +247,10 @@ $user_role = $_SESSION['user_role'] ?? '';
             .top-text strong { font-size: 12px; }
             .top-text span { font-size: 10px; }
             .top-item:nth-child(4), .top-item:nth-child(5) { display: none; }
-
             .navbar { height: 62px; padding: 0 14px; border-radius: 16px; width: 95%; }
             .logo img { height: 48px; }
             .logo-text .brand { font-size: 18px; }
             .logo-text .sub { font-size: 9px; }
-
             .nav-menu { display: none; flex-direction: column; position: absolute; top: 72px; left: 0; width: 100%; background: rgba(10,10,10,0.96); backdrop-filter: blur(12px); padding: 24px 20px; gap: 14px; border-radius: 0 0 20px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
             .nav-menu.open { display: flex; }
             .nav-menu li a { font-size: 18px; }
@@ -332,7 +258,6 @@ $user_role = $_SESSION['user_role'] ?? '';
             .nav-icons { gap: 14px; }
             .nav-icons a { font-size: 17px; }
             .cart-badge { width: 16px; height: 16px; font-size: 9px; top: -6px; right: -8px; }
-
             .hero { flex-direction: column; justify-content: center; padding: 0 20px; min-height: 480px; height: auto; max-height: none; margin-top: -62px; padding-top: 40px; padding-bottom: 60px; }
             .hero-content { flex-direction: column; text-align: center; gap: 10px; }
             .hero-text { max-width: 100%; }
@@ -340,7 +265,6 @@ $user_role = $_SESSION['user_role'] ?? '';
             .hero-buttons { justify-content: center; }
             .btn { height: 48px; font-size: 14px; min-width: 150px; padding: 0 24px; }
             .hero-visual { display: none; }
-
             .categories-grid { grid-template-columns: repeat(2,1fr); }
             .products-grid { grid-template-columns: repeat(2,1fr); }
             .testimonials-grid { grid-template-columns: 1fr; }
@@ -373,48 +297,18 @@ $user_role = $_SESSION['user_role'] ?? '';
 </head>
 <body>
 
-    <!-- ===== TOP BAR ===== -->
+    <!-- TOP BAR -->
     <div class="top-bar">
         <div class="top-bar-container">
-            <div class="top-item">
-                <i class="fas fa-truck"></i>
-                <div class="top-text">
-                    <strong>Livraison</strong>
-                    <span>Internationale</span>
-                </div>
-            </div>
-            <div class="top-item">
-                <i class="fas fa-shield-alt"></i>
-                <div class="top-text">
-                    <strong>Paiement</strong>
-                    <span>100% sécurisé</span>
-                </div>
-            </div>
-            <div class="top-item">
-                <i class="fas fa-star"></i>
-                <div class="top-text">
-                    <strong>Produits</strong>
-                    <span>Premium</span>
-                </div>
-            </div>
-            <div class="top-item">
-                <i class="fas fa-headset"></i>
-                <div class="top-text">
-                    <strong>Support</strong>
-                    <span>24/7</span>
-                </div>
-            </div>
-            <div class="top-item">
-                <i class="fas fa-undo-alt"></i>
-                <div class="top-text">
-                    <strong>Retours</strong>
-                    <span>30 jours</span>
-                </div>
-            </div>
+            <div class="top-item"><i class="fas fa-truck"></i><div class="top-text"><strong>Livraison</strong><span>Internationale</span></div></div>
+            <div class="top-item"><i class="fas fa-shield-alt"></i><div class="top-text"><strong>Paiement</strong><span>100% sécurisé</span></div></div>
+            <div class="top-item"><i class="fas fa-star"></i><div class="top-text"><strong>Produits</strong><span>Premium</span></div></div>
+            <div class="top-item"><i class="fas fa-headset"></i><div class="top-text"><strong>Support</strong><span>24/7</span></div></div>
+            <div class="top-item"><i class="fas fa-undo-alt"></i><div class="top-text"><strong>Retours</strong><span>30 jours</span></div></div>
         </div>
     </div>
 
-    <!-- ===== NAVBAR ===== -->
+    <!-- NAVBAR -->
     <div class="navbar-wrapper">
         <nav class="navbar">
             <div class="logo">
@@ -432,60 +326,50 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <li><a href="contact.php">Contact</a></li>
             </ul>
             <div class="nav-icons">
-                <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
-                <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
+                <a href="#"><i class="fas fa-search"></i></a>
+                <a href="#"><i class="far fa-heart"></i></a>
                 <?php if ($user_connecte): ?>
-                    <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
+                    <a href="mon-compte.php"><i class="fas fa-user"></i></a>
                 <?php else: ?>
-                    <a href="login.php" aria-label="Connexion"><i class="fas fa-user"></i></a>
+                    <a href="login.php"><i class="fas fa-user"></i></a>
                 <?php endif; ?>
-                <a href="panier.php" aria-label="Panier" style="position:relative;">
+                <a href="panier.php" style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
                 <?php if ($user_connecte && $user_role === 'admin'): ?>
-                    <a href="admin.php" aria-label="Admin"><i class="fas fa-cog"></i></a>
+                    <a href="admin.php"><i class="fas fa-cog"></i></a>
                 <?php endif; ?>
-                <button class="hamburger" id="hamburger" aria-label="Menu">
-                    <span></span><span></span><span></span>
-                </button>
+                <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
             </div>
         </nav>
     </div>
 
-    <!-- ===== HERO ===== -->
+    <!-- HERO -->
     <section class="hero">
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="hero-text">
-                <h1>
-                    <span class="line1">LA</span>
-                    <span class="line2">TECHNOLOGIE</span>
-                    <span class="line3">SIMPLIFIÉE.</span>
-                </h1>
-                <p>Découvrez les meilleurs accessoires tech sélectionnés avec soin pour améliorer votre quotidien, votre bureau et votre expérience numérique.</p>
+                <h1><span class="line1">LA</span><span class="line2">TECHNOLOGIE</span><span class="line3">SIMPLIFIÉE.</span></h1>
+                <p>Découvrez les meilleurs accessoires tech sélectionnés avec soin pour améliorer votre quotidien.</p>
                 <div class="hero-buttons">
                     <a href="boutique.php" class="btn btn-primary">Découvrir nos produits</a>
                     <a href="#" class="btn btn-secondary">Voir les offres</a>
                 </div>
             </div>
-            <div class="hero-visual">
-                <div class="glow-circle"></div>
-            </div>
+            <div class="hero-visual"><div class="glow-circle"></div></div>
         </div>
     </section>
 
-    <!-- ===== NOTRE HISTOIRE ===== -->
+    <!-- NOTRE HISTOIRE -->
     <section class="brand-story">
         <div class="container">
             <div class="story-grid">
                 <div class="story-text">
                     <span class="badge">Notre histoire</span>
                     <h2>Une passion pour la tech, <br />une mission : <span>simplifier vos choix</span>.</h2>
-                    <p>Fondée en <strong>2025</strong> par <strong>Samy Sabeur</strong>, EasyPick est bien plus qu'une simple boutique en ligne. C'est un véritable guide pour vous aider à <strong>"picker" (choisir)</strong> les meilleurs accessoires tech, sans prise de tête.</p>
-                    <p>Fatigué de passer des heures à comparer des fiches techniques ? Samy et son équipe sélectionnent avec soin chaque produit pour vous garantir le meilleur rapport qualité-prix, en testant et en vérifiant rigoureusement chaque référence.</p>
-                    <p>Notre promesse : vous offrir une expérience d'achat fluide, des produits premium et un accompagnement sur mesure, pour que vous puissiez équiper votre quotidien en toute confiance.</p>
+                    <p>Fondée en <strong>2025</strong> par <strong>Samy Sabeur</strong>, EasyPick est bien plus qu'une simple boutique en ligne.</p>
                     <div class="signature">— <span>EasyPick</span>, votre guide tech depuis 2025.</div>
                 </div>
                 <div class="story-visual">
@@ -502,130 +386,99 @@ $user_role = $_SESSION['user_role'] ?? '';
         </div>
     </section>
 
-    <!-- ===== CATEGORIES ===== -->
+    <!-- CATEGORIES -->
     <section class="categories">
         <div class="container">
             <h2 class="section-title">Shop par <span>Catégorie</span></h2>
             <p class="section-sub">Trouvez l'accessoire parfait pour votre setup</p>
             <div class="categories-grid">
-                <div class="category-card">
-                    <img src="https://picsum.photos/seed/audio/400/300" alt="Audio" />
-                    <div class="cat-content">
-                        <h3>Audio & Casques</h3>
-                        <a href="boutique.php" class="btn-cat">Découvrir</a>
-                    </div>
-                </div>
-                <div class="category-card">
-                    <img src="https://picsum.photos/seed/clavier/400/300" alt="Clavier" />
-                    <div class="cat-content">
-                        <h3>Claviers & Souris</h3>
-                        <a href="boutique.php" class="btn-cat">Découvrir</a>
-                    </div>
-                </div>
-                <div class="category-card">
-                    <img src="https://picsum.photos/seed/chargeur/400/300" alt="Chargeur" />
-                    <div class="cat-content">
-                        <h3>Chargeurs & Batteries</h3>
-                        <a href="boutique.php" class="btn-cat">Découvrir</a>
-                    </div>
-                </div>
-                <div class="category-card">
-                    <img src="https://picsum.photos/seed/enceinte/400/300" alt="Enceinte" />
-                    <div class="cat-content">
-                        <h3>Enceintes & Son</h3>
-                        <a href="boutique.php" class="btn-cat">Découvrir</a>
-                    </div>
-                </div>
+                <div class="category-card"><img src="https://picsum.photos/seed/audio/400/300" alt="Audio" /><div class="cat-content"><h3>Audio & Casques</h3><a href="boutique.php" class="btn-cat">Découvrir</a></div></div>
+                <div class="category-card"><img src="https://picsum.photos/seed/clavier/400/300" alt="Clavier" /><div class="cat-content"><h3>Claviers & Souris</h3><a href="boutique.php" class="btn-cat">Découvrir</a></div></div>
+                <div class="category-card"><img src="https://picsum.photos/seed/chargeur/400/300" alt="Chargeur" /><div class="cat-content"><h3>Chargeurs & Batteries</h3><a href="boutique.php" class="btn-cat">Découvrir</a></div></div>
+                <div class="category-card"><img src="https://picsum.photos/seed/enceinte/400/300" alt="Enceinte" /><div class="cat-content"><h3>Enceintes & Son</h3><a href="boutique.php" class="btn-cat">Découvrir</a></div></div>
             </div>
         </div>
     </section>
 
-    <!-- ===== PRODUITS VEDETTES ===== -->
+    <!-- PRODUITS VEDETTES (DYNAMIQUES DEPUIS LA BDD) -->
     <section class="products">
         <div class="container">
             <h2 class="section-title">Nos <span>Best Sellers</span></h2>
             <p class="section-sub">Les produits préférés de notre communauté</p>
             <div class="products-grid">
+                <?php
+                $stmt = $pdo->query('SELECT * FROM produits ORDER BY id DESC LIMIT 4');
+                $produits = $stmt->fetchAll();
+                if (empty($produits)): ?>
+                    <p style="color:rgba(255,255,255,0.4); text-align:center; grid-column:1/-1; padding:40px 0;">Aucun produit disponible.</p>
+                <?php else: foreach ($produits as $p): ?>
                 <div class="product-card">
-                    <img src="https://picsum.photos/seed/casque/300/200" alt="Casque" />
-                    <div class="product-name">Casque Bluetooth Pro</div>
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                    <div class="product-price"><span class="old">79,99 €</span> 59,99 €</div>
+                    <img src="<?= htmlspecialchars($p['image'] ?? 'https://picsum.photos/seed/' . $p['id'] . '/300/200') ?>" alt="<?= htmlspecialchars($p['nom']) ?>" />
+                    <div class="product-name"><?= htmlspecialchars($p['nom']) ?></div>
+                    <div class="product-price">
+                        <?php if ($p['prix_old']): ?><span class="old"><?= number_format($p['prix_old'], 2, ',', ' ') ?> €</span><?php endif; ?>
+                        <?= number_format($p['prix'], 2, ',', ' ') ?> €
+                    </div>
                     <button class="btn-add">Ajouter au panier</button>
                 </div>
-                <div class="product-card">
-                    <img src="https://picsum.photos/seed/clavierrgb/300/200" alt="Clavier RGB" />
-                    <div class="product-name">Clavier Mécanique RGB</div>
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="product-price"><span class="old">119,99 €</span> 89,99 €</div>
-                    <button class="btn-add">Ajouter au panier</button>
-                </div>
-                <div class="product-card">
-                    <img src="https://picsum.photos/seed/souris/300/200" alt="Souris" />
-                    <div class="product-name">Souris Gaming Pro</div>
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="product-price"><span class="old">49,99 €</span> 39,99 €</div>
-                    <button class="btn-add">Ajouter au panier</button>
-                </div>
-                <div class="product-card">
-                    <img src="https://picsum.photos/seed/chargeursansfil/300/200" alt="Chargeur sans fil" />
-                    <div class="product-name">Chargeur Sans Fil</div>
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                    <div class="product-price"><span class="old">39,99 €</span> 29,99 €</div>
-                    <button class="btn-add">Ajouter au panier</button>
-                </div>
+                <?php endforeach; endif; ?>
             </div>
         </div>
     </section>
 
-    <!-- ===== PROMO ===== -->
+    <!-- PROMO -->
     <section class="promo-banner">
         <div class="container">
             <div class="promo-content">
                 <h2>Jusqu'à <span>-30%</span> sur votre première commande</h2>
-                <p>Profitez de cette offre exclusive pour équiper votre setup tech. Code : <strong>EASYPICK30</strong></p>
+                <p>Code : <strong>EASYPICK30</strong></p>
                 <a href="boutique.php" class="btn-promo">Je profite de l'offre</a>
             </div>
         </div>
     </section>
 
-    <!-- ===== AVIS ===== -->
+    <!-- AVIS DYNAMIQUES -->
     <section class="testimonials">
         <div class="container">
             <h2 class="section-title">Ils nous <span>font confiance</span></h2>
             <p class="section-sub">Ce que nos clients pensent de nous</p>
             <div class="testimonials-grid">
+                <?php
+                try {
+                    $stmt = $pdo->prepare("SELECT a.*, u.nom as utilisateur_nom, u.prenom as utilisateur_prenom 
+                                           FROM avis a 
+                                           JOIN utilisateurs u ON a.utilisateur_id = u.id 
+                                           WHERE a.note >= 4 
+                                           ORDER BY a.created_at DESC 
+                                           LIMIT 3");
+                    $stmt->execute();
+                    $avis = $stmt->fetchAll();
+                    if (!empty($avis)):
+                        foreach ($avis as $avis_item):
+                            $initials = strtoupper(substr($avis_item['utilisateur_prenom'] ?? 'U', 0, 1) . substr($avis_item['utilisateur_nom'] ?? 'N', 0, 1));
+                ?>
                 <div class="testimonial-card">
-                    <img src="https://picsum.photos/seed/avatar1/100/100" alt="Avatar" class="avatar" />
-                    <div class="name">Sophie L.</div>
-                    <div class="role">Chef de projet</div>
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment">"Livraison ultra-rapide et produits de qualité. Le casque est incroyablement confortable, je recommande !"</div>
+                    <div class="avatar"><span style="display:flex; align-items:center; justify-content:center; width:60px; height:60px; border-radius:50%; background:#ff6a00; color:#fff; font-weight:700; font-size:20px;"><?= $initials ?></span></div>
+                    <div class="name"><?= htmlspecialchars($avis_item['utilisateur_prenom'] . ' ' . $avis_item['utilisateur_nom']) ?></div>
+                    <div class="role">Client EasyPick</div>
+                    <div class="stars"><?php for ($i = 1; $i <= 5; $i++): ?><?= $i <= $avis_item['note'] ? '<i class="fas fa-star"></i>' : '<i class="fas fa-star grey"></i>' ?><?php endfor; ?></div>
+                    <div class="comment">"<?= htmlspecialchars($avis_item['commentaire']) ?>"</div>
                 </div>
-                <div class="testimonial-card">
-                    <img src="https://picsum.photos/seed/avatar2/100/100" alt="Avatar" class="avatar" />
-                    <div class="name">Thomas R.</div>
-                    <div class="role">Développeur</div>
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment">"Site très pro, paiement sécurisé, et le clavier mécanique est un vrai plaisir pour coder. Bravo !"</div>
-                </div>
-                <div class="testimonial-card">
-                    <img src="https://picsum.photos/seed/avatar3/100/100" alt="Avatar" class="avatar" />
-                    <div class="name">Camille M.</div>
-                    <div class="role">Designer UI</div>
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <div class="comment">"Le design du site est magnifique, et les produits sont parfaits pour mon home office. Service client au top !"</div>
-                </div>
+                <?php endforeach; else: ?>
+                <div class="testimonial-card" style="grid-column:1/-1; text-align:center; color:rgba(255,255,255,0.4); padding:40px;"><p>Pas encore d'avis. Soyez le premier !</p></div>
+                <?php endif; } catch (PDOException $e) { ?>
+                <div class="testimonial-card" style="grid-column:1/-1; text-align:center; color:rgba(255,255,255,0.4); padding:40px;"><p>Pas encore d'avis.</p></div>
+                <?php } ?>
             </div>
         </div>
     </section>
 
-    <!-- ===== NEWSLETTER ===== -->
+    <!-- NEWSLETTER -->
     <section class="newsletter">
         <div class="container">
             <div class="newsletter-content">
                 <h2>Ne ratez aucune <span style="color:#ff6a00;">offre</span></h2>
-                <p>Inscrivez-vous à notre newsletter et recevez en avant-première nos promotions exclusives.</p>
+                <p>Inscrivez-vous à notre newsletter.</p>
                 <form class="newsletter-form" onsubmit="return inscrireNewsletter(event)">
                     <input type="email" id="newsletterEmail" placeholder="Votre adresse email" required />
                     <button type="submit">S'abonner</button>
@@ -635,82 +488,34 @@ $user_role = $_SESSION['user_role'] ?? '';
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>EasyPick</h4>
-                    <ul>
-                        <li><a href="a-propos.php">À propos</a></li>
-                        <li><a href="blog.php">Blog</a></li>
-                        <li><a href="carrieres.php">Carrières</a></li>
-                        <li><a href="contact.php">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Aide</h4>
-                    <ul>
-                        <li><a href="#">Centre d'aide</a></li>
-                        <li><a href="#">Suivi de commande</a></li>
-                        <li><a href="#">Retours</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Légal</h4>
-                    <ul>
-                        <li><a href="cgv.php">CGV</a></li>
-                        <li><a href="confidentialite.php">Politique de confidentialité</a></li>
-                        <li><a href="cookies.php">Cookies</a></li>
-                        <li><a href="mentions-legales.php">Mentions légales</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Suivez-nous</h4>
-                    <div class="footer-social">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                    <div class="footer-payments">
-                        <i class="fab fa-cc-visa"></i>
-                        <i class="fab fa-cc-mastercard"></i>
-                        <i class="fab fa-cc-paypal"></i>
-                        <i class="fab fa-cc-apple-pay"></i>
-                    </div>
-                </div>
+                <div class="footer-col"><h4>EasyPick</h4><ul><li><a href="a-propos.php">À propos</a></li><li><a href="blog.php">Blog</a></li><li><a href="carrieres.php">Carrières</a></li><li><a href="contact.php">Contact</a></li></ul></div>
+                <div class="footer-col"><h4>Aide</h4><ul><li><a href="#">Centre d'aide</a></li><li><a href="#">Suivi de commande</a></li><li><a href="#">Retours</a></li><li><a href="#">FAQ</a></li></ul></div>
+                <div class="footer-col"><h4>Légal</h4><ul><li><a href="cgv.php">CGV</a></li><li><a href="confidentialite.php">Politique de confidentialité</a></li><li><a href="cookies.php">Cookies</a></li><li><a href="mentions-legales.php">Mentions légales</a></li></ul></div>
+                <div class="footer-col"><h4>Suivez-nous</h4><div class="footer-social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div><div class="footer-payments"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div></div>
             </div>
-            <div class="footer-bottom">
-                &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.
-            </div>
+            <div class="footer-bottom">&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.</div>
         </div>
     </footer>
 
-    <!-- ===== JAVASCRIPT ===== -->
     <script>
-        // Hamburger
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('open');
-        });
+        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
 
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    navMenu.classList.remove('open');
-                }
+                if (window.innerWidth <= 768) navMenu.classList.remove('open');
             });
         });
 
-        // Newsletter
         function inscrireNewsletter(e) {
             e.preventDefault();
             const email = document.getElementById('newsletterEmail').value;
             const msg = document.getElementById('newsletterMessage');
-
             fetch('newsletter-inscrire.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -720,9 +525,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             .then(data => {
                 msg.textContent = data.message;
                 msg.style.color = data.success ? '#00b894' : '#ff4444';
-                if (data.success) {
-                    document.getElementById('newsletterEmail').value = '';
-                }
+                if (data.success) document.getElementById('newsletterEmail').value = '';
                 setTimeout(() => msg.textContent = '', 4000);
             })
             .catch(() => {
