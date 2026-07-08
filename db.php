@@ -1,10 +1,4 @@
 <?php
-// db.php - Connexion à la base de données
-
-// Démarrer la session si elle n'est pas déjà active
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 // 🔧 CORRECTION : Utiliser 127.0.0.1 au lieu de localhost
 $host = getenv('DB_HOST') ?: '127.0.0.1';  // ← CHANGÉ

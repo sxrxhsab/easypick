@@ -15,14 +15,18 @@ $user_role = $_SESSION['user_role'] ?? '';
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 
 // Récupérer les infos de l'utilisateur
-$stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE id = ?');
-$stmt->execute([$user_id]);
-$user = $stmt->fetch();
-
-if (!$user) {
-    session_destroy();
-    header('Location: login.php');
-    exit();
+try {
+    $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE id = ?');
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch();
+    
+    if (!$user) {
+        session_destroy();
+        header('Location: login.php');
+        exit();
+    }
+} catch (PDOException $e) {
+    die('Erreur : ' . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -123,7 +127,7 @@ if (!$user) {
     <nav class="navbar-simple">
         <div class="nav-container">
             <div class="logo-text">
-                <span><span class="easy">EASY</span><span class="pick">PICK</span></span>
+                <span class="easy">EASY</span><span class="pick">PICK</span>
             </div>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.php">Accueil</a></li>
