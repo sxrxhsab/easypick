@@ -1,4 +1,5 @@
-﻿<?php
+<?php
+ob_start(); // ← Anti-erreur session_start()
 session_start();
 require_once 'db.php';
 
