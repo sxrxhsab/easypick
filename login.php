@@ -1,12 +1,18 @@
 <?php
+ob_start();
 session_start();
 require_once 'db.php';
+if (!function_exists('__')) {
+    function __($text) {
+        return $text;
+    }
+}
 
 $erreur = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
 
     if (empty($email) || empty($password)) {
         $erreur = 'Veuillez remplir tous les champs.';
@@ -22,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_role'] = $user['role'];
 
-            // Forcer l'écriture de la session avant la redirection
             session_write_close();
 
             if ($user['role'] === 'admin') {
@@ -42,17 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – <?= __('connexion') ?></title>
+    <title>EasyPick – Connexion</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .login-box { background: #1A1A1A; padding: 50px 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); width: 100%; max-width: 420px; }
         .login-box h1 { font-size: 28px; font-weight: 900; text-align: center; margin-bottom: 8px; }
-        .login-box h1 span { color: #ff6a00; }
+        .login-box h1 .easy { color: #ff6a00; }
+        .login-box h1 .pick { color: #fff; }
         .login-box .sub { text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 30px; }
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: rgba(255,255,255,0.7); }
@@ -64,13 +70,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .links { text-align: center; margin-top: 18px; color: rgba(255,255,255,0.3); font-size: 14px; }
         .links a { color: #ff6a00; transition: color 0.3s; }
         .links a:hover { color: #ff8833; }
-        .back-home { display: inline-block; margin-top: 20px; color: rgba(255,255,255,0.2); font-size: 13px; transition: color 0.3s; }
+        .back-home { display: inline-block; margin-top: 20px; color: rgba(255,255,255,0.2); font-size: 13px; transition: color 0.3s; text-align: center; width: 100%; }
         .back-home:hover { color: #fff; }
+        .footer { background: transparent; padding: 20px 0 10px; text-align: center; color: rgba(255,255,255,0.12); font-size: 12px; width: 100%; max-width: 420px; margin-top: 20px; }
+        .footer a { color: #ff6a00; }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h1><span>EASY</span>PICK</h1>
+        <h1><span class="easy">EASY</span><span class="pick">PICK</span></h1>
         <div class="sub">Connectez-vous à votre compte</div>
 
         <?php if ($erreur): ?>
@@ -79,22 +87,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST">
             <div class="form-group">
-                <label><?= __('email') ?></label>
-                <input type="email" name="email" required placeholder="vous@exemple.com" />
+                <label>Email</label>
+                <input type="email" name="email" required placeholder="vous@exemple.com" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
             </div>
             <div class="form-group">
-                <label><?= __('mot_de_passe') ?></label>
+                <label>Mot de passe</label>
                 <input type="password" name="password" required placeholder="••••••••" />
             </div>
-            <button type="submit" class="btn-login"><?= __('se_connecter') ?></button>
+            <button type="submit" class="btn-login">Se connecter</button>
         </form>
 
         <div class="links">
-            <?= __('pas_encore_compte') ?> <a href="register.php"><?= __('creer_un_compte') ?></a>
+            Pas encore de compte ? <a href="register.php">Créer un compte</a>
         </div>
-        <div style="text-align:center;">
-            <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> <?= __('retour_accueil') ?></a>
-        </div>
+        <a href="index.php" class="back-home"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
     </div>
+
+    <footer class="footer">
+        &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.
+    </footer>
 </body>
 </html>
