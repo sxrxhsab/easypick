@@ -2,10 +2,8 @@
 ob_start();
 session_start();
 require_once 'db.php';
-
 $erreur = '';
 $succes = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prenom = trim($_POST['prenom'] ?? '');
     $nom = trim($_POST['nom'] ?? '');
