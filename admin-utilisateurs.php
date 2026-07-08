@@ -7,22 +7,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
-// Statistiques
-$nb_produits = $pdo->query('SELECT COUNT(*) FROM produits')->fetchColumn();
-$nb_commandes = $pdo->query('SELECT COUNT(*) FROM commandes')->fetchColumn();
-$nb_utilisateurs = $pdo->query('SELECT COUNT(*) FROM utilisateurs')->fetchColumn();
+// Récupérer tous les utilisateurs
+$stmt = $pdo->query('SELECT * FROM utilisateurs ORDER BY id DESC');
+$utilisateurs = $stmt->fetchAll();
 
-// ✅ Correction : utiliser la colonne "statut" avec la valeur "payée" (ou "payee" selon ta base)
-// Si tu as des commandes avec statut "payée" (avec accent), utilise "payée". Sinon, remplace par "payee".
-$chiffre_affaires = $pdo->query("SELECT SUM(total) FROM commandes WHERE statut = 'payee'")->fetchColumn();
-$chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',', ' ') : '0,00';
+$nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
+$user_connecte = isset($_SESSION['user_id']);
+$user_role = $_SESSION['user_role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin</title>
+    <title>EasyPick – Admin Utilisateurs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -55,15 +53,27 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
         .admin-hero p { color: rgba(255,255,255,0.4); font-size: 15px; margin-top: 4px; }
 
         .section { padding: 30px 0 60px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #1A1A1A; padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); text-align: center; }
-        .stat-card .number { font-size: 28px; font-weight: 900; color: #ff6a00; }
-        .stat-card .label { color: rgba(255,255,255,0.4); font-size: 14px; margin-top: 4px; }
-
         .admin-menu { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px; }
         .admin-menu a { padding: 12px 24px; background: #1A1A1A; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); font-weight: 600; transition: all 0.3s; }
         .admin-menu a:hover { background: rgba(255,106,0,0.1); border-color: rgba(255,106,0,0.2); color: #ff6a00; }
         .admin-menu a.active { background: rgba(255,106,0,0.1); border-color: #ff6a00; color: #ff6a00; }
+
+        .table-wrap { overflow-x: auto; background: #1A1A1A; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); padding: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 14px 16px; color: rgba(255,255,255,0.3); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        .role { padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; }
+        .role.admin { background: rgba(255,106,0,0.15); color: #ff6a00; }
+        .role.user { background: rgba(13,202,240,0.15); color: #0dcaf0; }
+        .btn-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-actions a { padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; transition: all 0.3s; }
+        .btn-edit { background: rgba(255,106,0,0.1); color: #ff6a00; border: 1px solid rgba(255,106,0,0.2); }
+        .btn-edit:hover { background: rgba(255,106,0,0.2); }
+        .btn-delete { background: rgba(255,68,68,0.1); color: #ff4444; border: 1px solid rgba(255,68,68,0.2); }
+        .btn-delete:hover { background: rgba(255,68,68,0.2); }
+
+        .empty { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.3); }
 
         @media (max-width: 768px) {
             .navbar-simple { height: 60px; padding: 0 16px; }
@@ -75,84 +85,72 @@ $chiffre_affaires = $chiffre_affaires ? number_format($chiffre_affaires, 2, ',',
             .navbar-simple .nav-icons { gap: 14px; }
             .navbar-simple .nav-icons a { font-size: 16px; }
             .admin-hero h1 { font-size: 28px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
+            th, td { padding: 10px 12px; font-size: 13px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== NAVBAR ===== -->
-    <nav class="navbar-simple">
-        <div class="nav-container">
-            <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php">Accueil</a></li>
-                <li><a href="boutique.php">Boutique</a></li>
-                <li><a href="#">Nouveautés</a></li>
-                <li><a href="#">Promotions</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-            <div class="nav-icons">
-                <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
-                <a href="logout.php" aria-label="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
-                <button class="hamburger" id="hamburger" aria-label="Menu">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </div>
-    </nav>
+    <?php include 'header.php'; ?>
 
-    <!-- ===== HERO ===== -->
     <section class="admin-hero">
         <div class="container">
-            <h1>Tableau de bord <span>Admin</span></h1>
-            <p>Gérez vos produits, commandes et utilisateurs.</p>
+            <h1>Gestion des <span>utilisateurs</span></h1>
+            <p>Consultez et gérez les comptes des clients inscrits.</p>
         </div>
     </section>
 
-    <!-- ===== CONTENU ===== -->
     <section class="section">
         <div class="container">
 
-            <!-- Menu admin (une seule fois) -->
             <div class="admin-menu">
-                <a href="admin.php" class="active"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
                 <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
                 <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
-                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a href="admin-utilisateurs.php" class="active"><i class="fas fa-users"></i> Utilisateurs</a>
             </div>
 
-            <!-- Statistiques -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="number"><?= $nb_produits ?></div>
-                    <div class="label">Produits</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number"><?= $nb_commandes ?></div>
-                    <div class="label">Commandes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number"><?= $nb_utilisateurs ?></div>
-                    <div class="label">Utilisateurs</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number"><?= $chiffre_affaires ?> €</div>
-                    <div class="label">Chiffre d'affaires</div>
-                </div>
-            </div>
-
-            <div style="background:#1A1A1A; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.06);">
-                <p style="color:rgba(255,255,255,0.4); font-size:14px;">Bienvenue dans votre espace d'administration. Utilisez le menu ci-dessus pour gérer votre boutique.</p>
+            <div class="table-wrap">
+                <?php if (empty($utilisateurs)): ?>
+                    <div class="empty">Aucun utilisateur inscrit.</div>
+                <?php else: ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Inscrit le</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($utilisateurs as $user): ?>
+                            <tr>
+                                <td><?= $user['id'] ?></td>
+                                <td><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></td>
+                                <td><?= htmlspecialchars($user['email']) ?></td>
+                                <td><span class="role <?= $user['role'] ?>"><?= $user['role'] ?></span></td>
+                                <td><?= date('d/m/Y', strtotime($user['created_at'])) ?></td>
+                                <td>
+                                    <div class="btn-actions">
+                                        <a href="admin-utilisateur-modifier.php?id=<?= $user['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Modifier</a>
+                                        <a href="admin-utilisateur-supprimer.php?id=<?= $user['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="fas fa-trash"></i> Supprimer</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
             </div>
 
         </div>
     </section>
 
     <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.12); font-size:13px;">
-        <div class="container">
-            &copy; 2026 EasyPick – Admin
-        </div>
+        <div class="container">&copy; 2026 EasyPick – Admin</div>
     </footer>
 
     <script>
