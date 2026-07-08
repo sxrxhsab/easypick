@@ -1,7 +1,8 @@
 <?php
 ob_start();
-session_start(); // ← ligne 3
+session_start();
 require_once 'db.php';
+
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $categorie = isset($_GET['categorie']) ? (int)$_GET['categorie'] : null;
 $prix_max = isset($_GET['prix_max']) ? (int)$_GET['prix_max'] : null;
@@ -397,12 +398,17 @@ $produits = $stmt->fetchAll();
                             </div>
                         <?php else: ?>
                             <?php foreach ($produits as $index => $produit):
-                                // Vérification des favoris
+                                // Vérification des favoris - AVEC GESTION D'ERREUR
                                 $est_favori = false;
                                 if (isset($_SESSION['user_id'])) {
-                                    $stmt = $pdo->prepare('SELECT produit_id FROM wishlist WHERE utilisateur_id = ? AND produit_id = ?');
-                                    $stmt->execute([$_SESSION['user_id'], $produit['id']]);
-                                    $est_favori = $stmt->fetch();
+                                    try {
+                                        $stmt = $pdo->prepare('SELECT produit_id FROM wishlist WHERE utilisateur_id = ? AND produit_id = ?');
+                                        $stmt->execute([$_SESSION['user_id'], $produit['id']]);
+                                        $est_favori = $stmt->fetch();
+                                    } catch (PDOException $e) {
+                                        // Table wishlist n'existe pas, on ignore
+                                        $est_favori = false;
+                                    }
                                 }
                             ?>
                             <div class="product-card fade-up delay-<?= ($index % 4) + 1 ?>">
