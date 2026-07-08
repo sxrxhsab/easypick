@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     $password_confirm = $_POST['password_confirm'];
 
+    // 1. Validations
     if (empty($prenom) || empty($nom) || empty($email) || empty($password)) {
         $erreur = 'Tous les champs sont obligatoires.';
     } elseif ($password !== $password_confirm) {
@@ -19,15 +20,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) < 6) {
         $erreur = 'Le mot de passe doit faire au moins 6 caractères.';
     } else {
-        // Vérifier si l'email existe déjà
-        $stmt = $pdo->prepare('INSERT INTO utilisateurs (prenom, nom, email, password, role) VALUES (?, ?, ?, ?, "user")');
+        // 2. Vérifier si l'email existe déjà (sans insérer)
+        $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
             $erreur = 'Cet email est déjà utilisé.';
         } else {
+            // 3. Hash du mot de passe
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare('INSERT INTO utilisateurs (prenom, nom, email, password, role) VALUES (?, ?, ?, ?, "user")');
-            $stmt->execute([$prenom, $nom, $email, $hash]);
+
+            // 4. Insertion correcte (5 colonnes → 5 paramètres)
+            $stmt = $pdo->prepare('INSERT INTO utilisateurs (prenom, nom, email, password, role) VALUES (?, ?, ?, ?, ?)');
+            $stmt->execute([$prenom, $nom, $email, $hash, 'user']); // 'user' par défaut
+
             $succes = 'Compte créé avec succès ! Vous pouvez vous connecter.';
         }
     }
