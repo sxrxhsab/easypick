@@ -1,58 +1,22 @@
 ﻿<?php
-ob_start();
+ob_start(); // ← AJOUTÉ
 session_start();
 require_once 'db.php';
+
+// Récupérer les produits
+$stmt = $pdo->query('SELECT * FROM produits ORDER BY id DESC');
+$produits = $stmt->fetchAll();
 
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
-?>
 
-// ==================== RECHERCHE & FILTRES ====================
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$categorie = isset($_GET['categorie']) ? (int)$_GET['categorie'] : null;
-$prix_max = isset($_GET['prix_max']) ? (int)$_GET['prix_max'] : null;
-$marque = isset($_GET['marque']) ? (int)$_GET['marque'] : null;
-$note_min = isset($_GET['note_min']) ? (int)$_GET['note_min'] : null;
-$sort = isset($_GET['sort']) ? $_GET['sort'] : 'relevance';
-
-// Requête SQL de base
-$sql = 'SELECT * FROM produits WHERE 1=1';
-$params = [];
-
-if (!empty($search)) {
-    $sql .= ' AND (nom LIKE ? OR description LIKE ?)';
-    $params[] = '%' . $search . '%';
-    $params[] = '%' . $search . '%';
+// Fonction de traduction si elle n'existe pas
+if (!function_exists('__')) {
+    function __($text) {
+        return $text;
+    }
 }
-if ($categorie) {
-    $sql .= ' AND categorie_id = ?';
-    $params[] = $categorie;
-}
-if ($prix_max && $prix_max > 0) {
-    $sql .= ' AND prix <= ?';
-    $params[] = $prix_max;
-}
-if ($marque) {
-    $sql .= ' AND marque_id = ?';
-    $params[] = $marque;
-}
-if ($note_min && $note_min > 0) {
-    $sql .= ' AND note >= ?';
-    $params[] = $note_min;
-}
-
-switch ($sort) {
-    case 'price-asc': $sql .= ' ORDER BY prix ASC'; break;
-    case 'price-desc': $sql .= ' ORDER BY prix DESC'; break;
-    case 'rating': $sql .= ' ORDER BY note DESC, nb_avis DESC'; break;
-    case 'newest': $sql .= ' ORDER BY created_at DESC'; break;
-    default: $sql .= ' ORDER BY id ASC';
-}
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$produits = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
