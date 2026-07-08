@@ -1,12 +1,12 @@
 ﻿<?php
 ob_start();
 session_start();
-require_once __DIR__ . '/db.php';
+require_once 'db.php';
 
-// Variables navbar
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
+?>
 
 // ==================== RECHERCHE & FILTRES ====================
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
