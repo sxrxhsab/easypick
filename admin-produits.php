@@ -153,14 +153,12 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <th>ID</th>
                             <th>Image</th>
                             <th>Nom</th>
-                            <th>Prix</th>
+                            <th>Prix vente</th>
+                            <th>Prix achat</th>
+                            <th>Marge</th>
                             <th>Stock</th>
                             <th>Badges</th>
                             <th>Actions</th>
-                            <th>Prix vente</th>
-<th>Prix achat</th>
-<th>Marge</th>
-<th>Stock</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -176,6 +174,21 @@ $user_role = $_SESSION['user_role'] ?? '';
                             </td>
                             <td><?= htmlspecialchars($p['nom']) ?></td>
                             <td><?= number_format($p['prix'], 2, ',', ' ') ?> €</td>
+                            <td style="color:#888; font-size:13px;">
+                                <?= $p['prix_achat'] ? number_format($p['prix_achat'], 2, ',', ' ') . ' €' : '-' ?>
+                            </td>
+                            <td>
+                                <?php 
+                                if ($p['prix_achat'] > 0) {
+                                    $marge = $p['prix'] - $p['prix_achat'];
+                                    $marge_pct = round(($marge / $p['prix_achat']) * 100);
+                                    $couleur = $marge_pct > 50 ? '#00b894' : ($marge_pct > 20 ? '#ffc107' : '#ff4444');
+                                    echo '<span style="color:' . $couleur . '; font-weight:700;">+' . $marge_pct . '%</span>';
+                                } else {
+                                    echo '-';
+                                }
+                                ?>
+                            </td>
                             <td>
                                 <?php if ($p['stock'] <= 0): ?>
                                     <span class="stock-out">❌ Rupture</span>
@@ -190,22 +203,6 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 <?php if ($p['est_nouveau']): ?><span class="badge new">Nouveau</span> <?php endif; ?>
                                 <?php if ($p['est_top']): ?><span class="badge top">Top</span> <?php endif; ?>
                             </td>
-                            <td><?= number_format($p['prix'], 2, ',', ' ') ?> €</td>
-<td style="color:#888; font-size:13px;">
-    <?= $p['prix_achat'] ? number_format($p['prix_achat'], 2, ',', ' ') . ' €' : '-' ?>
-</td>
-<td>
-    <?php 
-    if ($p['prix_achat'] > 0) {
-        $marge = $p['prix'] - $p['prix_achat'];
-        $marge_pct = round(($marge / $p['prix_achat']) * 100);
-        $couleur = $marge_pct > 50 ? '#00b894' : ($marge_pct > 20 ? '#ffc107' : '#ff4444');
-        echo '<span style="color:' . $couleur . '; font-weight:700;">+' . $marge_pct . '%</span>';
-    } else {
-        echo '-';
-    }
-    ?>
-</td>
                             <td>
                                 <div class="btn-actions">
                                     <a href="admin-produit-modifier.php?id=<?= $p['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Modifier</a>
@@ -232,5 +229,6 @@ $user_role = $_SESSION['user_role'] ?? '';
             hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
         }
     </script>
+
 </body>
 </html>
