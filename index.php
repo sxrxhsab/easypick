@@ -327,7 +327,9 @@ $user_role = $_SESSION['user_role'] ?? '';
             </ul>
             <div class="nav-icons">
                 <a href="#"><i class="fas fa-search"></i></a>
-                <a href="#"><i class="far fa-heart"></i></a>
+                <a href="wishlist.php" aria-label="Wishlist" style="color:#ff6a00;">
+    <i class="fas fa-heart"></i>
+</a>
                 <?php if ($user_connecte): ?>
                     <a href="mon-compte.php"><i class="fas fa-user"></i></a>
                 <?php else: ?>

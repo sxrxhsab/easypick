@@ -50,11 +50,11 @@ if (isset($_SESSION['user_id'])) {
             
             <!-- Wishlist -->
             <a href="wishlist.php" aria-label="Wishlist" style="color:#ff6a00; position:relative;">
-                <i class="fas fa-heart"></i>
-                <?php if ($nb_wishlist > 0): ?>
-                    <span class="wishlist-badge" style="position:absolute; top:-8px; right:-10px; background:#ff6a00; color:#fff; font-size:9px; font-weight:700; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(255,106,0,0.4);"><?= $nb_wishlist ?></span>
-                <?php endif; ?>
-            </a>
+    <i class="fas fa-heart"></i>
+    <?php if ($nb_wishlist > 0): ?>
+        <span class="wishlist-badge"><?= $nb_wishlist ?></span>
+    <?php endif; ?>
+</a>
 
             <?php if ($user_connecte): ?>
                 <a href="mon-compte.php" data-i18n="mon_compte" aria-label="Mon compte"><i class="fas fa-user"></i></a>
