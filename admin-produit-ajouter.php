@@ -3,8 +3,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ob_start();
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require_once 'db.php';
 
 // Vérifier si l'utilisateur est admin
@@ -23,7 +21,6 @@ $marques = $pdo->query('SELECT * FROM marques')->fetchAll();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupération des champs texte
     $nom = trim($_POST['nom'] ?? '');
-    $slug = strtolower(trim(str_replace(' ', '-', $nom)));
     $description = trim($_POST['description'] ?? '');
     $prix = (float) ($_POST['prix'] ?? 0);
     $prix_old = !empty($_POST['prix_old']) ? (float) $_POST['prix_old'] : null;
@@ -40,17 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $file = $_FILES['image'];
         $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        $max_size = 5 * 1024 * 1024; // 5 Mo
+        $max_size = 5 * 1024 * 1024;
 
-        // Vérifier l'extension
         if (!in_array($extension, $allowed)) {
             $erreur = 'Format d\'image non autorisé. Utilisez JPG, PNG, GIF ou WEBP.';
-        }
-        // Vérifier la taille
-        elseif ($file['size'] > $max_size) {
+        } elseif ($file['size'] > $max_size) {
             $erreur = 'L\'image est trop lourde. Maximum 5 Mo.';
         } else {
-            // Créer le dossier uploads s'il n'existe pas
             $upload_dir = 'uploads/';
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0755, true);
@@ -96,11 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $images_json = !empty($images_paths) ? json_encode($images_paths) : null;
             
+            // ✅ REQUÊTE CORRIGÉE (sans slug)
             $stmt = $pdo->prepare('INSERT INTO produits 
-                (nom, slug, description, prix, prix_old, stock, categorie_id, marque_id, image, images, est_promo, est_nouveau, est_top) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                (nom, description, prix, prix_old, stock, categorie_id, marque_id, image, images, est_promo, est_nouveau, est_top) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
             $stmt->execute([
-                $nom, $slug, $description, $prix, $prix_old, $stock,
+                $nom, $description, $prix, $prix_old, $stock,
                 $categorie_id, $marque_id, $image_path, $images_json,
                 $est_promo, $est_nouveau, $est_top
             ]);
