@@ -46,9 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nom) || empty($description) || $prix <= 0 || empty($image)) {
         $erreur = 'Veuillez remplir tous les champs obligatoires.';
     } else {
-        $stmt = $pdo->prepare('UPDATE produits SET nom=?, slug=?, description=?, prix=?, prix_old=?, stock=?, categorie_id=?, image=?, est_promo=?, est_nouveau=?, est_top=? WHERE id=?');
-        $stmt->execute([$nom, $slug, $description, $prix, $prix_old, $stock, $categorie_id, $image, $est_promo, $est_nouveau, $est_top, $id]);
-        $succes = 'Produit modifié avec succès !';
+        $stmt = $pdo->prepare('UPDATE produits SET nom=?, description=?, prix=?, prix_achat=?, stock=?, categorie_id=?, image=?, est_promo=?, est_nouveau=?, est_top=? WHERE id=?');
+$stmt->execute([$nom, $description, $prix, $prix_achat, $stock, $categorie_id, $image, $est_promo, $est_nouveau, $est_top, $id]);
+       
         
         // Recharger les données
         $stmt = $pdo->prepare('SELECT * FROM produits WHERE id = ?');
@@ -166,6 +166,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </div>
         </div>
+        <div class="form-group">
+    <label>Prix d'achat (€)</label>
+    <input type="number" name="prix_achat" step="0.01" value="<?= $produit['prix_achat'] ?>" />
+    <small style="color:rgba(255,255,255,0.3);">Prix que tu paies à CJ Dropshipping</small>
+</div>
     </nav>
 
     <!-- ===== CONTENU ===== -->

@@ -64,10 +64,8 @@ while (($ligne = fgetcsv($handle)) !== false) {
     
     // Insérer dans la base
     try {
-        $stmt = $pdo->prepare('INSERT INTO produits 
-            (nom, description, prix, stock, image, created_at) 
-            VALUES (?, ?, ?, ?, ?, NOW())');
-        $stmt->execute([$nom_complet, $description, $prix, $stock, $image]);
+        $stmt = $pdo->prepare('INSERT INTO produits (nom, description, prix, prix_achat, stock, image, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+$stmt->execute([$nom_complet, 'Produit CJ Dropshipping', $prix * 2.2, $prix, $stock, $image]);
         $compteur++;
         echo "✅ Produit importé : <strong>$nom_complet</strong> - $prix €<br>";
     } catch (PDOException $e) {
