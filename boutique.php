@@ -243,39 +243,7 @@ $produits = $stmt->fetchAll();
     </style>
 </head>
 <body>
-
-    <!-- ===== NAVBAR ===== -->
-    <nav class="navbar-simple">
-        <div class="nav-container">
-            <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php" data-i18n="accueil">Accueil</a></li>
-                <li><a href="boutique.php" class="active" data-i18n="boutique">Boutique</a></li>
-                <li><a href="nouveautes.php" data-i18n="nouveautes">Nouveautés</a></li>
-                <li><a href="promotions.php" data-i18n="promotions">Promotions</a></li>
-                <li><a href="contact.php" data-i18n="contact">Contact</a></li>
-            </ul>
-            <div class="nav-icons">
-                <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
-                <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
-                <?php if ($user_connecte): ?>
-                    <a href="mon-compte.php" data-i18n="mon_compte" aria-label="Mon compte"><i class="fas fa-user"></i></a>
-                <?php else: ?>
-                    <a href="login.php" data-i18n="connexion" aria-label="Connexion"><i class="fas fa-user"></i></a>
-                <?php endif; ?>
-                <a href="panier.php" data-i18n="panier" aria-label="Panier" style="position:relative;">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-badge"><?= $nb_articles ?></span>
-                </a>
-                <?php if ($user_connecte && $user_role === 'admin'): ?>
-                    <a href="admin.php" data-i18n="admin" aria-label="Admin"><i class="fas fa-cog"></i></a>
-                <?php endif; ?>
-                <button class="hamburger" id="hamburger" aria-label="Menu">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </div>
-    </nav>
+<?php include 'header.php'; ?>
 
     <!-- ===== HERO ===== -->
     <section class="hero-shop">
