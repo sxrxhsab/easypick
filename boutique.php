@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 ob_start();
 session_start();
 require_once 'db.php';
@@ -508,14 +510,15 @@ $produits = $stmt->fetchAll();
         }
 
         // ===== FAVORIS =====
-        function toggleFav(productId, btn) {
-            const icon = btn.querySelector('i');
-            if (icon.classList.contains('fas')) {
-                window.location.href = 'wishlist-supprimer.php?id=' + productId;
-            } else {
-                window.location.href = 'wishlist-ajouter.php?id=' + productId;
-            }
-        }
+       // ===== FAVORIS =====
+function toggleFav(productId, btn) {
+    const icon = btn.querySelector('i');
+    if (icon.classList.contains('fas')) {
+        window.location.href = 'wishlist-supprimer.php?id=' + productId;
+    } else {
+        window.location.href = 'wishlist-ajouter.php?id=' + productId;
+    }
+}
 
         // ===== APERÇU RAPIDE =====
         function quickView(btn) {
