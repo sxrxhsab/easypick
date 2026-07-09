@@ -62,40 +62,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erreur = 'Veuillez sélectionner une image.';
     }
 
-    // ---- Gestion des images multiples (optionnel) ----
-    $images_paths = [];
-    if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
-        $upload_dir = 'uploads/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
-        
-        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-            if (!empty($_FILES['images']['name'][$key])) {
-                $extension = strtolower(pathinfo($_FILES['images']['name'][$key], PATHINFO_EXTENSION));
-                if (in_array($extension, $allowed)) {
-                    $nom_fichier = uniqid() . '.' . $extension;
-                    if (move_uploaded_file($tmp_name, $upload_dir . $nom_fichier)) {
-                        $images_paths[] = $upload_dir . $nom_fichier;
-                    }
-                }
-            }
-        }
-    }
-
     // Si tout est bon, on insère dans la BDD
     if (empty($erreur) && !empty($image_path)) {
         if (empty($nom) || empty($description) || $prix <= 0) {
             $erreur = 'Veuillez remplir tous les champs obligatoires (*).';
         } else {
-            $images_json = !empty($images_paths) ? json_encode($images_paths) : null;
-            
-            // ✅ REQUÊTE CORRIGÉE (sans slug)
+            // ✅ REQUÊTE CORRIGÉE (sans slug et sans images)
             $stmt = $pdo->prepare('INSERT INTO produits 
-                (nom, description, prix, prix_old, stock, categorie_id, marque_id, image, images, est_promo, est_nouveau, est_top) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                (nom, description, prix, prix_old, stock, categorie_id, marque_id, image, est_promo, est_nouveau, est_top) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
             $stmt->execute([
                 $nom, $description, $prix, $prix_old, $stock,
-                $categorie_id, $marque_id, $image_path, $images_json,
+                $categorie_id, $marque_id, $image_path,
                 $est_promo, $est_nouveau, $est_top
             ]);
             $succes = 'Produit ajouté avec succès !';
