@@ -5,7 +5,6 @@ require_once 'db.php';
 
 echo "<h1>📦 Importation des produits CJ Dropshipping</h1>";
 
-// 1. Vérifier que le fichier CSV existe
 $fichier = 'produits_cj.csv';
 
 if (!file_exists($fichier)) {
@@ -13,13 +12,11 @@ if (!file_exists($fichier)) {
          📁 Télécharge le fichier depuis CJ Dropshipping et mets-le dans le dossier du site avec le nom <strong>produits_cj.csv</strong>");
 }
 
-// 2. Lire le CSV
 $handle = fopen($fichier, 'r');
 if (!$handle) {
     die("❌ Impossible d'ouvrir le fichier.");
 }
 
-// Lire la première ligne (en-têtes)
 $entetes = fgetcsv($handle);
 
 echo "<p>📋 Colonnes trouvées : " . implode(' → ', $entetes) . "</p>";
@@ -29,31 +26,45 @@ $compteur = 0;
 $erreurs = 0;
 
 while (($ligne = fgetcsv($handle)) !== false) {
-    // ✅ ADAPTATION POUR TON CSV
+    // ✅ LECTURE DES COLONNES
     $nom = trim($ligne[0] ?? 'Produit CJ');
     $image = trim($ligne[1] ?? '');
-    $sku = trim($ligne[2] ?? '');
-    $couleur = trim($ligne[3] ?? '');
-    $entrepot = trim($ligne[4] ?? '');
+    $sku = trim($ligne[2] ?? '');                 // ✅ SKU
+    $couleur = trim($ligne[3] ?? '');             // ✅ Couleur
+    $entrepot = trim($ligne[4] ?? '');            // ✅ Entrepôt
     $inventaire = (int) ($ligne[5] ?? 0);
-    $prix = (float) ($ligne[14] ?? 0); // Product Base Price ($)
+    $prix_base = (float) ($ligne[14] ?? 0);
     $frais_livraison = (float) ($ligne[15] ?? 0);
-    $total_cost = (float) ($ligne[16] ?? $prix);
-    $stock = (int) ($ligne[5] ?? 10); // Inventory
+    $stock = (int) ($ligne[5] ?? 10);
     
-    // Construire le nom complet avec la couleur
+    // ============================================================
+    // ✅ CALCUL DES PRIX
+    // ============================================================
+    $prix_achat = $prix_base + $frais_livraison;
+    $prix_vente = $prix_achat; // Tu modifieras toi-même
+    
+    $prix_achat = round($prix_achat, 2);
+    $prix_vente = round($prix_vente, 2);
+    
+    // ============================================================
+    // ✅ CONSTRUCTION DU NOM ET DE LA DESCRIPTION
+    // ============================================================
+    
+    // Nom avec couleur
     if (!empty($couleur)) {
         $nom_complet = $nom . ' - ' . $couleur;
     } else {
         $nom_complet = $nom;
     }
     
-    // Description
-    $description = "SKU: $sku | Entrepôt: $entrepot | Couleur: $couleur";
+    // ✅ DESCRIPTION COMPLÈTE AVEC SKU, ENTREPÔT, COULEUR, LIVRAISON
+    $description = "SKU: $sku | Entrepôt: $entrepot | Couleur: $couleur | Livraison: " . number_format($frais_livraison, 2) . " €";
     
     // Vérifier que le prix est valide
-    if ($prix <= 0) {
-        $prix = 9.99;
+    if ($prix_base <= 0) {
+        $prix_base = 9.99;
+        $prix_achat = $prix_base + $frais_livraison;
+        $prix_vente = $prix_achat;
     }
     
     // Vérifier que le nom n'est pas vide
@@ -62,12 +73,30 @@ while (($ligne = fgetcsv($handle)) !== false) {
         continue;
     }
     
-    // Insérer dans la base
+    // ✅ Insérer dans la base
     try {
-        $stmt = $pdo->prepare('INSERT INTO produits (nom, description, prix, prix_achat, stock, image, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
-$stmt->execute([$nom_complet, 'Produit CJ Dropshipping', $prix * 2.2, $prix, $stock, $image]);
+        $stmt = $pdo->prepare('INSERT INTO produits 
+            (nom, description, prix, prix_achat, stock, image, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, NOW())');
+        
+        $stmt->execute([
+            $nom_complet,           // Nom du produit
+            $description,           // ✅ Description avec SKU
+            $prix_vente,            // Prix de vente
+            $prix_achat,            // Prix d'achat (produit + livraison)
+            $stock,                 // Stock
+            $image                  // Image
+        ]);
+        
         $compteur++;
-        echo "✅ Produit importé : <strong>$nom_complet</strong> - $prix €<br>";
+        
+        // Affichage du résultat
+        echo "✅ Produit importé : <strong>$nom_complet</strong><br>";
+        echo "&nbsp;&nbsp;&nbsp;📦 Prix base: " . number_format($prix_base, 2) . " € | ";
+        echo "🚚 Livraison: " . number_format($frais_livraison, 2) . " € | ";
+        echo "💰 Prix achat: " . number_format($prix_achat, 2) . " €<br>";
+        echo "&nbsp;&nbsp;&nbsp;🔑 SKU: <strong>$sku</strong> | 📍 Entrepôt: $entrepot<br><br>";
+        
     } catch (PDOException $e) {
         $erreurs++;
         echo "❌ Erreur pour <strong>$nom</strong> : " . $e->getMessage() . "<br>";
