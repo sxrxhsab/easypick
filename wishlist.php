@@ -1,6 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ob_start();
 session_start();
 require_once 'db.php';
 
@@ -10,40 +9,39 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+$nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 
-// Récupérer les produits favoris
+// Récupérer les produits de la wishlist
 $stmt = $pdo->prepare('
-    SELECT p.* FROM wishlist w 
-    JOIN produits p ON w.produit_id = p.id 
-    WHERE w.utilisateur_id = ? 
+    SELECT p.* FROM produits p
+    JOIN wishlist w ON p.id = w.produit_id
+    WHERE w.utilisateur_id = ?
     ORDER BY w.created_at DESC
 ');
 $stmt->execute([$user_id]);
 $produits = $stmt->fetchAll();
-
-$nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
-$user_connecte = isset($_SESSION['user_id']);
-$user_role = $_SESSION['user_role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Mes favoris</title>
+    <title>EasyPick – Ma Wishlist</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* (reprendre les styles de <?= __('boutique') ?>.php pour la grille) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; }
         a { text-decoration: none; color: inherit; }
-        .container { max-width: 1500px; margin: 0 auto; padding: 0 30px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        .navbar-simple { width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px; }
-        .navbar-simple .nav-container { max-width: 1500px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .navbar-simple {
+            width: 100%; height: 68px; background: #181818; border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 1000; padding: 0 30px;
+        }
+        .navbar-simple .nav-container { max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
         .navbar-simple .logo-text { font-weight: 900; font-size: 22px; letter-spacing: 1px; }
         .navbar-simple .logo-text .easy { color: #ff6a00; }
         .navbar-simple .logo-text .pick { color: #fff; }
@@ -52,10 +50,12 @@ $user_role = $_SESSION['user_role'] ?? '';
         .navbar-simple .nav-menu li a::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 0; height: 2px; background: #ff6a00; border-radius: 10px; transition: width 0.3s; }
         .navbar-simple .nav-menu li a:hover { color: #fff; }
         .navbar-simple .nav-menu li a:hover::after { width: 100%; }
-        .navbar-simple .nav-icons { display: flex; gap: 20px; }
+        .navbar-simple .nav-menu li a.active { color: #fff; }
+        .navbar-simple .nav-menu li a.active::after { width: 100%; }
+        .navbar-simple .nav-icons { display: flex; gap: 20px; align-items: center; }
         .navbar-simple .nav-icons a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.3s; position: relative; }
         .navbar-simple .nav-icons a:hover { color: #ff6a00; }
-        .navbar-simple .nav-icons .cart-badge { position: absolute; top: -6px; right: -8px; background: #ff6a00; color: #fff; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(255,106,0,0.4); }
+        .navbar-simple .cart-badge { position: absolute; top: -6px; right: -8px; background: #ff6a00; color: #fff; font-size: 9px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .navbar-simple .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
         .navbar-simple .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 10px; transition: 0.3s; }
 
@@ -64,33 +64,15 @@ $user_role = $_SESSION['user_role'] ?? '';
         .page-hero h1 span { color: #ff6a00; }
         .page-hero p { color: rgba(255,255,255,0.4); font-size: 15px; }
 
-        .wishlist-section { padding: 40px 0 80px; background: #151515; }
-        .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 35px; }
-        .product-card { background: #202020; border-radius: 20px; overflow: hidden; padding: 24px 24px 28px; border: 1px solid rgba(255,255,255,0.06); transition: transform 0.4s, box-shadow 0.4s; position: relative; display: flex; flex-direction: column; }
-        .product-card:hover { transform: translateY(-12px); box-shadow: 0 30px 70px rgba(255,106,0,0.12); border-color: rgba(255,106,0,0.12); }
-        .product-card .product-image-wrap { position: relative; overflow: hidden; border-radius: 16px; background: #151515; margin-bottom: 16px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; }
-        .product-card .product-image-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 20px; transition: transform 0.5s; }
-        .product-card:hover .product-image-wrap img { transform: scale(1.08); }
-        .product-card .badges { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
-        .product-card .badges .badge { padding: 4px 14px; border-radius: 30px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        .product-card .badges .badge.promo { background: #ff6a00; color: #fff; }
-        .product-card .badges .badge.new { background: #00b894; color: #fff; }
-        .product-card .badges .badge.top { background: #fdcb6e; color: #151515; }
-        .product-card .action-buttons { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 8px; z-index: 2; opacity: 0; transform: translateX(12px); transition: all 0.4s; }
-        .product-card:hover .action-buttons { opacity: 1; transform: translateX(0); }
-        .product-card .action-buttons button { width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(21,21,21,0.85); backdrop-filter: blur(8px); color: #fff; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.06); z-index: 3; }
-        .product-card .action-buttons button:hover { background: #ff6a00; transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,106,0,0.25); border-color: #ff6a00; }
-        .product-card .product-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #fff; }
-        .product-card .product-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .product-card .product-rating .stars { color: #ffb800; font-size: 13px; }
-        .product-card .product-rating .stars .grey { color: #444; }
-        .product-card .product-rating .count { color: rgba(255,255,255,0.2); font-size: 12px; }
-        .product-card .product-price { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .product-card .product-price .current { font-size: 32px; font-weight: 900; color: #ff6a00; letter-spacing: -0.5px; }
-        .product-card .product-price .old { font-size: 16px; color: rgba(255,255,255,0.2); text-decoration: line-through; font-weight: 400; }
-        .product-card .card-actions { display: flex; gap: 10px; margin-top: auto; position: relative; z-index: 2; }
-        .product-card .card-actions .btn-add { width: 100%; padding: 14px 0; background: linear-gradient(135deg, #ff6a00, #ff7d1a); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.4s; font-family: 'Poppins', sans-serif; box-shadow: 0 6px 25px rgba(255,106,0,0.12); text-align: center; display: inline-block; }
-        .product-card .card-actions .btn-add:hover { transform: scale(1.03); box-shadow: 0 10px 35px rgba(255,106,0,0.25); background: linear-gradient(135deg, #ff7d1a, #ff8c33); }
+        .products-section { padding: 30px 0 60px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .product-card { background: #1A1A1A; border-radius: 16px; padding: 20px; text-align: center; transition: transform 0.3s; border: 1px solid rgba(255,255,255,0.06); }
+        .product-card:hover { transform: translateY(-8px); border-color: rgba(255,106,0,0.2); }
+        .product-card img { width: 100%; height: 200px; object-fit: contain; background: #0D0D0D; border-radius: 12px; margin-bottom: 15px; padding: 10px; }
+        .product-card .product-name { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+        .product-card .product-price { font-size: 22px; font-weight: 700; color: #ff6a00; }
+        .btn-remove { background: transparent; border: 2px solid #ff4444; color: #ff4444; padding: 8px 20px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-remove:hover { background: #ff4444; color: #fff; }
 
         .empty { text-align: center; padding: 60px 0; color: rgba(255,255,255,0.4); }
         .empty i { font-size: 48px; margin-bottom: 16px; }
@@ -98,8 +80,6 @@ $user_role = $_SESSION['user_role'] ?? '';
         .footer { background: #0F0F0F; padding: 40px 0 20px; border-top: 1px solid rgba(255,255,255,0.04); text-align: center; color: rgba(255,255,255,0.12); font-size: 13px; }
         .footer a { color: #ff6a00; }
 
-        @media (max-width: 1200px) { .products-grid { grid-template-columns: repeat(3,1fr); gap: 30px; } }
-        @media (max-width: 992px) { .products-grid { grid-template-columns: repeat(2,1fr); gap: 28px; } }
         @media (max-width: 768px) {
             .navbar-simple { height: 60px; padding: 0 16px; }
             .navbar-simple .logo-text { font-size: 18px; }
@@ -110,100 +90,89 @@ $user_role = $_SESSION['user_role'] ?? '';
             .navbar-simple .nav-icons { gap: 14px; }
             .navbar-simple .nav-icons a { font-size: 16px; }
             .page-hero h1 { font-size: 28px; }
-            .products-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+            .products-grid { grid-template-columns: 1fr 1fr; }
         }
-        @media (max-width: 480px) { .products-grid { grid-template-columns: 1fr; gap: 24px; } }
+        @media (max-width: 480px) {
+            .products-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <?php include 'header.php'; ?>
+    <!-- NAVBAR -->
+    <nav class="navbar-simple">
+        <div class="nav-container">
+            <div class="logo-text">
+                <span class="easy">EASY</span><span class="pick">PICK</span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.php">Accueil</a></li>
+                <li><a href="boutique.php">Boutique</a></li>
+                <li><a href="nouveautes.php">Nouveautés</a></li>
+                <li><a href="promotions.php">Promotions</a></li>
+                <li><a href="contact.php">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#"><i class="fas fa-search"></i></a>
+                <a href="wishlist.php" style="color:#ff6a00;"><i class="fas fa-heart"></i></a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="mon-compte.php"><i class="fas fa-user"></i></a>
+                <?php else: ?>
+                    <a href="login.php"><i class="fas fa-user"></i></a>
+                <?php endif; ?>
+                <a href="panier.php" style="position:relative;">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge"><?= $nb_articles ?></span>
+                </a>
+                <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            </div>
+        </div>
+    </nav>
 
+    <!-- HERO -->
     <section class="page-hero">
         <div class="container">
-            <h1>Mes <span>favoris</span></h1>
-            <p>Retrouvez ici tous les <?= __('produits') ?> que vous avez aimés.</p>
+            <h1>Ma <span>Wishlist</span></h1>
+            <p>Vos produits favoris.</p>
         </div>
     </section>
 
-    <section class="wishlist-section">
+    <!-- PRODUITS -->
+    <section class="products-section">
         <div class="container">
             <?php if (empty($produits)): ?>
                 <div class="empty">
-                    <i class="fas fa-heart" style="color:#ff6a00;"></i>
-                    <p>Vous n'avez pas encore de favoris.</p>
-                    <a href="boutique.php" style="color:#ff6a00; font-weight:600;">Découvrir nos <?= __('produits') ?></a>
+                    <i class="fas fa-heart"></i>
+                    <p>Votre wishlist est vide.</p>
+                    <a href="boutique.php" style="color:#ff6a00;">Découvrez nos produits</a>
                 </div>
             <?php else: ?>
                 <div class="products-grid">
                     <?php foreach ($produits as $produit): ?>
-                    <div class="product-card">
-                        <a href="produit.php?id=<?= $produit['id'] ?>" class="product-link-overlay"></a>
-                        <div class="product-image-wrap">
-                            <img src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
-                            <div class="badges">
-                                <?php if ($produit['est_promo'] && $produit['prix_old']): ?>
-                                    <span class="badge promo">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
-                                <?php endif; ?>
-                                <?php if ($produit['est_nouveau']): ?>
-                                    <span class="badge new">Nouveau</span>
-                                <?php endif; ?>
-                                <?php if ($produit['est_top']): ?>
-                                    <span class="badge top">Top vente</span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="action-buttons">
-                                <button class="fav-btn" onclick="event.stopPropagation(); window.location.href='wishlist-<?= __('supprimer') ?>.php?id=<?= $produit['id'] ?>'">
-                                    <i class="fas fa-heart" style="color:#ff6a00;"></i>
-                                </button>
-                                <button onclick="event.stopPropagation(); quickView(this)"><i class="fas fa-eye"></i></button>
-                            </div>
+                        <div class="product-card">
+                            <img src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/300/200') ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
+                            <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
+                            <div class="product-price"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</div>
+                            <a href="wishlist-supprimer.php?id=<?= $produit['id'] ?>" class="btn-remove"><i class="fas fa-trash"></i> Retirer</a>
                         </div>
-                        <div class="product-name"><?= htmlspecialchars($produit['nom']) ?></div>
-                        <div class="product-rating">
-                            <span class="stars">
-                                <?php
-                                $note = round($produit['note'] * 2) / 2;
-                                for ($i = 1; $i <= 5; $i++) {
-                                    if ($i <= $note) echo '<i class="fas fa-star"></i>';
-                                    elseif ($i - 0.5 <= $note) echo '<i class="fas fa-star-half-alt"></i>';
-                                    else echo '<i class="fas fa-star grey"></i>';
-                                }
-                                ?>
-                            </span>
-                            <span class="count">(<?= $produit['nb_avis'] ?> <?= __('avis') ?>)</span>
-                        </div>
-                        <div class="product-price">
-                            <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
-                            <?php if ($produit['prix_old']): ?>
-                                <span class="old"><?= number_format($produit['prix_old'], 2, ',', ' ') ?> €</span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="card-actions">
-                            <a href="<?= __('panier') ?>-<?= __('ajouter') ?>.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add"><?= __('ajouter') ?> au <?= __('panier') ?></a>
-                        </div>
-                    </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>
     </section>
 
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
-            &copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.
+            &copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.
         </div>
     </footer>
 
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
-
-        function quickView(btn) {
-            const card = btn.closest('.product-card');
-            const name = card.querySelector('.product-name').textContent;
-            alert('🖥️ Aperçu rapide : ' + name);
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
         }
     </script>
 
