@@ -32,9 +32,9 @@ $succes = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = trim($_POST['nom'] ?? '');
-    $slug = strtolower(trim(str_replace(' ', '-', $nom)));
     $description = trim($_POST['description'] ?? '');
     $prix = (float) ($_POST['prix'] ?? 0);
+    $prix_achat = !empty($_POST['prix_achat']) ? (float) $_POST['prix_achat'] : null; // ✅ AJOUTÉ
     $prix_old = !empty($_POST['prix_old']) ? (float) $_POST['prix_old'] : null;
     $stock = (int) ($_POST['stock'] ?? 0);
     $categorie_id = (int) ($_POST['categorie_id'] ?? 0);
@@ -46,9 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nom) || empty($description) || $prix <= 0 || empty($image)) {
         $erreur = 'Veuillez remplir tous les champs obligatoires.';
     } else {
-        $stmt = $pdo->prepare('UPDATE produits SET nom=?, description=?, prix=?, prix_achat=?, stock=?, categorie_id=?, image=?, est_promo=?, est_nouveau=?, est_top=? WHERE id=?');
-$stmt->execute([$nom, $description, $prix, $prix_achat, $stock, $categorie_id, $image, $est_promo, $est_nouveau, $est_top, $id]);
-       
+        // ✅ REQUÊTE CORRIGÉE avec prix_achat et prix_old
+        $stmt = $pdo->prepare('UPDATE produits SET nom=?, description=?, prix=?, prix_achat=?, prix_old=?, stock=?, categorie_id=?, image=?, est_promo=?, est_nouveau=?, est_top=? WHERE id=?');
+        $stmt->execute([$nom, $description, $prix, $prix_achat, $prix_old, $stock, $categorie_id, $image, $est_promo, $est_nouveau, $est_top, $id]);
+        $succes = 'Produit modifié avec succès !';
         
         // Recharger les données
         $stmt = $pdo->prepare('SELECT * FROM produits WHERE id = ?');
@@ -166,11 +167,6 @@ $stmt->execute([$nom, $description, $prix, $prix_achat, $stock, $categorie_id, $
                 </button>
             </div>
         </div>
-        <div class="form-group">
-    <label>Prix d'achat (€)</label>
-    <input type="number" name="prix_achat" step="0.01" value="<?= $produit['prix_achat'] ?>" />
-    <small style="color:rgba(255,255,255,0.3);">Prix que tu paies à CJ Dropshipping</small>
-</div>
     </nav>
 
     <!-- ===== CONTENU ===== -->
@@ -201,6 +197,13 @@ $stmt->execute([$nom, $description, $prix, $prix_achat, $stock, $categorie_id, $
                     <div class="form-group">
                         <label>Prix (€) <span class="required">*</span></label>
                         <input type="number" name="prix" step="0.01" required value="<?= $produit['prix'] ?>" />
+                    </div>
+
+                    <!-- ✅ PRIX D'ACHAT AJOUTÉ ICI (dans le formulaire) -->
+                    <div class="form-group">
+                        <label>Prix d'achat (€)</label>
+                        <input type="number" name="prix_achat" step="0.01" value="<?= $produit['prix_achat'] ?? '' ?>" />
+                        <small style="color:rgba(255,255,255,0.3);">Prix que tu paies à CJ Dropshipping</small>
                     </div>
                     
                     <div class="form-group">
