@@ -272,6 +272,19 @@ $user_role = $_SESSION['user_role'] ?? '';
 
                     <div class="product-short-desc">
     <?php 
+    $desc = $produit['description_longue'] ?? '';
+    if (empty($desc)) {
+        $desc = $produit['description'] ?? '';
+        // Nettoyer la description courte
+        $desc = preg_replace('/SKU: [^\|]+\| Entrepôt: [^\|]+\| Couleur: [^\|]+\| Livraison: [0-9.,]+\s*€/', '', $desc);
+        $desc = trim($desc);
+        if (empty($desc)) {
+            $desc = 'Aucune description disponible.';
+        }
+    }
+    echo nl2br(htmlspecialchars($desc));
+    ?>
+</div>
     $desc = $produit['description'] ?? 'Aucune description disponible.';
     // Nettoyer la description pour enlever les infos techniques
     $desc_propre = preg_replace('/SKU: [^\|]+\| Entrepôt: [^\|]+\| Couleur: [^\|]+\| Livraison: [0-9.,]+\s*€/', '', $desc);
