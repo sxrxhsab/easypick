@@ -1,7 +1,17 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require_once __DIR__ . '/db.php';
+ob_start();
+session_start();
+require_once 'db.php';
+
+// Fonction de traduction
+if (!function_exists('__')) {
+    function __($text) {
+        return $text;
+    }
+}
+
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
@@ -19,15 +29,17 @@ if (!$produit) {
     exit;
 }
 
-// Récupérer les produits similaires (même catégorie)
+// ✅ CORRECTION : RANDOM() au lieu de RAND()
 $stmt = $pdo->prepare('SELECT * FROM produits WHERE categorie_id = ? AND id != ? ORDER BY RANDOM() LIMIT 4');
 $stmt->execute([$produit['categorie_id'], $id]);
 $similaires = $stmt->fetchAll();
 
-// Nombre d'articles dans le panier
-$nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
+// Récupérer les avis
+$stmt = $pdo->prepare('SELECT * FROM avis WHERE produit_id = ? ORDER BY created_at DESC');
+$stmt->execute([$id]);
+$avis = $stmt->fetchAll();
 
-// Variables pour la navbar
+$nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
 ?>
@@ -37,12 +49,10 @@ $user_role = $_SESSION['user_role'] ?? '';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EasyPick – <?= htmlspecialchars($produit['nom']) ?></title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #151515; color: #fff; overflow-x: hidden; }
@@ -169,21 +179,21 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="nav-container">
             <a href="index.php" class="logo-text"><span class="easy">EASY</span><span class="pick">PICK</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.php"><?= __('accueil') ?></a></li>
-                <li><a href="boutique.php"><?= __('boutique') ?></a></li>
-                <li><a href="nouveautes.php"><?= __('nouveautes') ?></a></li>
-                <li><a href="promotions.php"><?= __('promotions') ?></a></li>
-                <li><a href="contact.php"><?= __('contact') ?></a></li>
+                <li><a href="index.php">Accueil</a></li>
+                <li><a href="boutique.php">Boutique</a></li>
+                <li><a href="nouveautes.php">Nouveautés</a></li>
+                <li><a href="promotions.php">Promotions</a></li>
+                <li><a href="contact.php">Contact</a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" aria-label="Recherche"><i class="fas fa-search"></i></a>
                 <a href="#" aria-label="Favoris"><i class="far fa-heart"></i></a>
                 <?php if ($user_connecte): ?>
-                    <a href="mon-compte.php" aria-label='<?= __('mon_compte') ?>'><i class="fas fa-user"></i></a>
+                    <a href="mon-compte.php" aria-label="Mon compte"><i class="fas fa-user"></i></a>
                 <?php else: ?>
-                    <a href="login.php" aria-label='<?= __('connexion') ?>'><i class="fas fa-user"></i></a>
+                    <a href="login.php" aria-label="Connexion"><i class="fas fa-user"></i></a>
                 <?php endif; ?>
-                <a href="panier.php" aria-label='<?= __('panier') ?>' style="position:relative;">
+                <a href="panier.php" aria-label="Panier" style="position:relative;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge"><?= $nb_articles ?></span>
                 </a>
@@ -202,9 +212,9 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="container">
             <h1><span class="orange">FICHE</span> PRODUIT</h1>
             <div class="breadcrumb">
-                <a href="index.php"><?= __('accueil') ?></a>
+                <a href="index.php">Accueil</a>
                 <span class="sep"><i class="fas fa-chevron-right"></i></span>
-                <a href="boutique.php"><?= __('boutique') ?></a>
+                <a href="boutique.php">Boutique</a>
                 <span class="sep"><i class="fas fa-chevron-right"></i></span>
                 <span class="current"><?= htmlspecialchars($produit['nom']) ?></span>
             </div>
@@ -219,10 +229,10 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <!-- Galerie -->
                 <div class="product-gallery">
                     <div class="main-image">
-                        <img id="mainImage" src="<?= htmlspecialchars($produit['image']) ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
+                        <img id="mainImage" src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
                     </div>
                     <div class="thumbnails">
-                        <img src="<?= htmlspecialchars($produit['image']) ?>" alt="Vue principale" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image']) ?>')" />
+                        <img src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>" alt="Vue principale" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>')" />
                         <?php 
                         $images = json_decode($produit['images'], true);
                         if ($images && is_array($images)):
@@ -249,7 +259,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                             }
                             ?>
                         </div>
-                        <span class="reviews-count"><?= number_format($produit['note'], 1, ',', ' ') ?>/5 – <a href="#reviews"><?= $produit['nb_avis'] ?> <?= __('avis') ?></a></span>
+                        <span class="reviews-count"><?= number_format($produit['note'], 1, ',', ' ') ?>/5 – <a href="#reviews"><?= $produit['nb_avis'] ?> avis</a></span>
                     </div>
 
                     <div class="product-price">
@@ -271,16 +281,16 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <button onclick="updateQty(1)">+</button>
                         </div>
                         <a href="panier-ajouter.php?id=<?= $produit['id'] ?>&qte=1" class="btn-add-cart">
-                            <i class="fas fa-shopping-cart"></i> <?= __('ajouter') ?> au <?= __('panier') ?>
+                            <i class="fas fa-shopping-cart"></i> Ajouter au panier
                         </a>
-                        <button class="btn-buy-now" onclick="buyNow()"><?= __('acheter_maintenant') ?></button>
+                        <button class="btn-buy-now" onclick="buyNow()">Acheter maintenant</button>
                     </div>
 
                     <div class="product-extras">
-                        <span class="extra-item"><i class="fas fa-truck"></i> <?= __('livraison') ?> offerte</span>
+                        <span class="extra-item"><i class="fas fa-truck"></i> Livraison offerte</span>
                         <span class="extra-item"><i class="fas fa-undo-alt"></i> Retours sous 30 jours</span>
                         <span class="extra-item"><i class="fas fa-shield-alt"></i> Garantie 2 ans</span>
-                        <span class="extra-item"><i class="fas fa-check-circle in-stock"></i> <?= __('en_stock') ?> (<?= $produit['stock'] ?> unités)</span>
+                        <span class="extra-item"><i class="fas fa-check-circle in-stock"></i> En stock (<?= $produit['stock'] ?> unités)</span>
                     </div>
 
                     <!-- Onglets -->
@@ -288,7 +298,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <div class="tabs-nav">
                             <button class="active" data-tab="desc">Description</button>
                             <button data-tab="specs">Caractéristiques</button>
-                            <button data-tab="reviews" id="reviews"><?= __('avis') ?> clients</button>
+                            <button data-tab="reviews" id="reviews">Avis clients</button>
                         </div>
                         <div class="tab-content">
 
@@ -303,21 +313,14 @@ $user_role = $_SESSION['user_role'] ?? '';
                                     <li><strong>Catégorie</strong> <?= $produit['categorie_id'] ?></li>
                                     <li><strong>Stock</strong> <?= $produit['stock'] ?> unités</li>
                                     <li><strong>Note</strong> <?= number_format($produit['note'], 1, ',', ' ') ?>/5</li>
-                                    <li><strong>Nombre d'<?= __('avis') ?></strong> <?= $produit['nb_avis'] ?></li>
+                                    <li><strong>Nombre d'avis</strong> <?= $produit['nb_avis'] ?></li>
                                 </ul>
                             </div>
 
-                            <!-- ✅ SECTION AVIS CORRIGÉE -->
+                            <!-- SECTION AVIS -->
                             <div class="tab-pane" id="tab-reviews">
-                                <?php
-                                // Récupérer les avis du produit
-                                $stmt = $pdo->prepare('SELECT * FROM avis WHERE produit_id = ? ORDER BY created_at DESC');
-                                $stmt->execute([$id]);
-                                $avis = $stmt->fetchAll();
-                                ?>
-
                                 <?php if (empty($avis)): ?>
-                                    <p style="color:rgba(255,255,255,0.4);">Aucun <?= __('avis') ?> pour le moment. Soyez le premier à donner votre <?= __('avis') ?> !</p>
+                                    <p style="color:rgba(255,255,255,0.4);">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
                                 <?php else: ?>
                                     <?php foreach ($avis as $a): ?>
                                     <div class="review-item">
@@ -340,7 +343,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                                     <?php endforeach; ?>
                                 <?php endif; ?>
 
-                                <!-- ✅ Messages de succès/erreur -->
+                                <!-- Messages de succès/erreur -->
                                 <?php if (isset($_SESSION['succes_avis'])): ?>
                                     <div style="background:rgba(0,184,148,0.1); border:1px solid rgba(0,184,148,0.2); color:#00b894; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
                                         <?= htmlspecialchars($_SESSION['succes_avis']) ?>
@@ -354,14 +357,14 @@ $user_role = $_SESSION['user_role'] ?? '';
                                     </div>
                                 <?php endif; ?>
 
-                                <!-- ✅ Formulaire accessible à TOUS (même sans compte) -->
+                                <!-- Formulaire d'avis -->
                                 <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
-                                    <h4 style="font-size:18px; font-weight:700; margin-bottom:12px;"><?= __('donner_votre_avis') ?></h4>
+                                    <h4 style="font-size:18px; font-weight:700; margin-bottom:12px;">Donnez votre avis</h4>
                                     <form method="POST" action="ajouter-avis.php">
                                         <input type="hidden" name="produit_id" value="<?= $produit['id'] ?>" />
 
                                         <div class="form-group" style="margin-bottom:12px;">
-                                            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Votre <?= __('nom') ?> *</label>
+                                            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:4px; color:rgba(255,255,255,0.7);">Votre nom *</label>
                                             <input type="text" name="nom" required placeholder="Votre nom" style="width:100%; padding:12px 16px; background:#0F0F0F; border:1px solid rgba(255,255,255,0.06); border-radius:12px; color:#fff; font-size:14px; font-family:'Poppins', sans-serif; outline:none;" />
                                         </div>
 
@@ -381,14 +384,12 @@ $user_role = $_SESSION['user_role'] ?? '';
                                         </div>
 
                                         <button type="submit" style="padding:10px 24px; background:linear-gradient(135deg, #ff6a00, #ff7d1a); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.3s; font-family:'Poppins', sans-serif;">
-                                            <i class="fas fa-paper-plane"></i> <?= __('publier') ?> mon <?= __('avis') ?>
+                                            <i class="fas fa-paper-plane"></i> Publier mon avis
                                         </button>
                                     </form>
                                 </div>
 
                             </div>
-                            <!-- FIN SECTION AVIS -->
-
                         </div>
                     </div>
                 </div>
@@ -404,7 +405,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             <div class="related-grid">
                 <?php foreach ($similaires as $similaire): ?>
                 <div class="related-card">
-                    <img src="<?= htmlspecialchars($similaire['image']) ?>" alt="<?= htmlspecialchars($similaire['nom']) ?>" />
+                    <img src="<?= htmlspecialchars($similaire['image'] ?? 'https://picsum.photos/seed/' . $similaire['id'] . '/300/200') ?>" alt="<?= htmlspecialchars($similaire['nom']) ?>" />
                     <h4><?= htmlspecialchars($similaire['nom']) ?></h4>
                     <div class="related-price">
                         <?php if ($similaire['prix_old']): ?>
@@ -423,7 +424,7 @@ $user_role = $_SESSION['user_role'] ?? '';
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 EasyPick – <?= __('tous_droits_reserves') ?>. <?= __('design_par') ?> <a href="#">Sarah Sabeur</a>.</p>
+            <p>&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.</p>
         </div>
     </footer>
 
@@ -431,7 +432,9 @@ $user_role = $_SESSION['user_role'] ?? '';
         // Hamburger
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
 
         // Galerie
         function changeImage(thumb, src) {
@@ -481,6 +484,6 @@ $user_role = $_SESSION['user_role'] ?? '';
             });
         }
     </script>
-<?php include __DIR__ . '/footer.php'; ?>
+
 </body>
 </html>
