@@ -270,31 +270,21 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <?php endif; ?>
                     </div>
 
+                    <!-- ✅ DESCRIPTION CORRIGÉE (UN SEUL BLOC PHP) -->
                     <div class="product-short-desc">
-    <?php 
-    $desc = $produit['description_longue'] ?? '';
-    if (empty($desc)) {
-        $desc = $produit['description'] ?? '';
-        // Nettoyer la description courte
-        $desc = preg_replace('/SKU: [^\|]+\| Entrepôt: [^\|]+\| Couleur: [^\|]+\| Livraison: [0-9.,]+\s*€/', '', $desc);
-        $desc = trim($desc);
-        if (empty($desc)) {
-            $desc = 'Aucune description disponible.';
-        }
-    }
-    echo nl2br(htmlspecialchars($desc));
-    ?>
-</div>
-    $desc = $produit['description'] ?? 'Aucune description disponible.';
-    // Nettoyer la description pour enlever les infos techniques
-    $desc_propre = preg_replace('/SKU: [^\|]+\| Entrepôt: [^\|]+\| Couleur: [^\|]+\| Livraison: [0-9.,]+\s*€/', '', $desc);
-    $desc_propre = trim($desc_propre);
-    if (empty($desc_propre)) {
-        $desc_propre = 'Aucune description disponible.';
-    }
-    echo nl2br(htmlspecialchars($desc_propre));
-    ?>
-</div>
+                        <?php 
+                        $desc = $produit['description_longue'] ?? '';
+                        if (empty($desc)) {
+                            $desc = $produit['description'] ?? '';
+                            $desc = preg_replace('/SKU: [^\|]+\| Entrepôt: [^\|]+\| Couleur: [^\|]+\| Livraison: [0-9.,]+\s*€/', '', $desc);
+                            $desc = trim($desc);
+                            if (empty($desc)) {
+                                $desc = 'Aucune description disponible.';
+                            }
+                        }
+                        echo nl2br(htmlspecialchars($desc));
+                        ?>
+                    </div>
 
                     <div class="product-actions">
                         <div class="qty-selector">
@@ -330,14 +320,14 @@ $user_role = $_SESSION['user_role'] ?? '';
                             </div>
 
                             <div class="tab-pane" id="tab-specs">
-                                 <ul>
-        <li><strong>Référence</strong> EAS-<?= str_pad($produit['id'], 4, '0', STR_PAD_LEFT) ?></li>
-        <li><strong>SKU</strong> <?= htmlspecialchars($produit['sku'] ?? 'Non défini') ?></li>
-        <li><strong>Catégorie</strong> <?= $produit['categorie_id'] ?></li>
-        <li><strong>Stock</strong> <?= $produit['stock'] ?> unités</li>
-        <li><strong>Note</strong> <?= number_format($produit['note'], 1, ',', ' ') ?>/5</li>
-        <li><strong>Nombre d'avis</strong> <?= $produit['nb_avis'] ?></li>
-    </ul>
+                                <ul>
+                                    <li><strong>Référence</strong> EAS-<?= str_pad($produit['id'], 4, '0', STR_PAD_LEFT) ?></li>
+                                    <li><strong>SKU</strong> <?= htmlspecialchars($produit['sku'] ?? 'Non défini') ?></li>
+                                    <li><strong>Catégorie</strong> <?= $produit['categorie_id'] ?></li>
+                                    <li><strong>Stock</strong> <?= $produit['stock'] ?> unités</li>
+                                    <li><strong>Note</strong> <?= number_format($produit['note'], 1, ',', ' ') ?>/5</li>
+                                    <li><strong>Nombre d'avis</strong> <?= $produit['nb_avis'] ?></li>
+                                </ul>
                             </div>
 
                             <!-- SECTION AVIS -->
