@@ -42,6 +42,17 @@ $avis = $stmt->fetchAll();
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
+
+// ✅ Calcul du prix total (produit + livraison)
+$prix_achat = $produit['prix_achat'] ?? 0;
+$prix_vente = $produit['prix'] ?? 0;
+$frais_livraison = 0;
+
+// Si prix_achat > prix_vente, la différence est la livraison
+if ($prix_achat > $prix_vente) {
+    $frais_livraison = $prix_achat - $prix_vente;
+}
+$prix_total = $prix_vente + $frais_livraison;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -104,10 +115,11 @@ $user_role = $_SESSION['user_role'] ?? '';
         .product-info .product-rating .stars .grey { color: #444; }
         .product-info .product-rating .reviews-count { color: rgba(255,255,255,0.4); font-size: 14px; }
         .product-info .product-rating .reviews-count a { color: #ff6a00; }
-        .product-info .product-price { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+        .product-info .product-price { display: flex; flex-direction: column; gap: 4px; margin-bottom: 18px; }
         .product-info .product-price .current { font-size: 36px; font-weight: 900; color: #ff6a00; letter-spacing: -0.5px; }
         .product-info .product-price .old { font-size: 20px; color: rgba(255,255,255,0.2); text-decoration: line-through; }
         .product-info .product-price .discount { background: rgba(255,106,0,0.15); color: #ff6a00; padding: 4px 14px; border-radius: 30px; font-size: 13px; font-weight: 700; }
+        .product-info .product-price .shipping-fee { font-size: 14px; color: rgba(255,255,255,0.3); }
         .product-info .product-short-desc { color: rgba(255,255,255,0.6); font-size: 16px; line-height: 1.7; margin-bottom: 25px; border-left: 3px solid #ff6a00; padding-left: 16px; }
         .product-actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 25px; }
         .qty-selector { display: flex; align-items: center; background: #1A1A1A; border-radius: 60px; border: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
@@ -262,15 +274,23 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <span class="reviews-count"><?= number_format($produit['note'], 1, ',', ' ') ?>/5 – <a href="#reviews"><?= $produit['nb_avis'] ?> avis</a></span>
                     </div>
 
+                    <!-- ✅ PRIX AVEC FRAIS DE LIVRAISON -->
                     <div class="product-price">
-                        <span class="current"><?= number_format($produit['prix'], 2, ',', ' ') ?> €</span>
-                        <?php if ($produit['prix_old']): ?>
-                            <span class="old"><?= number_format($produit['prix_old'], 2, ',', ' ') ?> €</span>
-                            <span class="discount">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
+                        <div>
+                            <span class="current"><?= number_format($prix_total, 2, ',', ' ') ?> €</span>
+                            <?php if ($produit['prix_old']): ?>
+                                <span class="old"><?= number_format($produit['prix_old'], 2, ',', ' ') ?> €</span>
+                                <span class="discount">-<?= round((1 - $produit['prix'] / $produit['prix_old']) * 100) ?>%</span>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($frais_livraison > 0): ?>
+                            <div class="shipping-fee">(+ <?= number_format($frais_livraison, 2, ',', ' ') ?> € de frais de livraison)</div>
+                        <?php else: ?>
+                            <div class="shipping-fee" style="color:#00b894;">✅ Livraison offerte</div>
                         <?php endif; ?>
                     </div>
 
-                    <!-- ✅ DESCRIPTION CORRIGÉE (UN SEUL BLOC PHP) -->
+                    <!-- ✅ DESCRIPTION CORRIGÉE -->
                     <div class="product-short-desc">
                         <?php 
                         $desc = $produit['description_longue'] ?? '';
