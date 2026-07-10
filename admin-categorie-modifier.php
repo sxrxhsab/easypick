@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ob_start();
 session_start();
 require_once 'db.php';
 
@@ -28,7 +29,7 @@ $erreur = '';
 $succes = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = trim($_POST['nom']);
+    $nom = trim($_POST['nom'] ?? '');
     $slug = strtolower(trim(str_replace(' ', '-', $nom)));
 
     if (empty($nom)) {
@@ -51,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><?= __('modifier') ?> la catégorie</title>
+    <title>Modifier la catégorie</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -67,9 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .navbar-simple .logo-text { font-weight: 900; font-size: 22px; letter-spacing: 1px; }
         .navbar-simple .logo-text .easy { color: #ff6a00; }
         .navbar-simple .logo-text .pick { color: #fff; }
-        .navbar-simple .nav-icons { display: flex; gap: 20px; }
+        .navbar-simple .nav-menu { display: flex; align-items: center; gap: 30px; list-style: none; }
+        .navbar-simple .nav-menu li a { font-weight: 500; font-size: 14px; color: rgba(255,255,255,0.6); transition: color 0.3s; padding: 4px 0; position: relative; }
+        .navbar-simple .nav-menu li a::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 0; height: 2px; background: #ff6a00; border-radius: 10px; transition: width 0.3s; }
+        .navbar-simple .nav-menu li a:hover { color: #fff; }
+        .navbar-simple .nav-menu li a:hover::after { width: 100%; }
+        .navbar-simple .nav-menu li a.active { color: #fff; }
+        .navbar-simple .nav-menu li a.active::after { width: 100%; }
+        .navbar-simple .nav-icons { display: flex; gap: 20px; align-items: center; }
         .navbar-simple .nav-icons a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.3s; }
         .navbar-simple .nav-icons a:hover { color: #ff6a00; }
+        .navbar-simple .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
+        .navbar-simple .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 10px; transition: 0.3s; }
 
         .section { padding: 40px 0 80px; }
         .form-box { background: #1A1A1A; padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); }
@@ -78,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-box .sub { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 20px; }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; color: rgba(255,255,255,0.7); }
+        .form-group label .required { color: #ff6a00; }
         .form-group input { width: 100%; padding: 12px 16px; background: #0F0F0F; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; color: #fff; font-size: 14px; font-family: 'Poppins', sans-serif; outline: none; transition: border-color 0.3s; }
         .form-group input:focus { border-color: #ff6a00; box-shadow: 0 0 0 3px rgba(255,106,0,0.06); }
         .btn-submit { padding: 12px 30px; background: linear-gradient(135deg, #ff6a00, #ff7d1a); color: #fff; border: none; border-radius: 14px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
@@ -87,22 +98,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .back-link { display: inline-block; margin-top: 16px; color: rgba(255,255,255,0.3); transition: color 0.3s; }
         .back-link:hover { color: #fff; }
 
-        @media (max-width: 768px) { .container { padding: 0 16px; } .form-box { padding: 20px; } }
+        @media (max-width: 768px) { .container { padding: 0 16px; } .form-box { padding: 20px; }
+            .navbar-simple { height: 60px; padding: 0 16px; }
+            .navbar-simple .logo-text { font-size: 18px; }
+            .navbar-simple .nav-menu { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; width: 100%; background: #181818; padding: 24px 20px; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+            .navbar-simple .nav-menu.open { display: flex; }
+            .navbar-simple .nav-menu li a { font-size: 16px; color: rgba(255,255,255,0.7); }
+            .navbar-simple .hamburger { display: flex; }
+            .navbar-simple .nav-icons { gap: 14px; }
+            .navbar-simple .nav-icons a { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
 
-    <?php
-    $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
-    $user_connecte = isset($_SESSION['user_id']);
-    $user_role = $_SESSION['user_role'] ?? '';
-    include 'header.php';
-    ?>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar-simple">
+        <div class="nav-container">
+            <div class="logo-text">
+                <span class="easy">EASY</span><span class="pick">PICK</span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="admin.php">Dashboard</a></li>
+                <li><a href="admin-produits.php">Produits</a></li>
+                <li><a href="admin-categories.php" class="active">Catégories</a></li>
+                <li><a href="admin-commandes.php">Commandes</a></li>
+                <li><a href="admin-utilisateurs.php">Utilisateurs</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="index.php"><i class="fas fa-home"></i></a>
+                <a href="logout.php"><i class="fas fa-sign-out-alt"></i></a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
+    <!-- ===== CONTENU ===== -->
     <section class="section">
         <div class="container">
             <div class="form-box">
-                <h2><?= __('modifier') ?> la <span>catégorie</span></h2>
+                <h2>Modifier la <span>catégorie</span></h2>
                 <div class="sub">ID #<?= $categorie['id'] ?> – <?= htmlspecialchars($categorie['nom']) ?></div>
 
                 <?php if ($erreur): ?>
@@ -114,10 +151,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form method="POST">
                     <div class="form-group">
-                        <label><?= __('nom') ?> de la catégorie *</label>
-                        <input type="text" name="<?= __('nom') ?>" required value="<?= htmlspecialchars($categorie['nom']) ?>" />
+                        <label>Nom de la catégorie <span class="required">*</span></label>
+                        <input type="text" name="nom" required value="<?= htmlspecialchars($categorie['nom']) ?>" />
                     </div>
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> <?= __('enregistrer') ?></button>
+                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Enregistrer</button>
                 </form>
 
                 <div style="margin-top:16px;">
@@ -130,7 +167,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
     </script>
 
 </body>
