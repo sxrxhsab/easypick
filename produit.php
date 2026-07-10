@@ -2,8 +2,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/db.php';
-
-// Récupérer l'ID du produit depuis l'URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
@@ -22,7 +20,7 @@ if (!$produit) {
 }
 
 // Récupérer les produits similaires (même catégorie)
-$stmt = $pdo->prepare('SELECT * FROM produits WHERE categorie_id = ? AND id != ? ORDER BY RAND() LIMIT 4');
+$stmt = $pdo->prepare('SELECT * FROM produits WHERE categorie_id = ? AND id != ? ORDER BY RANDOM() LIMIT 4');
 $stmt->execute([$produit['categorie_id'], $id]);
 $similaires = $stmt->fetchAll();
 
