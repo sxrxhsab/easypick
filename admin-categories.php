@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ob_start();
 session_start();
 require_once 'db.php';
 
@@ -15,13 +16,17 @@ $categories = $pdo->query('SELECT * FROM categories ORDER BY nom')->fetchAll();
 $nb_articles = isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0;
 $user_connecte = isset($_SESSION['user_id']);
 $user_role = $_SESSION['user_role'] ?? '';
+
+// Récupérer le message de session
+$message = $_SESSION['message'] ?? '';
+unset($_SESSION['message']);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EasyPick – Admin <?= __('categories') ?></title>
+    <title>EasyPick – Gestion des catégories</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
@@ -42,7 +47,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .navbar-simple .nav-menu li a::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 0; height: 2px; background: #ff6a00; border-radius: 10px; transition: width 0.3s; }
         .navbar-simple .nav-menu li a:hover { color: #fff; }
         .navbar-simple .nav-menu li a:hover::after { width: 100%; }
-        .navbar-simple .nav-icons { display: flex; gap: 20px; }
+        .navbar-simple .nav-icons { display: flex; gap: 20px; align-items: center; }
         .navbar-simple .nav-icons a { color: rgba(255,255,255,0.6); font-size: 18px; transition: color 0.3s; position: relative; }
         .navbar-simple .nav-icons a:hover { color: #ff6a00; }
         .navbar-simple .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; padding: 4px; }
@@ -59,6 +64,10 @@ $user_role = $_SESSION['user_role'] ?? '';
         .admin-menu a:hover { background: rgba(255,106,0,0.1); border-color: rgba(255,106,0,0.2); color: #ff6a00; }
         .admin-menu a.active { background: rgba(255,106,0,0.1); border-color: #ff6a00; color: #ff6a00; }
 
+        .message { padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; }
+        .message.success { background: rgba(0,184,148,0.1); border: 1px solid rgba(0,184,148,0.2); color: #00b894; }
+        .message.error { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.2); color: #ff4444; }
+
         .table-wrap { overflow-x: auto; background: #1A1A1A; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); padding: 10px; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 14px 16px; color: rgba(255,255,255,0.3); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -72,6 +81,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .btn-delete:hover { background: rgba(255,68,68,0.2); }
         .btn-add { display: inline-block; padding: 10px 24px; background: #ff6a00; color: #fff; border-radius: 12px; font-weight: 700; transition: all 0.3s; margin-bottom: 20px; }
         .btn-add:hover { background: #ff7d1a; transform: scale(1.02); box-shadow: 0 8px 25px rgba(255,106,0,0.2); }
+        .badge-count { background: rgba(255,106,0,0.12); color: #ff6a00; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 8px; }
 
         @media (max-width: 768px) {
             .navbar-simple { height: 60px; padding: 0 16px; }
@@ -93,8 +103,8 @@ $user_role = $_SESSION['user_role'] ?? '';
 
     <section class="admin-hero">
         <div class="container">
-            <h1>Gestion des <span><?= __('categories') ?></span></h1>
-            <p>Ajoutez, modifiez ou supprimez des <?= __('categories') ?> de <?= __('produits') ?>.</p>
+            <h1>Gestion des <span>Catégories</span></h1>
+            <p>Ajoutez, modifiez ou supprimez des catégories de produits.</p>
         </div>
     </section>
 
@@ -102,14 +112,18 @@ $user_role = $_SESSION['user_role'] ?? '';
         <div class="container">
 
             <div class="admin-menu">
-                <a href="admin.php"><i class="fas fa-chart-pie"></i> <?= __('tableau_de_bord') ?></a>
-                <a href="admin-produits.php"><i class="fas fa-box"></i> <?= __('produits') ?></a>
-                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> <?= __('commandes') ?></a>
-                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> <?= __('utilisateurs') ?></a>
-                <a href="admin-categories.php" class="active"><i class="fas fa-tags"></i> <?= __('categories') ?></a>
+                <a href="admin.php"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
+                <a href="admin-produits.php"><i class="fas fa-box"></i> Produits</a>
+                <a href="admin-categories.php" class="active"><i class="fas fa-tags"></i> Catégories</a>
+                <a href="admin-commandes.php"><i class="fas fa-shopping-bag"></i> Commandes</a>
+                <a href="admin-utilisateurs.php"><i class="fas fa-users"></i> Utilisateurs</a>
             </div>
 
-            <a href="admin-categorie-ajouter.php" class="btn-add"><i class="fas fa-plus"></i> <?= __('ajouter') ?> une catégorie</a>
+            <?php if ($message): ?>
+                <div class="message success"><?= htmlspecialchars($message) ?></div>
+            <?php endif; ?>
+
+            <a href="admin-categorie-ajouter.php" class="btn-add"><i class="fas fa-plus"></i> Ajouter une catégorie</a>
 
             <div class="table-wrap">
                 <?php if (empty($categories)): ?>
@@ -119,9 +133,8 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th><?= __('nom') ?></th>
-                                <th>Slug</th>
-                                <th><?= __('produits') ?> associés</th>
+                                <th>Nom</th>
+                                <th>Produits associés</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -133,12 +146,11 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <tr>
                                 <td><?= $cat['id'] ?></td>
                                 <td><strong><?= htmlspecialchars($cat['nom']) ?></strong></td>
-                                <td><?= htmlspecialchars($cat['slug']) ?></td>
-                                <td><?= $nb_produits ?></td>
+                                <td><span class="badge-count"><?= $nb_produits ?></span></td>
                                 <td>
                                     <div class="btn-actions">
-                                        <a href="admin-categorie-<?= __('modifier') ?>.php?id=<?= $cat['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> <?= __('modifier') ?></a>
-                                        <a href="admin-categorie-<?= __('supprimer') ?>.php?id=<?= $cat['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cette catégorie ? Les produits ne seront pas supprimés.')"><i class="fas fa-trash"></i> <?= __('supprimer') ?></a>
+                                        <a href="admin-categorie-modifier.php?id=<?= $cat['id'] ?>" class="btn-edit"><i class="fas fa-edit"></i> Modifier</a>
+                                        <a href="admin-categorie-supprimer.php?id=<?= $cat['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer cette catégorie ? Les produits ne seront pas supprimés.')"><i class="fas fa-trash"></i> Supprimer</a>
                                     </div>
                                 </td>
                             </tr>
@@ -151,10 +163,16 @@ $user_role = $_SESSION['user_role'] ?? '';
         </div>
     </section>
 
+    <footer style="background:#0F0F0F; padding:30px 0 20px; border-top:1px solid rgba(255,255,255,0.04); text-align:center; color:rgba(255,255,255,0.12); font-size:13px;">
+        <div class="container">&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#" style="color:#ff6a00;">Samy Sabeur</a>.</div>
+    </footer>
+
     <script>
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        if (hamburger && navMenu) {
+            hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+        }
     </script>
 
 </body>
