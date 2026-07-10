@@ -297,21 +297,34 @@ $produits = $stmt->fetchAll();
                             <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
                         <?php endif; ?>
 
+                        <!-- ===== FILTRES CATÉGORIES (UN SEUL BLOC) ===== -->
                         <div class="filter-block active-filter">
                             <h4 onclick="toggleFilter(this)" data-i18n="categories">Catégories <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <ul>
                                     <?php
-                                    $categories = $pdo->query('SELECT * FROM categories')->fetchAll();
+                                    $categories = $pdo->query('SELECT * FROM categories ORDER BY nom')->fetchAll();
                                     foreach ($categories as $cat):
                                         $checked = ($categorie == $cat['id']) ? 'checked' : '';
+                                        $count = $pdo->query('SELECT COUNT(*) FROM produits WHERE categorie_id = ' . $cat['id'])->fetchColumn();
+                                        if ($count > 0): // Afficher uniquement les catégories avec des produits
                                     ?>
-                                        <li><label><input type="checkbox" name="categorie" value="<?= $cat['id'] ?>" <?= $checked ?> onchange="this.form.submit()"> <?= htmlspecialchars($cat['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE categorie_id = ' . $cat['id'])->fetchColumn() ?>)</span></label></li>
-                                    <?php endforeach; ?>
+                                        <li>
+                                            <label>
+                                                <input type="checkbox" name="categorie" value="<?= $cat['id'] ?>" <?= $checked ?> onchange="this.form.submit()">
+                                                <?= htmlspecialchars($cat['nom']) ?>
+                                                <span class="count">(<?= $count ?>)</span>
+                                            </label>
+                                        </li>
+                                    <?php 
+                                        endif;
+                                    endforeach; 
+                                    ?>
                                 </ul>
                             </div>
                         </div>
 
+                        <!-- ===== FILTRE PRIX ===== -->
                         <div class="filter-block">
                             <h4 onclick="toggleFilter(this)" data-i18n="prix">Prix <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
@@ -326,21 +339,34 @@ $produits = $stmt->fetchAll();
                             </div>
                         </div>
 
+                        <!-- ===== FILTRES MARQUES (UN SEUL BLOC) ===== -->
                         <div class="filter-block">
                             <h4 onclick="toggleFilter(this)" data-i18n="marques">Marques <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
                                 <ul>
                                     <?php
-                                    $marques = $pdo->query('SELECT * FROM marques')->fetchAll();
+                                    $marques = $pdo->query('SELECT * FROM marques ORDER BY nom')->fetchAll();
                                     foreach ($marques as $m):
                                         $checked = ($marque == $m['id']) ? 'checked' : '';
+                                        $count = $pdo->query('SELECT COUNT(*) FROM produits WHERE marque_id = ' . $m['id'])->fetchColumn();
+                                        if ($count > 0): // Afficher uniquement les marques avec des produits
                                     ?>
-                                        <li><label><input type="checkbox" name="marque" value="<?= $m['id'] ?>" <?= $checked ?> onchange="this.form.submit()"> <?= htmlspecialchars($m['nom']) ?> <span class="count">(<?= $pdo->query('SELECT COUNT(*) FROM produits WHERE marque_id = ' . $m['id'])->fetchColumn() ?>)</span></label></li>
-                                    <?php endforeach; ?>
+                                        <li>
+                                            <label>
+                                                <input type="checkbox" name="marque" value="<?= $m['id'] ?>" <?= $checked ?> onchange="this.form.submit()">
+                                                <?= htmlspecialchars($m['nom']) ?>
+                                                <span class="count">(<?= $count ?>)</span>
+                                            </label>
+                                        </li>
+                                    <?php 
+                                        endif;
+                                    endforeach; 
+                                    ?>
                                 </ul>
                             </div>
                         </div>
 
+                        <!-- ===== FILTRE NOTE ===== -->
                         <div class="filter-block">
                             <h4 onclick="toggleFilter(this)" data-i18n="note_minimale">Note minimale <i class="fas fa-chevron-down"></i></h4>
                             <div class="filter-content">
@@ -478,15 +504,14 @@ $produits = $stmt->fetchAll();
         }
 
         // ===== FAVORIS =====
-       // ===== FAVORIS =====
-function toggleFav(productId, btn) {
-    const icon = btn.querySelector('i');
-    if (icon.classList.contains('fas')) {
-        window.location.href = 'wishlist-supprimer.php?id=' + productId;
-    } else {
-        window.location.href = 'wishlist-ajouter.php?id=' + productId;
-    }
-}
+        function toggleFav(productId, btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('fas')) {
+                window.location.href = 'wishlist-supprimer.php?id=' + productId;
+            } else {
+                window.location.href = 'wishlist-ajouter.php?id=' + productId;
+            }
+        }
 
         // ===== APERÇU RAPIDE =====
         function quickView(btn) {
