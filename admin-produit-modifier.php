@@ -33,12 +33,15 @@ $succes = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = trim($_POST['nom'] ?? '');
     $description = trim($_POST['description'] ?? '');
+    $description_longue = trim($_POST['description_longue'] ?? '');
+    $sku = trim($_POST['sku'] ?? '');
     $prix = (float) ($_POST['prix'] ?? 0);
-    $prix_achat = !empty($_POST['prix_achat']) ? (float) $_POST['prix_achat'] : null; // ✅ AJOUTÉ
+    $prix_achat = !empty($_POST['prix_achat']) ? (float) $_POST['prix_achat'] : null;
     $prix_old = !empty($_POST['prix_old']) ? (float) $_POST['prix_old'] : null;
     $stock = (int) ($_POST['stock'] ?? 0);
     $categorie_id = (int) ($_POST['categorie_id'] ?? 0);
     $image = trim($_POST['image'] ?? '');
+    $images = trim($_POST['images'] ?? '');
     $est_promo = isset($_POST['est_promo']) ? 1 : 0;
     $est_nouveau = isset($_POST['est_nouveau']) ? 1 : 0;
     $est_top = isset($_POST['est_top']) ? 1 : 0;
@@ -46,9 +49,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nom) || empty($description) || $prix <= 0 || empty($image)) {
         $erreur = 'Veuillez remplir tous les champs obligatoires.';
     } else {
-        // ✅ REQUÊTE CORRIGÉE avec prix_achat et prix_old
-        $stmt = $pdo->prepare('UPDATE produits SET nom=?, description=?, prix=?, prix_achat=?, prix_old=?, stock=?, categorie_id=?, image=?, est_promo=?, est_nouveau=?, est_top=? WHERE id=?');
-        $stmt->execute([$nom, $description, $prix, $prix_achat, $prix_old, $stock, $categorie_id, $image, $est_promo, $est_nouveau, $est_top, $id]);
+        // ✅ REQUÊTE CORRIGÉE avec tous les champs
+        $stmt = $pdo->prepare('UPDATE produits SET 
+            nom=?, 
+            description=?, 
+            description_longue=?, 
+            sku=?, 
+            prix=?, 
+            prix_achat=?, 
+            prix_old=?, 
+            stock=?, 
+            categorie_id=?, 
+            image=?, 
+            images=?, 
+            est_promo=?, 
+            est_nouveau=?, 
+            est_top=? 
+            WHERE id=?');
+        
+        $stmt->execute([
+            $nom, 
+            $description, 
+            $description_longue, 
+            $sku, 
+            $prix, 
+            $prix_achat, 
+            $prix_old, 
+            $stock, 
+            $categorie_id, 
+            $image, 
+            $images, 
+            $est_promo, 
+            $est_nouveau, 
+            $est_top, 
+            $id
+        ]);
+        
         $succes = 'Produit modifié avec succès !';
         
         // Recharger les données
@@ -190,8 +226,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     
                     <div class="form-group">
-                        <label>Description <span class="required">*</span></label>
+                        <label>Description courte <span class="required">*</span></label>
                         <textarea name="description" required><?= htmlspecialchars($produit['description']) ?></textarea>
+                        <small>Description avec SKU, entrepôt, couleur, livraison</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description longue</label>
+                        <textarea name="description_longue" rows="6"><?= htmlspecialchars($produit['description_longue'] ?? '') ?></textarea>
+                        <small>Description complète pour la page produit</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>SKU</label>
+                        <input type="text" name="sku" value="<?= htmlspecialchars($produit['sku'] ?? '') ?>" />
+                        <small>Code SKU du produit chez CJ</small>
                     </div>
                     
                     <div class="form-group">
@@ -199,11 +248,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="number" name="prix" step="0.01" required value="<?= $produit['prix'] ?>" />
                     </div>
 
-                    <!-- ✅ PRIX D'ACHAT AJOUTÉ ICI (dans le formulaire) -->
                     <div class="form-group">
                         <label>Prix d'achat (€)</label>
                         <input type="number" name="prix_achat" step="0.01" value="<?= $produit['prix_achat'] ?? '' ?>" />
-                        <small style="color:rgba(255,255,255,0.3);">Prix que tu paies à CJ Dropshipping</small>
+                        <small>Prix que tu paies à CJ (produit + livraison)</small>
                     </div>
                     
                     <div class="form-group">
@@ -231,7 +279,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label>URL de l'image <span class="required">*</span></label>
                         <input type="text" name="image" required value="<?= htmlspecialchars($produit['image']) ?>" />
-                        <small>Chemin de l'image dans le dossier uploads/</small>
+                        <small>Image principale du produit</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Images multiples (JSON)</label>
+                        <textarea name="images" rows="3"><?= htmlspecialchars($produit['images'] ?? '') ?></textarea>
+                        <small>Format : ["url1.jpg", "url2.jpg", "url3.jpg"]</small>
                     </div>
                     
                     <div class="form-group">
