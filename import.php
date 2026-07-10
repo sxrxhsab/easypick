@@ -57,8 +57,12 @@ while (($ligne = fgetcsv($handle)) !== false) {
         $nom_complet = $nom;
     }
     
-    // ✅ DESCRIPTION COMPLÈTE AVEC SKU, ENTREPÔT, COULEUR, LIVRAISON
+    // ✅ DESCRIPTION AVEC SKU (pour l'affichage)
     $description = "SKU: $sku | Entrepôt: $entrepot | Couleur: $couleur | Livraison: " . number_format($frais_livraison, 2) . " €";
+    
+    // ✅ DESCRIPTION LONGUE (pour la page produit)
+    $description_longue = "Découvrez le $nom_complet, un produit de qualité sélectionné par EasyPick. " .
+                          "Parfait pour votre quotidien, alliant performance et fiabilité.";
     
     // Vérifier que le prix est valide
     if ($prix_base <= 0) {
@@ -73,15 +77,17 @@ while (($ligne = fgetcsv($handle)) !== false) {
         continue;
     }
     
-    // ✅ Insérer dans la base
+    // ✅ Insérer dans la base (avec sku et description_longue)
     try {
         $stmt = $pdo->prepare('INSERT INTO produits 
-            (nom, description, prix, prix_achat, stock, image, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, NOW())');
+            (nom, description, description_longue, sku, prix, prix_achat, stock, image, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())');
         
         $stmt->execute([
             $nom_complet,           // Nom du produit
-            $description,           // ✅ Description avec SKU
+            $description,           // Description courte (avec SKU)
+            $description_longue,    // ✅ Description longue (pour la page produit)
+            $sku,                   // ✅ SKU stocké séparément
             $prix_vente,            // Prix de vente
             $prix_achat,            // Prix d'achat (produit + livraison)
             $stock,                 // Stock
