@@ -48,11 +48,20 @@ $prix_achat = $produit['prix_achat'] ?? 0;
 $prix_vente = $produit['prix'] ?? 0;
 $frais_livraison = 0;
 
-// Si prix_achat > prix_vente, la différence est la livraison
 if ($prix_achat > $prix_vente) {
     $frais_livraison = $prix_achat - $prix_vente;
 }
 $prix_total = $prix_vente + $frais_livraison;
+
+// ✅ Extraire les caractéristiques de la description
+$caracteristiques = [];
+$desc = $produit['description_longue'] ?? $produit['description'] ?? '';
+preg_match_all('/• ([^:]+): ([^\n]+)/', $desc, $matches);
+if (!empty($matches[1])) {
+    foreach ($matches[1] as $i => $key) {
+        $caracteristiques[trim($key)] = trim($matches[2][$i] ?? '');
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -125,11 +134,8 @@ $prix_total = $prix_vente + $frais_livraison;
         .qty-selector button { width: 48px; height: 48px; background: transparent; border: none; color: #fff; font-size: 22px; font-weight: 300; cursor: pointer; transition: background 0.3s; }
         .qty-selector button:hover { background: rgba(255,106,0,0.12); }
         .qty-selector input { width: 50px; height: 48px; background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; font-family: 'Poppins', sans-serif; outline: none; }
-        .qty-selector input::-webkit-outer-spin-button, .qty-selector input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .qty-selector input[type="number"] { -moz-appearance: textfield; }
         .btn-add-cart { flex: 1; min-width: 180px; padding: 14px 30px; background: linear-gradient(135deg, #ff6a00, #ff7d1a); color: #fff; border: none; border-radius: 60px; font-weight: 700; font-size: 18px; cursor: pointer; transition: all 0.4s; box-shadow: 0 8px 30px rgba(255,106,0,0.15); font-family: 'Poppins', sans-serif; text-align: center; display: inline-block; }
         .btn-add-cart:hover { transform: scale(1.02); box-shadow: 0 12px 40px rgba(255,106,0,0.25); background: linear-gradient(135deg, #ff7d1a, #ff8c33); }
-        .btn-add-cart.added { background: #00b894; }
         .btn-buy-now { padding: 14px 35px; background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.15); border-radius: 60px; font-weight: 700; font-size: 18px; cursor: pointer; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
         .btn-buy-now:hover { background: rgba(255,255,255,0.04); color: #ff6a00; border-color: #ff6a00; transform: scale(1.02); }
         .product-extras { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 6px; }
@@ -148,11 +154,6 @@ $prix_total = $prix_vente + $frais_livraison;
         .tab-pane { display: none; animation: fadeIn 0.4s; }
         .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .tab-pane p { color: rgba(255,255,255,0.6); line-height: 1.8; font-size: 16px; }
-        .tab-pane ul { list-style: none; color: rgba(255,255,255,0.6); font-size: 16px; }
-        .tab-pane ul li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 12px; }
-        .tab-pane ul li strong { color: #fff; min-width: 130px; }
-        .tab-pane ul li:last-child { border-bottom: none; }
 
         .review-item { padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
         .review-item:last-child { border-bottom: none; }
@@ -162,6 +163,15 @@ $prix_total = $prix_vente + $frais_livraison;
         .review-item .review-header .review-date { color: rgba(255,255,255,0.2); font-size: 12px; margin-left: auto; }
         .review-item .review-stars { color: #ffb800; font-size: 14px; margin-bottom: 4px; }
         .review-item .review-text { color: rgba(255,255,255,0.5); font-size: 15px; line-height: 1.6; }
+
+        .specs-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .specs-table tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .specs-table tr:last-child { border-bottom: none; }
+        .specs-table td { padding: 12px 8px; font-size: 15px; }
+        .specs-table td:first-child { font-weight: 600; color: rgba(255,255,255,0.5); width: 40%; }
+        .specs-table td:last-child { color: rgba(255,255,255,0.8); }
+
+        .certification-badge { display: inline-block; padding: 4px 14px; border-radius: 30px; font-size: 12px; font-weight: 700; background: rgba(0,184,148,0.15); color: #00b894; margin-right: 8px; margin-bottom: 8px; }
 
         .related-products { padding: 40px 0 70px; background: #151515; border-top: 1px solid rgba(255,255,255,0.04); }
         .related-products .section-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; text-align: center; }
@@ -273,7 +283,6 @@ $prix_total = $prix_vente + $frais_livraison;
                         <span class="reviews-count"><?= number_format($produit['note'], 1, ',', ' ') ?>/5 – <a href="#reviews"><?= $produit['nb_avis'] ?> avis</a></span>
                     </div>
 
-                    <!-- PRIX -->
                     <div class="product-price">
                         <div>
                             <span class="current"><?= number_format($prix_total, 2, ',', ' ') ?> €</span>
@@ -289,7 +298,6 @@ $prix_total = $prix_vente + $frais_livraison;
                         <?php endif; ?>
                     </div>
 
-                    <!-- ACTIONS -->
                     <div class="product-actions">
                         <div class="qty-selector">
                             <button onclick="updateQty(-1)">−</button>
@@ -313,8 +321,8 @@ $prix_total = $prix_vente + $frais_livraison;
                     <div class="product-tabs">
                         <div class="tabs-nav">
                             <button class="active" data-tab="desc">Description</button>
-                            <button data-tab="specs">Caractéristiques</button>
-                            <button data-tab="reviews" id="reviews">Avis clients</button>
+                            <button data-tab="specs">Spécifications</button>
+                            <button data-tab="reviews" id="reviews">Avis clients (<?= count($avis) ?>)</button>
                         </div>
                         <div class="tab-content">
 
@@ -332,18 +340,36 @@ $prix_total = $prix_vente + $frais_livraison;
                                 }
                                 echo nl2br(htmlspecialchars($desc_tab));
                                 ?>
+                                
+                                <?php if (!empty($produit['sku'])): ?>
+                                <div style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
+                                    <span class="certification-badge"><i class="fas fa-check-circle"></i> Produit certifié</span>
+                                    <span class="certification-badge"><i class="fas fa-shield-alt"></i> Garantie 2 ans</span>
+                                    <span class="certification-badge"><i class="fas fa-truck"></i> Livraison offerte</span>
+                                </div>
+                                <?php endif; ?>
                             </div>
 
-                            <!-- CARACTÉRISTIQUES -->
+                            <!-- SPÉCIFICATIONS -->
                             <div class="tab-pane" id="tab-specs">
-                                <ul>
-                                    <li><strong>Référence</strong> EAS-<?= str_pad($produit['id'], 4, '0', STR_PAD_LEFT) ?></li>
-                                    <li><strong>SKU</strong> <?= htmlspecialchars($produit['sku'] ?? 'Non défini') ?></li>
-                                    <li><strong>Catégorie</strong> <?= $produit['categorie_id'] ?></li>
-                                    <li><strong>Stock</strong> <?= $produit['stock'] ?> unités</li>
-                                    <li><strong>Note</strong> <?= number_format($produit['note'], 1, ',', ' ') ?>/5</li>
-                                    <li><strong>Nombre d'avis</strong> <?= $produit['nb_avis'] ?></li>
-                                </ul>
+                                <table class="specs-table">
+                                    <tr><td>Référence</td><td>EAS-<?= str_pad($produit['id'], 4, '0', STR_PAD_LEFT) ?></td></tr>
+                                    <?php if (!empty($produit['sku'])): ?>
+                                    <tr><td>SKU</td><td><?= htmlspecialchars($produit['sku']) ?></td></tr>
+                                    <?php endif; ?>
+                                    <tr><td>Catégorie</td><td><?= $produit['categorie_id'] ?: 'Non définie' ?></td></tr>
+                                    <tr><td>Stock</td><td><?= $produit['stock'] ?> unités</td></tr>
+                                    <tr><td>Note</td><td><?= number_format($produit['note'], 1, ',', ' ') ?>/5</td></tr>
+                                    <tr><td>Nombre d'avis</td><td><?= $produit['nb_avis'] ?></td></tr>
+                                    <?php if (!empty($caracteristiques)): ?>
+                                        <?php foreach ($caracteristiques as $key => $value): ?>
+                                            <tr><td><?= htmlspecialchars($key) ?></td><td><?= htmlspecialchars($value) ?></td></tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                    <tr><td>Garantie</td><td>2 ans</td></tr>
+                                    <tr><td>Livraison</td><td>Offerte</td></tr>
+                                    <tr><td>Retours</td><td>30 jours</td></tr>
+                                </table>
                             </div>
 
                             <!-- AVIS -->
@@ -372,7 +398,6 @@ $prix_total = $prix_vente + $frais_livraison;
                                     <?php endforeach; ?>
                                 <?php endif; ?>
 
-                                <!-- Messages de succès/erreur -->
                                 <?php if (isset($_SESSION['succes_avis'])): ?>
                                     <div style="background:rgba(0,184,148,0.1); border:1px solid rgba(0,184,148,0.2); color:#00b894; padding:10px 14px; border-radius:10px; margin-bottom:16px; font-size:13px;">
                                         <?= htmlspecialchars($_SESSION['succes_avis']) ?>
@@ -417,7 +442,6 @@ $prix_total = $prix_vente + $frais_livraison;
                                         </button>
                                     </form>
                                 </div>
-
                             </div>
                         </div>
                     </div>
