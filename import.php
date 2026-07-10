@@ -68,12 +68,10 @@ while (($ligne = fgetcsv($handle)) !== false) {
     // ✅ DESCRIPTION COURTE (avec SKU)
     $description = "SKU: $sku | Entrepôt: $entrepot | Couleur: $couleur | Livraison: " . number_format($frais_livraison, 2) . " €";
     
-    // ✅ DESCRIPTION LONGUE (complète pour la page produit)
+    // ✅ DESCRIPTION LONGUE
     if (!empty($description_csv)) {
-        // Utiliser la description du CSV
         $description_longue = $description_csv;
     } else {
-        // Générer une description complète
         $description_longue = "🔹 " . $nom_complet . "\n\n";
         $description_longue .= "📦 **Caractéristiques techniques :**\n";
         $description_longue .= "• Référence : " . $sku . "\n";
@@ -93,46 +91,71 @@ while (($ligne = fgetcsv($handle)) !== false) {
     }
     
     // ============================================================
-    // ✅ RÉCUPÉRATION DES IMAGES MULTIPLES
+    // ✅ RÉCUPÉRATION AUTOMATIQUE DES IMAGES MULTIPLES
     // ============================================================
     $images = [];
     
-    // Image principale
+    // 1. Image principale
     if (!empty($image)) {
         $images[] = $image;
     }
     
-    // Images supplémentaires depuis le CSV (colonnes 7 à 10)
-    for ($i = 7; $i <= 10; $i++) {
-        $img = trim($ligne[$i] ?? '');
-        if (!empty($img) && $img != $image) {
-            $images[] = $img;
+    // 2. 🔥 RECHERCHER LES IMAGES DANS LE CSV (colonnes 7 à 15)
+    for ($i = 7; $i <= 15; $i++) {
+        if (isset($ligne[$i])) {
+            $img = trim($ligne[$i] ?? '');
+            // Vérifier si c'est une URL d'image
+            if (!empty($img) && filter_var($img, FILTER_VALIDATE_URL) && $img != $image) {
+                $images[] = $img;
+            }
         }
     }
     
-    // Si pas d'images supplémentaires, générer des variantes
-    if (count($images) == 1 && !empty($image)) {
-        $base = pathinfo($image, PATHINFO_FILENAME);
+    // 3. 🔥 GÉNÉRER AUTOMATIQUEMENT DES VARIANTES DE L'IMAGE
+    if (!empty($image)) {
         $ext = pathinfo($image, PATHINFO_EXTENSION);
-        for ($i = 2; $i <= 4; $i++) {
-            $images[] = str_replace($base, $base . '_' . $i, $image);
+        $base = pathinfo($image, PATHINFO_FILENAME);
+        
+        // Générer 6 variantes
+        $variantes = [
+            str_replace($base, $base . '_1', $image),
+            str_replace($base, $base . '_2', $image),
+            str_replace($base, $base . '_3', $image),
+            str_replace($base, $base . '_4', $image),
+            str_replace($base, $base . '_5', $image),
+            str_replace($base, $base . '_6', $image),
+        ];
+        
+        foreach ($variantes as $v) {
+            if (!in_array($v, $images) && $v != $image) {
+                $images[] = $v;
+            }
         }
     }
     
-    $images_json = json_encode($images);
+    // 4. 🔥 SI PAS ASSEZ D'IMAGES, AJOUTER DES IMAGES PAR DÉFAUT
+    if (count($images) < 3) {
+        // Utiliser le SKU ou l'ID pour générer des images uniques
+        $seed = !empty($sku) ? $sku : $nom;
+        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_1/600/400';
+        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_2/600/400';
+        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_3/600/400';
+        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_4/600/400';
+    }
+    
+    // Garder seulement les images uniques
+    $images = array_unique($images);
+    $images_json = json_encode(array_values($images));
     
     // ============================================================
     // ✅ VALIDATION
     // ============================================================
-    
-    // Vérifier que le prix est valide
     if ($prix_base <= 0) {
         $prix_base = 9.99;
         $prix_achat = $prix_base + $frais_livraison;
         $prix_vente = $prix_achat * 2.2;
     }
     
-    // Vérifier que le nom n'est pas vide
     if (empty($nom)) {
         $erreurs++;
         continue;
@@ -147,20 +170,20 @@ while (($ligne = fgetcsv($handle)) !== false) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())');
         
         $stmt->execute([
-            $nom_complet,           // Nom du produit
-            $description,           // Description courte (avec SKU)
-            $description_longue,    // ✅ Description longue
-            $sku,                   // ✅ SKU
-            $prix_vente,            // Prix de vente (avec marge)
-            $prix_achat,            // Prix d'achat (produit + livraison)
-            $stock,                 // Stock
-            $image,                 // Image principale
-            $images_json            // ✅ Images multiples (JSON)
+            $nom_complet,
+            $description,
+            $description_longue,
+            $sku,
+            $prix_vente,
+            $prix_achat,
+            $stock,
+            $image,
+            $images_json
         ]);
         
         $compteur++;
         
-        // Affichage du résultat
+        // Affichage
         echo "✅ Produit importé : <strong>$nom_complet</strong><br>";
         echo "&nbsp;&nbsp;&nbsp;📦 Prix base: " . number_format($prix_base, 2) . " € | ";
         echo "🚚 Livraison: " . number_format($frais_livraison, 2) . " € | ";
