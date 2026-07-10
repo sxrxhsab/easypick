@@ -290,7 +290,7 @@ $prix_total = $prix_vente + $frais_livraison;
                         <?php endif; ?>
                     </div>
 
-                    <!-- ✅ DESCRIPTION CORRIGÉE -->
+                    <!-- ✅ DESCRIPTION -->
                     <div class="product-short-desc">
                         <?php 
                         $desc = $produit['description_longue'] ?? '';
@@ -334,8 +334,20 @@ $prix_total = $prix_vente + $frais_livraison;
                         </div>
                         <div class="tab-content">
 
+                            <!-- ✅ ONGLET DESCRIPTION CORRIGÉ -->
                             <div class="tab-pane active" id="tab-desc">
-                                <p><?= nl2br(htmlspecialchars($produit['description'])) ?></p>
+                                <?php 
+                                $desc_tab = $produit['description_longue'] ?? '';
+                                if (empty($desc_tab)) {
+                                    $desc_tab = $produit['description'] ?? '';
+                                    $desc_tab = preg_replace('/SKU: [^\|]+\| Entrepôt: [^\|]+\| Couleur: [^\|]+\| Livraison: [0-9.,]+\s*€/', '', $desc_tab);
+                                    $desc_tab = trim($desc_tab);
+                                    if (empty($desc_tab)) {
+                                        $desc_tab = 'Aucune description disponible.';
+                                    }
+                                }
+                                echo nl2br(htmlspecialchars($desc_tab));
+                                ?>
                                 <p style="margin-top:15px;">Ce produit est soigneusement sélectionné par EasyPick pour vous garantir qualité et performance.</p>
                             </div>
 
