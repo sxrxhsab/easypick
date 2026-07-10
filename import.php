@@ -26,7 +26,9 @@ $compteur = 0;
 $erreurs = 0;
 
 while (($ligne = fgetcsv($handle)) !== false) {
+    // ============================================================
     // ✅ LECTURE DES COLONNES
+    // ============================================================
     $nom = trim($ligne[0] ?? 'Produit CJ');
     $image = trim($ligne[1] ?? '');
     $sku = trim($ligne[2] ?? '');
@@ -66,10 +68,12 @@ while (($ligne = fgetcsv($handle)) !== false) {
     // ✅ DESCRIPTION COURTE (avec SKU)
     $description = "SKU: $sku | Entrepôt: $entrepot | Couleur: $couleur | Livraison: " . number_format($frais_livraison, 2) . " €";
     
-    // ✅ DESCRIPTION LONGUE
+    // ✅ DESCRIPTION LONGUE (complète pour la page produit)
     if (!empty($description_csv)) {
+        // Utiliser la description du CSV
         $description_longue = $description_csv;
     } else {
+        // Générer une description complète
         $description_longue = "🔹 " . $nom_complet . "\n\n";
         $description_longue .= "📦 **Caractéristiques techniques :**\n";
         $description_longue .= "• Référence : " . $sku . "\n";
@@ -88,13 +92,17 @@ while (($ligne = fgetcsv($handle)) !== false) {
         $description_longue .= "• Garantie 2 ans";
     }
     
-    // ✅ Récupérer toutes les images
+    // ============================================================
+    // ✅ RÉCUPÉRATION DES IMAGES MULTIPLES
+    // ============================================================
     $images = [];
+    
+    // Image principale
     if (!empty($image)) {
         $images[] = $image;
     }
     
-    // Ajouter des images supplémentaires depuis le CSV (colonnes 7 à 10)
+    // Images supplémentaires depuis le CSV (colonnes 7 à 10)
     for ($i = 7; $i <= 10; $i++) {
         $img = trim($ligne[$i] ?? '');
         if (!empty($img) && $img != $image) {
@@ -113,6 +121,10 @@ while (($ligne = fgetcsv($handle)) !== false) {
     
     $images_json = json_encode($images);
     
+    // ============================================================
+    // ✅ VALIDATION
+    // ============================================================
+    
     // Vérifier que le prix est valide
     if ($prix_base <= 0) {
         $prix_base = 9.99;
@@ -126,26 +138,29 @@ while (($ligne = fgetcsv($handle)) !== false) {
         continue;
     }
     
-    // ✅ Insérer dans la base
+    // ============================================================
+    // ✅ INSERTION DANS LA BASE
+    // ============================================================
     try {
         $stmt = $pdo->prepare('INSERT INTO produits 
             (nom, description, description_longue, sku, prix, prix_achat, stock, image, images, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())');
         
         $stmt->execute([
-            $nom_complet,
-            $description,
-            $description_longue,
-            $sku,
-            $prix_vente,
-            $prix_achat,
-            $stock,
-            $image,
-            $images_json
+            $nom_complet,           // Nom du produit
+            $description,           // Description courte (avec SKU)
+            $description_longue,    // ✅ Description longue
+            $sku,                   // ✅ SKU
+            $prix_vente,            // Prix de vente (avec marge)
+            $prix_achat,            // Prix d'achat (produit + livraison)
+            $stock,                 // Stock
+            $image,                 // Image principale
+            $images_json            // ✅ Images multiples (JSON)
         ]);
         
         $compteur++;
         
+        // Affichage du résultat
         echo "✅ Produit importé : <strong>$nom_complet</strong><br>";
         echo "&nbsp;&nbsp;&nbsp;📦 Prix base: " . number_format($prix_base, 2) . " € | ";
         echo "🚚 Livraison: " . number_format($frais_livraison, 2) . " € | ";
