@@ -62,6 +62,17 @@ if (!empty($matches[1])) {
         $caracteristiques[trim($key)] = trim($matches[2][$i] ?? '');
     }
 }
+
+// ✅ Décoder les images
+$images = !empty($produit['images']) ? json_decode($produit['images'], true) : [];
+if (!is_array($images)) {
+    $images = [];
+}
+// Ajouter l'image principale si elle n'est pas dans le tableau
+if (!empty($produit['image']) && !in_array($produit['image'], $images)) {
+    array_unshift($images, $produit['image']);
+}
+$images = array_unique($images);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -247,24 +258,21 @@ if (!empty($matches[1])) {
         <div class="container">
             <div class="product-layout">
 
-                <!-- Galerie -->
+                <!-- ===== GALERIE ===== -->
                 <div class="product-gallery">
                     <div class="main-image">
-                        <img id="mainImage" src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
+                        <img id="mainImage" src="<?= htmlspecialchars($images[0] ?? $produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>" alt="<?= htmlspecialchars($produit['nom']) ?>" />
                     </div>
                     <div class="thumbnails">
-                        <img src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>" alt="Vue principale" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>')" />
-                        <?php 
-                        $images = !empty($produit['images']) ? json_decode($produit['images'], true) : [];
-                        if ($images && is_array($images)):
-                            foreach ($images as $img): 
-                        ?>
-                            <img src="<?= htmlspecialchars($img) ?>" alt="Vue supplémentaire" onclick="changeImage(this, '<?= htmlspecialchars($img) ?>')" />
-                        <?php endforeach; endif; ?>
+                        <?php foreach ($images as $index => $img): ?>
+                            <?php if (!empty($img)): ?>
+                                <img src="<?= htmlspecialchars($img) ?>" alt="Vue <?= $index+1 ?>" class="<?= $index === 0 ? 'active' : '' ?>" onclick="changeImage(this, '<?= htmlspecialchars($img) ?>')" />
+                            <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
-                <!-- Infos -->
+                <!-- ===== INFOS ===== -->
                 <div class="product-info">
                     <h1 class="product-name"><?= htmlspecialchars($produit['nom']) ?></h1>
                     <div class="product-ref">Référence : EAS-<?= str_pad($produit['id'], 4, '0', STR_PAD_LEFT) ?></div>
@@ -317,7 +325,7 @@ if (!empty($matches[1])) {
                         <span class="extra-item"><i class="fas fa-check-circle in-stock"></i> En stock (<?= $produit['stock'] ?> unités)</span>
                     </div>
 
-                    <!-- ONGLETS -->
+                    <!-- ===== ONGLETS ===== -->
                     <div class="product-tabs">
                         <div class="tabs-nav">
                             <button class="active" data-tab="desc">Description</button>
