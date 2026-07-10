@@ -234,7 +234,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                     <div class="thumbnails">
                         <img src="<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>" alt="Vue principale" class="active" onclick="changeImage(this, '<?= htmlspecialchars($produit['image'] ?? 'https://picsum.photos/seed/' . $produit['id'] . '/600/400') ?>')" />
                         <?php 
-                        $images = json_decode($produit['images'], true);
+                        $images = !empty($produit['images']) ? json_decode($produit['images'], true) : [];
                         if ($images && is_array($images)):
                             foreach ($images as $img): 
                         ?>
