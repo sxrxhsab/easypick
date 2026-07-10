@@ -88,6 +88,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         .badge.top { background: rgba(253,203,110,0.15); color: #fdcb6e; }
         .stock-low { color: #ffc107; font-weight: 700; }
         .stock-out { color: #ff4444; font-weight: 700; }
+        .images-count { color: #ff6a00; font-size: 12px; }
 
         @media (max-width: 768px) {
             .navbar-simple { height: 60px; padding: 0 16px; }
@@ -157,6 +158,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                             <th>Prix achat</th>
                             <th>Marge</th>
                             <th>Stock</th>
+                            <th>Images</th>
                             <th>Badges</th>
                             <th>Actions</th>
                         </tr>
@@ -197,6 +199,19 @@ $user_role = $_SESSION['user_role'] ?? '';
                                 <?php else: ?>
                                     <?= $p['stock'] ?>
                                 <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php 
+                                $images = !empty($p['images']) ? json_decode($p['images'], true) : [];
+                                $count = count($images);
+                                ?>
+                                <span class="images-count">
+                                    <?php if ($count > 0): ?>
+                                        <i class="fas fa-images"></i> <?= $count ?>
+                                    <?php else: ?>
+                                        <span style="color:rgba(255,255,255,0.2);">-</span>
+                                    <?php endif; ?>
+                                </span>
                             </td>
                             <td>
                                 <?php if ($p['est_promo']): ?><span class="badge promo">Promo</span> <?php endif; ?>
