@@ -327,9 +327,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             </ul>
             <div class="nav-icons">
                 <a href="#"><i class="fas fa-search"></i></a>
-                <a href="wishlist.php" aria-label="Wishlist" style="color:#ff6a00;">
-    <i class="fas fa-heart"></i>
-</a>
+                <a href="wishlist.php" style="color:#ff6a00;"><i class="fas fa-heart"></i></a>
                 <?php if ($user_connecte): ?>
                     <a href="mon-compte.php"><i class="fas fa-user"></i></a>
                 <?php else: ?>
@@ -361,6 +359,18 @@ $user_role = $_SESSION['user_role'] ?? '';
                 </div>
             </div>
             <div class="hero-visual"><div class="glow-circle"></div></div>
+        </div>
+    </section>
+
+    <!-- ===== BARRE DE RECHERCHE ===== -->
+    <section style="padding: 30px 0 40px; background: #0d0d0d; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <div class="container">
+            <form action="boutique.php" method="GET" style="display:flex; gap:12px; max-width:600px; margin:0 auto;">
+                <input type="text" name="search" placeholder="Rechercher un produit..." style="flex:1; padding:14px 20px; background:#1A1A1A; border:1px solid rgba(255,255,255,0.06); border-radius:60px; color:#fff; font-size:16px; font-family:'Poppins', sans-serif; outline:none; transition:border-color 0.3s;" />
+                <button type="submit" style="padding:14px 30px; background:linear-gradient(135deg, #ff6a00, #ff7d1a); color:#fff; border:none; border-radius:60px; font-weight:700; font-size:16px; cursor:pointer; transition:all 0.3s; font-family:'Poppins', sans-serif;">
+                    <i class="fas fa-search"></i> Rechercher
+                </button>
+            </form>
         </div>
     </section>
 
