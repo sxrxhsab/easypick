@@ -91,60 +91,35 @@ while (($ligne = fgetcsv($handle)) !== false) {
     }
     
     // ============================================================
-    // ✅ RÉCUPÉRATION AUTOMATIQUE DES IMAGES MULTIPLES
+    // ✅ RÉCUPÉRATION DES IMAGES (VERSION QUI FONCTIONNE)
     // ============================================================
     $images = [];
     
-    // 1. Image principale
-    if (!empty($image)) {
+    // 1. Image principale depuis le CSV
+    if (!empty($image) && filter_var($image, FILTER_VALIDATE_URL)) {
         $images[] = $image;
     }
     
-    // 2. 🔥 RECHERCHER LES IMAGES DANS LE CSV (colonnes 7 à 15)
+    // 2. 🔥 IMAGES SUPPLÉMENTAIRES DEPUIS Picsum (TOUJOURS DISPONIBLES)
+    // Utiliser le SKU ou l'ID pour générer des images uniques
+    $seed = !empty($sku) ? $sku : 'product_' . $nom;
+    for ($i = 1; $i <= 4; $i++) {
+        $images[] = 'https://picsum.photos/seed/' . md5($seed . '_' . $i) . '/600/400';
+    }
+    
+    // 3. 🔥 ESSAYER DE RÉCUPÉRER D'AUTRES IMAGES DU CSV
     for ($i = 7; $i <= 15; $i++) {
         if (isset($ligne[$i])) {
             $img = trim($ligne[$i] ?? '');
-            // Vérifier si c'est une URL d'image
             if (!empty($img) && filter_var($img, FILTER_VALIDATE_URL) && $img != $image) {
                 $images[] = $img;
             }
         }
     }
     
-    // 3. 🔥 GÉNÉRER AUTOMATIQUEMENT DES VARIANTES DE L'IMAGE
-    if (!empty($image)) {
-        $ext = pathinfo($image, PATHINFO_EXTENSION);
-        $base = pathinfo($image, PATHINFO_FILENAME);
-        
-        // Générer 6 variantes
-        $variantes = [
-            str_replace($base, $base . '_1', $image),
-            str_replace($base, $base . '_2', $image),
-            str_replace($base, $base . '_3', $image),
-            str_replace($base, $base . '_4', $image),
-            str_replace($base, $base . '_5', $image),
-            str_replace($base, $base . '_6', $image),
-        ];
-        
-        foreach ($variantes as $v) {
-            if (!in_array($v, $images) && $v != $image) {
-                $images[] = $v;
-            }
-        }
-    }
-    
-    // 4. 🔥 SI PAS ASSEZ D'IMAGES, AJOUTER DES IMAGES PAR DÉFAUT
-    if (count($images) < 3) {
-        // Utiliser le SKU ou l'ID pour générer des images uniques
-        $seed = !empty($sku) ? $sku : $nom;
-        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_1/600/400';
-        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_2/600/400';
-        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_3/600/400';
-        $images[] = 'https://picsum.photos/seed/' . md5($seed) . '_4/600/400';
-    }
-    
-    // Garder seulement les images uniques
+    // Garder seulement les images uniques (max 6)
     $images = array_unique($images);
+    $images = array_slice($images, 0, 6);
     $images_json = json_encode(array_values($images));
     
     // ============================================================
@@ -170,20 +145,20 @@ while (($ligne = fgetcsv($handle)) !== false) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())');
         
         $stmt->execute([
-            $nom_complet,
-            $description,
-            $description_longue,
-            $sku,
-            $prix_vente,
-            $prix_achat,
-            $stock,
-            $image,
-            $images_json
+            $nom_complet,           // Nom du produit
+            $description,           // Description courte
+            $description_longue,    // Description longue
+            $sku,                   // SKU
+            $prix_vente,            // Prix de vente
+            $prix_achat,            // Prix d'achat
+            $stock,                 // Stock
+            $image,                 // Image principale
+            $images_json            // Images multiples
         ]);
         
         $compteur++;
         
-        // Affichage
+        // Affichage du résultat
         echo "✅ Produit importé : <strong>$nom_complet</strong><br>";
         echo "&nbsp;&nbsp;&nbsp;📦 Prix base: " . number_format($prix_base, 2) . " € | ";
         echo "🚚 Livraison: " . number_format($frais_livraison, 2) . " € | ";
