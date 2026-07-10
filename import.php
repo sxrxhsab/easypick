@@ -37,7 +37,7 @@ while (($ligne = fgetcsv($handle)) !== false) {
     $frais_livraison = (float) ($ligne[15] ?? 0);
     $stock = (int) ($ligne[5] ?? 10);
     
-    // ✅ Récupérer la description depuis le CSV (colonne 6 ou 1)
+    // ✅ Récupérer la description depuis le CSV (colonne 6)
     $description_csv = trim($ligne[6] ?? '');
     if (empty($description_csv)) {
         $description_csv = trim($ligne[1] ?? '');
@@ -47,7 +47,7 @@ while (($ligne = fgetcsv($handle)) !== false) {
     // ✅ CALCUL DES PRIX
     // ============================================================
     $prix_achat = $prix_base + $frais_livraison;
-    $prix_vente = $prix_achat * 2.2; // Marge de 120% (tu peux ajuster)
+    $prix_vente = $prix_achat * 2.2; // Marge de 120%
     
     $prix_achat = round($prix_achat, 2);
     $prix_vente = round($prix_vente, 2);
@@ -66,17 +66,15 @@ while (($ligne = fgetcsv($handle)) !== false) {
     // ✅ DESCRIPTION COURTE (avec SKU)
     $description = "SKU: $sku | Entrepôt: $entrepot | Couleur: $couleur | Livraison: " . number_format($frais_livraison, 2) . " €";
     
-    // ✅ DESCRIPTION LONGUE (complète pour la page produit)
+    // ✅ DESCRIPTION LONGUE
     if (!empty($description_csv)) {
-        // Utiliser la description du CSV
         $description_longue = $description_csv;
     } else {
-        // Générer une description complète
-        $description_longue = "🔹 $nom_complet\n\n";
+        $description_longue = "🔹 " . $nom_complet . "\n\n";
         $description_longue .= "📦 **Caractéristiques techniques :**\n";
-        $description_longue .= "• Référence : $sku\n";
-        $description_longue .= "• Entrepôt : $entrepot\n";
-        $description_longue .= "• Couleur : $couleur\n";
+        $description_longue .= "• Référence : " . $sku . "\n";
+        $description_longue .= "• Entrepôt : " . $entrepot . "\n";
+        $description_longue .= "• Couleur : " . $couleur . "\n";
         $description_longue .= "• Prix base : " . number_format($prix_base, 2) . " €\n";
         $description_longue .= "• Frais de livraison : " . number_format($frais_livraison, 2) . " €\n\n";
         $description_longue .= "✅ **Description :**\n";
@@ -89,6 +87,31 @@ while (($ligne = fgetcsv($handle)) !== false) {
         $description_longue .= "• Retours sous 30 jours\n";
         $description_longue .= "• Garantie 2 ans";
     }
+    
+    // ✅ Récupérer toutes les images
+    $images = [];
+    if (!empty($image)) {
+        $images[] = $image;
+    }
+    
+    // Ajouter des images supplémentaires depuis le CSV (colonnes 7 à 10)
+    for ($i = 7; $i <= 10; $i++) {
+        $img = trim($ligne[$i] ?? '');
+        if (!empty($img) && $img != $image) {
+            $images[] = $img;
+        }
+    }
+    
+    // Si pas d'images supplémentaires, générer des variantes
+    if (count($images) == 1 && !empty($image)) {
+        $base = pathinfo($image, PATHINFO_FILENAME);
+        $ext = pathinfo($image, PATHINFO_EXTENSION);
+        for ($i = 2; $i <= 4; $i++) {
+            $images[] = str_replace($base, $base . '_' . $i, $image);
+        }
+    }
+    
+    $images_json = json_encode($images);
     
     // Vérifier que le prix est valide
     if ($prix_base <= 0) {
@@ -106,29 +129,29 @@ while (($ligne = fgetcsv($handle)) !== false) {
     // ✅ Insérer dans la base
     try {
         $stmt = $pdo->prepare('INSERT INTO produits 
-            (nom, description, description_longue, sku, prix, prix_achat, stock, image, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())');
+            (nom, description, description_longue, sku, prix, prix_achat, stock, image, images, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())');
         
         $stmt->execute([
-            $nom_complet,           // Nom du produit
-            $description,           // Description courte (avec SKU)
-            $description_longue,    // ✅ Description longue
-            $sku,                   // ✅ SKU
-            $prix_vente,            // Prix de vente (avec marge)
-            $prix_achat,            // Prix d'achat (produit + livraison)
-            $stock,                 // Stock
-            $image                  // Image
+            $nom_complet,
+            $description,
+            $description_longue,
+            $sku,
+            $prix_vente,
+            $prix_achat,
+            $stock,
+            $image,
+            $images_json
         ]);
         
         $compteur++;
         
-        // Affichage du résultat
         echo "✅ Produit importé : <strong>$nom_complet</strong><br>";
         echo "&nbsp;&nbsp;&nbsp;📦 Prix base: " . number_format($prix_base, 2) . " € | ";
         echo "🚚 Livraison: " . number_format($frais_livraison, 2) . " € | ";
         echo "💰 Prix achat: " . number_format($prix_achat, 2) . " € | ";
         echo "💲 Prix vente: " . number_format($prix_vente, 2) . " €<br>";
-        echo "&nbsp;&nbsp;&nbsp;🔑 SKU: <strong>$sku</strong> | 📍 Entrepôt: $entrepot<br><br>";
+        echo "&nbsp;&nbsp;&nbsp;🔑 SKU: <strong>$sku</strong> | 📍 Entrepôt: $entrepot | 🖼️ " . count($images) . " images<br><br>";
         
     } catch (PDOException $e) {
         $erreurs++;

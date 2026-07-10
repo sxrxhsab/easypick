@@ -120,7 +120,6 @@ $prix_total = $prix_vente + $frais_livraison;
         .product-info .product-price .old { font-size: 20px; color: rgba(255,255,255,0.2); text-decoration: line-through; }
         .product-info .product-price .discount { background: rgba(255,106,0,0.15); color: #ff6a00; padding: 4px 14px; border-radius: 30px; font-size: 13px; font-weight: 700; }
         .product-info .product-price .shipping-fee { font-size: 14px; color: rgba(255,255,255,0.3); }
-        .product-info .product-short-desc { color: rgba(255,255,255,0.6); font-size: 16px; line-height: 1.7; margin-bottom: 25px; border-left: 3px solid #ff6a00; padding-left: 16px; }
         .product-actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 25px; }
         .qty-selector { display: flex; align-items: center; background: #1A1A1A; border-radius: 60px; border: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
         .qty-selector button { width: 48px; height: 48px; background: transparent; border: none; color: #fff; font-size: 22px; font-weight: 300; cursor: pointer; transition: background 0.3s; }
@@ -274,7 +273,7 @@ $prix_total = $prix_vente + $frais_livraison;
                         <span class="reviews-count"><?= number_format($produit['note'], 1, ',', ' ') ?>/5 – <a href="#reviews"><?= $produit['nb_avis'] ?> avis</a></span>
                     </div>
 
-                    <!-- ✅ PRIX AVEC FRAIS DE LIVRAISON -->
+                    <!-- PRIX -->
                     <div class="product-price">
                         <div>
                             <span class="current"><?= number_format($prix_total, 2, ',', ' ') ?> €</span>
@@ -290,22 +289,7 @@ $prix_total = $prix_vente + $frais_livraison;
                         <?php endif; ?>
                     </div>
 
-                    <!-- ✅ DESCRIPTION -->
-                    <div class="product-short-desc">
-                        <?php 
-                        $desc = $produit['description_longue'] ?? '';
-                        if (empty($desc)) {
-                            $desc = $produit['description'] ?? '';
-                            $desc = preg_replace('/SKU: [^\|]+\| Entrepôt: [^\|]+\| Couleur: [^\|]+\| Livraison: [0-9.,]+\s*€/', '', $desc);
-                            $desc = trim($desc);
-                            if (empty($desc)) {
-                                $desc = 'Aucune description disponible.';
-                            }
-                        }
-                        echo nl2br(htmlspecialchars($desc));
-                        ?>
-                    </div>
-
+                    <!-- ACTIONS -->
                     <div class="product-actions">
                         <div class="qty-selector">
                             <button onclick="updateQty(-1)">−</button>
@@ -325,7 +309,7 @@ $prix_total = $prix_vente + $frais_livraison;
                         <span class="extra-item"><i class="fas fa-check-circle in-stock"></i> En stock (<?= $produit['stock'] ?> unités)</span>
                     </div>
 
-                    <!-- Onglets -->
+                    <!-- ONGLETS -->
                     <div class="product-tabs">
                         <div class="tabs-nav">
                             <button class="active" data-tab="desc">Description</button>
@@ -334,7 +318,7 @@ $prix_total = $prix_vente + $frais_livraison;
                         </div>
                         <div class="tab-content">
 
-                            <!-- ✅ ONGLET DESCRIPTION CORRIGÉ -->
+                            <!-- DESCRIPTION -->
                             <div class="tab-pane active" id="tab-desc">
                                 <?php 
                                 $desc_tab = $produit['description_longue'] ?? '';
@@ -348,9 +332,9 @@ $prix_total = $prix_vente + $frais_livraison;
                                 }
                                 echo nl2br(htmlspecialchars($desc_tab));
                                 ?>
-                                <p style="margin-top:15px;">Ce produit est soigneusement sélectionné par EasyPick pour vous garantir qualité et performance.</p>
                             </div>
 
+                            <!-- CARACTÉRISTIQUES -->
                             <div class="tab-pane" id="tab-specs">
                                 <ul>
                                     <li><strong>Référence</strong> EAS-<?= str_pad($produit['id'], 4, '0', STR_PAD_LEFT) ?></li>
@@ -362,7 +346,7 @@ $prix_total = $prix_vente + $frais_livraison;
                                 </ul>
                             </div>
 
-                            <!-- SECTION AVIS -->
+                            <!-- AVIS -->
                             <div class="tab-pane" id="tab-reviews">
                                 <?php if (empty($avis)): ?>
                                     <p style="color:rgba(255,255,255,0.4);">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
