@@ -470,7 +470,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                 </div>
                 <!-- Claviers & Souris -->
                 <div class="category-card">
-                    <img src="https://images.unsplash.com/photo-1618384887929-16ec33abef8a?w=600&h=400&fit=crop&crop=center" alt="Clavier mécanique et souris" />
+                    <img src="https://i.pinimg.com/736x/24/1f/a0/241fa0e5e2e32892ed99847c7084eed7.jpg" alt="Clavier mécanique et souris" />
                     <div class="cat-content">
                         <h3>Claviers & Souris</h3>
                         <a href="boutique.php" class="btn-cat">Découvrir</a>
