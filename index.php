@@ -379,7 +379,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <img src="logoeasy.png" alt="EasyPick Logo" />
                 <div class="logo-text">
                     <span class="brand"><span class="easy">EASY</span><span class="pick">PICK</span></span>
-                    <span class="sub">By Samy Sabeur</span>
+                    <span class="sub">By CEO</span>
                 </div>
             </div>
             <ul class="nav-menu" id="navMenu">
@@ -437,14 +437,14 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <div class="story-text">
                     <span class="badge">Notre histoire</span>
                     <h2>Une passion pour la tech, <br />une mission : <span>simplifier vos choix</span>.</h2>
-                    <p>Fondée en <strong>2025</strong> par <strong>Samy Sabeur</strong>, EasyPick est bien plus qu'une simple boutique en ligne.</p>
+                    <p>Fondée en <strong>2025</strong> par <strong>CEO</strong>, EasyPick est bien plus qu'une simple boutique en ligne.</p>
                     <div class="signature">— <span>EasyPick</span>, votre guide tech depuis 2025.</div>
                 </div>
                 <div class="story-visual">
                     <div class="year-badge">2025</div>
                     <div class="founder-card">
                         <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
-                        <h4>Samy Sabeur</h4>
+                        <h4>CEO</h4>
                         <div class="title">Fondateur & CEO</div>
                         <div class="divider"></div>
                         <div class="quote"><i class="fas fa-quote-left"></i> Rendre la tech accessible et désirable, c'est notre ADN. <i class="fas fa-quote-right"></i></div>
@@ -587,7 +587,7 @@ $user_role = $_SESSION['user_role'] ?? '';
                 <div class="footer-col"><h4>Légal</h4><ul><li><a href="cgv.php">CGV</a></li><li><a href="confidentialite.php">Politique de confidentialité</a></li><li><a href="cookies.php">Cookies</a></li><li><a href="mentions-legales.php">Mentions légales</a></li></ul></div>
                 <div class="footer-col"><h4>Suivez-nous</h4><div class="footer-social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div><div class="footer-payments"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div></div>
             </div>
-            <div class="footer-bottom">&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Samy Sabeur</a>.</div>
+            <div class="footer-bottom">&copy; 2026 EasyPick – Tous droits réservés. Design par <a href="#">Sarah Sabeur</a>.</div>
         </div>
     </footer>
 
